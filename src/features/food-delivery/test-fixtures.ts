@@ -1,0 +1,63 @@
+import type { Binding, Connection, DeliveryOrder } from './delivery.types'
+
+export const orderFixture: DeliveryOrder = {
+  id: 'order-1',
+  outletId: 'outlet-1',
+  bindingId: 'binding-1',
+  provider: 'GRABFOOD',
+  externalId: 'provider-1',
+  displayId: 'GF-123',
+  orderType: 'delivery',
+  state: 'ACCEPTED',
+  providerState: 'ACCEPTED',
+  processingState: 'OK',
+  version: 1,
+  currency: 'IDR',
+  total: '15000.00',
+  scheduledAt: null,
+  preparedAt: null,
+  updatedAt: '2026-10-02T10:00:00.000Z',
+  transactionId: null,
+  inventoryHandledExternally: false,
+  financialError: null,
+  capabilities: {
+    manualAcceptance: false,
+    writesEnabled: true,
+    inventoryEnabled: true,
+  },
+  items: [
+    {
+      id: 'item-1',
+      name: 'Kopi susu',
+      quantity: 1,
+      unitPrice: '15000.00',
+      options: [],
+    },
+  ],
+}
+export const connectionFixture: Connection = {
+  id: 'connection-1',
+  provider: 'GRABFOOD',
+  environment: 'SANDBOX',
+  accountId: 'cafe',
+  enabled: true,
+  writesEnabled: true,
+}
+export const bindingFixture: Binding = {
+  id: 'binding-1',
+  connectionId: 'connection-1',
+  outletId: 'outlet-1',
+  externalOutletId: 'merchant-1',
+  provider: 'GRABFOOD',
+  enabled: false,
+  inventoryEnabled: false,
+  salesEnabled: false,
+  manualAcceptance: false,
+  preparationLeadMinutes: 30,
+  integrationStatus: null,
+  menuSyncStatus: null,
+  menuVersion: 1,
+  menu: { categories: [] },
+  importedMenu: null,
+  reconciledAt: null,
+}
