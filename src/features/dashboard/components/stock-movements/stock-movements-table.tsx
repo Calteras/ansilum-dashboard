@@ -1,10 +1,4 @@
 import * as React from 'react'
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from '@/components/icons'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -23,6 +17,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from '@/components/icons'
 
 export interface StockMovement {
   id: string
@@ -134,14 +134,14 @@ export function StockMovementsTable({
   }
 
   return (
-    <div className='overflow-hidden rounded-xl border bg-card'>
+    <div className='bg-card overflow-hidden rounded-xl border'>
       {/* Toolbar */}
       <div className='flex flex-col gap-3 border-b px-4 py-3.5 sm:flex-row sm:items-center sm:gap-4 sm:px-6'>
         <div className='flex flex-1 items-center gap-3'>
-          <p className='text-xs font-semibold tracking-wide text-foreground uppercase'>
+          <p className='text-foreground text-xs font-semibold tracking-wide uppercase'>
             {t('dashboard.stockTable.title')}
           </p>
-          <span className='rounded bg-primary/10 px-1.5 py-0.5 font-sans tabular-nums text-xs text-primary'>
+          <span className='bg-primary/10 text-primary rounded px-1.5 py-0.5 font-sans text-xs tabular-nums'>
             {filteredMovements.length}
           </span>
         </div>
@@ -163,31 +163,31 @@ export function StockMovementsTable({
         <Table>
           <TableHeader>
             <TableRow className='border-b hover:bg-transparent'>
-              <TableHead className='w-[40px] px-4 py-2.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase sm:px-6'>
+              <TableHead className='text-muted-foreground w-[40px] px-4 py-2.5 text-xs font-semibold tracking-wide uppercase sm:px-6'>
                 {t('dashboard.stockTable.colNo')}
               </TableHead>
-              <TableHead className='min-w-[140px] px-2 py-2.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+              <TableHead className='text-muted-foreground min-w-[140px] px-2 py-2.5 text-xs font-semibold tracking-wide uppercase'>
                 {t('dashboard.stockTable.colDate')}
               </TableHead>
-              <TableHead className='min-w-[140px] px-2 py-2.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+              <TableHead className='text-muted-foreground min-w-[140px] px-2 py-2.5 text-xs font-semibold tracking-wide uppercase'>
                 {t('dashboard.stockTable.colIngredient')}
               </TableHead>
-              <TableHead className='min-w-[80px] px-2 py-2.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+              <TableHead className='text-muted-foreground min-w-[80px] px-2 py-2.5 text-xs font-semibold tracking-wide uppercase'>
                 {t('dashboard.stockTable.colType')}
               </TableHead>
-              <TableHead className='min-w-[90px] px-2 py-2.5 text-right text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+              <TableHead className='text-muted-foreground min-w-[90px] px-2 py-2.5 text-right text-xs font-semibold tracking-wide uppercase'>
                 {t('dashboard.stockTable.colQty')}
               </TableHead>
-              <TableHead className='hidden min-w-[90px] px-2 py-2.5 text-right text-xs font-semibold tracking-wide text-muted-foreground uppercase md:table-cell'>
+              <TableHead className='text-muted-foreground hidden min-w-[90px] px-2 py-2.5 text-right text-xs font-semibold tracking-wide uppercase md:table-cell'>
                 {t('dashboard.stockTable.colCostPerUnit')}
               </TableHead>
-              <TableHead className='min-w-[110px] px-2 py-2.5 text-right text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+              <TableHead className='text-muted-foreground min-w-[110px] px-2 py-2.5 text-right text-xs font-semibold tracking-wide uppercase'>
                 {t('dashboard.stockTable.colTotalCost')}
               </TableHead>
-              <TableHead className='hidden min-w-[120px] px-2 py-2.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase lg:table-cell'>
+              <TableHead className='text-muted-foreground hidden min-w-[120px] px-2 py-2.5 text-xs font-semibold tracking-wide uppercase lg:table-cell'>
                 {t('dashboard.stockTable.colEmployee')}
               </TableHead>
-              <TableHead className='hidden min-w-[200px] px-4 py-2.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase sm:px-6 xl:table-cell'>
+              <TableHead className='text-muted-foreground hidden min-w-[200px] px-4 py-2.5 text-xs font-semibold tracking-wide uppercase sm:px-6 xl:table-cell'>
                 {t('dashboard.stockTable.colNotes')}
               </TableHead>
             </TableRow>
@@ -197,7 +197,7 @@ export function StockMovementsTable({
               <TableRow>
                 <TableCell
                   colSpan={9}
-                  className='h-32 text-center font-sans tabular-nums text-xs text-muted-foreground'
+                  className='text-muted-foreground h-32 text-center font-sans text-xs tabular-nums'
                 >
                   {t('dashboard.stockTable.loading')}
                 </TableCell>
@@ -206,7 +206,7 @@ export function StockMovementsTable({
               <TableRow>
                 <TableCell
                   colSpan={9}
-                  className='h-32 text-center font-sans tabular-nums text-xs text-muted-foreground'
+                  className='text-muted-foreground h-32 text-center font-sans text-xs tabular-nums'
                 >
                   {t('dashboard.stockTable.noResults')}
                 </TableCell>
@@ -215,7 +215,7 @@ export function StockMovementsTable({
               paginatedMovements.map((movement, index) => {
                 const typeCfg = TYPE_CONFIG[movement.movementType]
                 const typeLabel = typeCfg
-                  ? t(typeCfg.labelKey as any) as string
+                  ? (t(typeCfg.labelKey as any) as string)
                   : movement.movementType
                 const typeDot = typeCfg?.dot ?? 'bg-muted-foreground'
                 const typeText = typeCfg?.text ?? 'text-muted-foreground'
@@ -224,12 +224,12 @@ export function StockMovementsTable({
                 return (
                   <TableRow
                     key={movement.id}
-                    className='group border-b last:border-0 hover:bg-muted/20'
+                    className='group hover:bg-muted/20 border-b last:border-0'
                   >
-                    <TableCell className='px-4 py-3 font-sans tabular-nums text-xs text-muted-foreground sm:px-6'>
+                    <TableCell className='text-muted-foreground px-4 py-3 font-sans text-xs tabular-nums sm:px-6'>
                       {(currentPage - 1) * pageSize + index + 1}
                     </TableCell>
-                    <TableCell className='px-2 py-3 font-sans tabular-nums text-xs text-muted-foreground'>
+                    <TableCell className='text-muted-foreground px-2 py-3 font-sans text-xs tabular-nums'>
                       {formatDate(movement.movementDate)}
                     </TableCell>
                     <TableCell className='px-2 py-3'>
@@ -237,7 +237,7 @@ export function StockMovementsTable({
                         <span className='block truncate text-xs font-medium'>
                           {movement.ingredient.name}
                         </span>
-                        <span className='font-sans tabular-nums text-xs text-muted-foreground'>
+                        <span className='text-muted-foreground font-sans text-xs tabular-nums'>
                           {movement.ingredient.code}
                         </span>
                       </div>
@@ -247,34 +247,32 @@ export function StockMovementsTable({
                         <span
                           className={`inline-block h-1.5 w-1.5 rounded-full ${typeDot}`}
                         />
-                        <span
-                          className={`text-xs font-medium ${typeText}`}
-                        >
+                        <span className={`text-xs font-medium ${typeText}`}>
                           {typeLabel}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className='px-2 py-3 text-right font-sans tabular-nums text-xs tabular-nums'>
+                    <TableCell className='px-2 py-3 text-right font-sans text-xs tabular-nums'>
                       <span
                         className={
                           qty < 0
                             ? 'text-rose-600 dark:text-rose-400'
-                            : 'text-leaf '
+                            : 'text-leaf'
                         }
                       >
                         {qty.toLocaleString()} {movement.unit}
                       </span>
                     </TableCell>
-                    <TableCell className='hidden px-2 py-3 text-right font-sans tabular-nums text-xs tabular-nums text-muted-foreground md:table-cell'>
+                    <TableCell className='text-muted-foreground hidden px-2 py-3 text-right font-sans text-xs tabular-nums md:table-cell'>
                       Rp{Number(movement.costPerUnit).toLocaleString()}
                     </TableCell>
-                    <TableCell className='px-2 py-3 text-right font-sans tabular-nums text-xs font-medium tabular-nums'>
+                    <TableCell className='px-2 py-3 text-right font-sans text-xs font-medium tabular-nums'>
                       Rp{Number(movement.totalCost).toLocaleString()}
                     </TableCell>
-                    <TableCell className='hidden px-2 py-3 text-xs text-muted-foreground lg:table-cell'>
+                    <TableCell className='text-muted-foreground hidden px-2 py-3 text-xs lg:table-cell'>
                       {movement.employee.name}
                     </TableCell>
-                    <TableCell className='hidden max-w-[250px] truncate px-4 py-3 text-xs text-muted-foreground sm:px-6 xl:table-cell'>
+                    <TableCell className='text-muted-foreground hidden max-w-[250px] truncate px-4 py-3 text-xs sm:px-6 xl:table-cell'>
                       {movement.notes}
                     </TableCell>
                   </TableRow>
@@ -288,15 +286,18 @@ export function StockMovementsTable({
       {/* Pagination */}
       {filteredMovements.length > 0 && (
         <div className='flex flex-col items-center justify-between gap-3 border-t px-4 py-3 sm:flex-row sm:px-6'>
-          <div className='flex items-center gap-2 font-sans tabular-nums text-xs text-muted-foreground'>
-            <span className='hidden sm:inline'>{t('dashboard.stockTable.rows')}</span>
+          <div className='text-muted-foreground flex items-center gap-2 font-sans text-xs tabular-nums'>
+            <span className='hidden sm:inline'>
+              {t('dashboard.stockTable.rows')}
+            </span>
             <Select
               value={pageSize.toString()}
               onValueChange={(v) => setPageSize(Number(v))}
             >
-              <SelectTrigger className='h-7 w-[58px] text-xs'>
+              <SelectTrigger className='h-7 !w-auto min-w-[64px] gap-1 px-2.5 font-sans text-xs tabular-nums [&>span]:whitespace-nowrap [&>svg]:shrink-0'>
                 <SelectValue />
               </SelectTrigger>
+
               <SelectContent>
                 {PAGE_SIZE_OPTIONS.map((s) => (
                   <SelectItem key={s} value={s.toString()}>
@@ -345,7 +346,7 @@ export function StockMovementsTable({
                   <button
                     key={pageNum}
                     onClick={() => goToPage(pageNum)}
-                    className={`flex size-7 items-center justify-center rounded font-sans tabular-nums text-xs transition-colors ${
+                    className={`flex h-7 min-w-7 items-center justify-center rounded px-2 font-sans text-xs tabular-nums transition-colors ${
                       currentPage === pageNum
                         ? 'bg-primary text-primary-foreground'
                         : 'text-muted-foreground hover:bg-muted hover:text-foreground'

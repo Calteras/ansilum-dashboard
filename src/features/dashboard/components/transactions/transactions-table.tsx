@@ -1,13 +1,5 @@
 import * as React from 'react'
 import { format, parseISO } from 'date-fns'
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  Eye,
-  SlidersHorizontal,
-} from '@/components/icons'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -26,6 +18,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Eye,
+  SlidersHorizontal,
+} from '@/components/icons'
 
 export interface Transaction {
   id: string
@@ -160,7 +160,7 @@ export function TransactionsTable({
           <p className='text-foreground text-xs font-semibold tracking-wide uppercase'>
             {t('dashboard.transactionsTable.title')}
           </p>
-          <span className='bg-primary/10 text-primary rounded px-1.5 py-0.5 font-sans tabular-nums text-xs'>
+          <span className='bg-primary/10 text-primary rounded px-1.5 py-0.5 font-sans text-xs tabular-nums'>
             {effectiveTotalRows}
           </span>
         </div>
@@ -245,7 +245,7 @@ export function TransactionsTable({
               <TableRow>
                 <TableCell
                   colSpan={10}
-                  className='text-muted-foreground h-32 text-center font-sans tabular-nums text-xs'
+                  className='text-muted-foreground h-32 text-center font-sans text-xs tabular-nums'
                 >
                   {t('dashboard.transactionsTable.loading')}
                 </TableCell>
@@ -254,7 +254,7 @@ export function TransactionsTable({
               <TableRow>
                 <TableCell
                   colSpan={10}
-                  className='text-muted-foreground h-32 text-center font-sans tabular-nums text-xs'
+                  className='text-muted-foreground h-32 text-center font-sans text-xs tabular-nums'
                 >
                   {t('dashboard.transactionsTable.noResults')}
                 </TableCell>
@@ -275,15 +275,15 @@ export function TransactionsTable({
                     key={tx.id}
                     className='group hover:bg-muted/20 border-b last:border-0'
                   >
-                    <TableCell className='text-muted-foreground px-4 py-3 font-sans tabular-nums text-xs sm:px-6'>
+                    <TableCell className='text-muted-foreground px-4 py-3 font-sans text-xs tabular-nums sm:px-6'>
                       {(currentPage - 1) * pageSize + index + 1}
                     </TableCell>
                     <TableCell className='px-4 py-3 sm:px-6'>
-                      <span className='font-sans tabular-nums text-xs font-medium'>
+                      <span className='font-sans text-xs font-medium tabular-nums'>
                         {tx.transactionNo}
                       </span>
                     </TableCell>
-                    <TableCell className='text-muted-foreground px-2 py-3 font-sans tabular-nums text-xs'>
+                    <TableCell className='text-muted-foreground px-2 py-3 font-sans text-xs tabular-nums'>
                       {format(parseISO(tx.transactionDate), 'dd MMM yy HH:mm')}
                     </TableCell>
                     <TableCell className='px-2 py-3'>
@@ -292,7 +292,7 @@ export function TransactionsTable({
                           {tx.customerName || '—'}
                         </span>
                         {tx.tableNumber && (
-                          <span className='text-muted-foreground font-sans tabular-nums text-xs'>
+                          <span className='text-muted-foreground font-sans text-xs tabular-nums'>
                             {t('dashboard.transactionsTable.tbl')}{' '}
                             {tx.tableNumber}
                           </span>
@@ -311,10 +311,10 @@ export function TransactionsTable({
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className='px-2 py-3 text-center font-sans tabular-nums text-xs tabular-nums'>
+                    <TableCell className='px-2 py-3 text-center font-sans text-xs tabular-nums'>
                       {totalItems}
                     </TableCell>
-                    <TableCell className='px-2 py-3 text-right font-sans tabular-nums text-xs font-medium tabular-nums'>
+                    <TableCell className='px-2 py-3 text-right font-sans text-xs font-medium tabular-nums'>
                       Rp{Number(tx.grandTotal).toLocaleString()}
                     </TableCell>
                     <TableCell className='hidden px-2 py-3 md:table-cell'>
@@ -322,7 +322,7 @@ export function TransactionsTable({
                         {paymentMethods.map((m) => (
                           <span
                             key={m}
-                            className='bg-muted text-muted-foreground rounded px-1.5 py-0.5 font-sans tabular-nums text-xs'
+                            className='bg-muted text-muted-foreground rounded px-1.5 py-0.5 font-sans text-xs tabular-nums'
                           >
                             {PAYMENT_METHOD_KEYS[m]
                               ? translateKey(PAYMENT_METHOD_KEYS[m])
@@ -354,7 +354,7 @@ export function TransactionsTable({
       {/* Pagination */}
       {effectiveTotalRows > 0 && (
         <div className='flex flex-col items-center justify-between gap-3 border-t px-4 py-3 sm:flex-row sm:px-6'>
-          <div className='text-muted-foreground flex items-center gap-2 font-sans tabular-nums text-xs'>
+          <div className='text-muted-foreground flex items-center gap-2 font-sans text-xs tabular-nums'>
             <span className='hidden sm:inline'>
               {t('dashboard.transactionsTable.rows')}
             </span>
@@ -362,9 +362,10 @@ export function TransactionsTable({
               value={pageSize.toString()}
               onValueChange={(v) => onPageSizeChange(Number(v))}
             >
-              <SelectTrigger className='h-7 w-[58px] text-xs'>
+              <SelectTrigger className='h-7 !w-auto min-w-[64px] gap-1 px-2.5 font-sans text-xs tabular-nums [&>span]:whitespace-nowrap [&>svg]:shrink-0'>
                 <SelectValue />
               </SelectTrigger>
+
               <SelectContent>
                 {PAGE_SIZE_OPTIONS.map((s) => (
                   <SelectItem key={s} value={s.toString()}>
@@ -413,7 +414,7 @@ export function TransactionsTable({
                   <button
                     key={pageNum}
                     onClick={() => goToPage(pageNum)}
-                    className={`flex size-7 items-center justify-center rounded font-sans tabular-nums text-xs transition-colors ${
+                    className={`flex size-7 items-center justify-center rounded font-sans text-xs tabular-nums transition-colors ${
                       currentPage === pageNum
                         ? 'bg-primary text-primary-foreground'
                         : 'text-muted-foreground hover:bg-muted hover:text-foreground'
