@@ -16,7 +16,7 @@ export function Main({ fixed, className, fluid, ...props }: MainProps) {
       id='main'
       data-layout={fixed ? 'fixed' : 'auto'}
       className={cn(
-        'app-main relative isolate px-4 py-7 sm:px-6 lg:px-10 lg:py-10',
+        'app-main relative isolate py-7 sm:px-6 lg:py-10',
 
         fixed && 'flex grow flex-col overflow-hidden',
 
