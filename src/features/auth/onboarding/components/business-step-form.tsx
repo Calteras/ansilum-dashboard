@@ -1,4 +1,3 @@
-import { UiText } from '@/components/ui-text'
 import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
@@ -14,6 +13,7 @@ import {
   FormDescription,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { UiText } from '@/components/ui-text'
 import type { OnboardingFormData } from '../types'
 
 const businessSchema = z.object({
@@ -78,25 +78,31 @@ export function BusinessStepForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-5'>
-        <div className='space-y-4'>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className='grid gap-5'>
+        <div className='grid gap-5'>
           <FormField
             control={form.control}
             name='businessName'
             render={({ field }) => (
               <FormItem>
-                <FormLabel className='text-foreground text-sm font-semibold'><UiText id="Nama usaha" en="Business Name" /></FormLabel>
+                <FormLabel>
+                  <UiText id='Nama usaha' en='Business Name' />
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder='e.g., TerraCafe Indonesia'
                     disabled={isLoading}
-                    className='bg-background/50 focus:border-primary focus:ring-primary/20 h-10 transition-colors duration-200 focus:ring-2'
                     {...field}
                     onChange={(e) => handleBusinessNameChange(e.target.value)}
                   />
                 </FormControl>
-                <FormDescription className='text-muted-foreground text-xs'><UiText id="Nama yang digunakan usaha Anda" en="The name of your business or restaurant" /></FormDescription>
-                <FormMessage className='text-xs' />
+                <FormDescription>
+                  <UiText
+                    id='Nama yang digunakan usaha Anda'
+                    en='The name of your business or restaurant'
+                  />
+                </FormDescription>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -106,16 +112,22 @@ export function BusinessStepForm({
             name='businessSlug'
             render={({ field }) => (
               <FormItem>
-                <FormLabel className='text-foreground text-sm font-semibold'><UiText id="Alamat usaha" en="Business Slug" /></FormLabel>
+                <FormLabel>
+                  <UiText id='Alamat usaha' en='Business Slug' />
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder='e.g., terracafe-indonesia'
                     disabled={isLoading}
-                    className='bg-background/50 focus:border-primary focus:ring-primary/20 h-10 transition-colors duration-200 focus:ring-2'
                     {...field}
                   />
                 </FormControl>
-                <FormDescription className='text-muted-foreground text-xs'><UiText id="Alamat singkat usaha Anda, gunakan huruf kecil dan tanda hubung." en="URL-friendly identifier for your business" /></FormDescription>
+                <FormDescription>
+                  <UiText
+                    id='Alamat singkat usaha Anda, gunakan huruf kecil dan tanda hubung.'
+                    en='URL-friendly identifier for your business'
+                  />
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -128,7 +140,7 @@ export function BusinessStepForm({
           </div>
         )}
 
-        <div className='flex gap-3'>
+        <div className='mt-2 flex flex-col gap-3 sm:flex-row'>
           {onBack && (
             <Button
               type='button'
@@ -136,7 +148,9 @@ export function BusinessStepForm({
               className='flex-1'
               onClick={onBack}
               disabled={isLoading}
-            ><UiText id="Kembali" en="Back" /></Button>
+            >
+              <UiText id='Kembali' en='Back' />
+            </Button>
           )}
           <Button type='submit' className='flex-1' disabled={isLoading}>
             {isLoading ? 'Creating Business...' : 'Continue'}

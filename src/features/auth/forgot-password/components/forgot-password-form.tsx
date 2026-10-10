@@ -1,9 +1,7 @@
-import { UiText } from '@/components/ui-text'
 import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowRight, Loader2 } from '@/components/icons'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,6 +13,8 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { ArrowRight, Loader2 } from '@/components/icons'
+import { UiText } from '@/components/ui-text'
 import { AuthRequestError, requestPasswordResetApi } from '../../api/auth.api'
 import { TurnstileChallenge } from '../../components/turnstile-challenge'
 import { useChallenge } from '../../hooks/use-challenge'
@@ -66,7 +66,7 @@ export function ForgotPasswordForm({
       <form
         aria-busy={isLoading}
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('grid gap-2', className)}
+        className={cn('grid gap-5', className)}
         {...props}
       >
         <FormField
@@ -91,12 +91,18 @@ export function ForgotPasswordForm({
         {error && <p role='alert'>{error}</p>}
         {message && <p role='status'>{message}</p>}
         {cooldown.remaining > 0 && (
-          <p role='status'><UiText id="Coba lagi dalam" en="Try again in" />{cooldown.remaining}<UiText id="detik." en="seconds." /></p>
+          <p role='status'>
+            <UiText id='Coba lagi dalam' en='Try again in' />
+            {cooldown.remaining}
+            <UiText id='detik.' en='seconds.' />
+          </p>
         )}
         <Button
           className='mt-2'
           disabled={isLoading || !challenge.ready || cooldown.remaining > 0}
-        ><UiText id="Lanjutkan" en="Continue" />{isLoading ? <Loader2 className='animate-spin' /> : <ArrowRight />}
+        >
+          <UiText id='Lanjutkan' en='Continue' />
+          {isLoading ? <Loader2 className='animate-spin' /> : <ArrowRight />}
         </Button>
       </form>
     </Form>

@@ -1,9 +1,9 @@
-import { UiText } from '@/components/ui-text'
 import { useState, useCallback } from 'react'
 import { Link, Navigate } from '@tanstack/react-router'
-import { CheckCircle2, Circle, ArrowLeft } from '@/components/icons'
 import { Logo } from '@/assets/logo'
 import { useAuthStore } from '@/stores/auth-store'
+import { CheckCircle2, Circle, ArrowLeft } from '@/components/icons'
+import { UiText } from '@/components/ui-text'
 import { createEmployeeApi } from '@/features/employees/api/employees.api'
 import { createOutletApi } from '@/features/outlets/api/outlets.api'
 import { createTenantApi, setActiveTenantApi } from '../api/tenant.api'
@@ -167,7 +167,12 @@ export function Onboarding() {
 
   const currentIndex = STEPS.findIndex((s) => s.key === currentStep)
 
-  if (isPending) return <p role='status'><UiText id="Menyiapkan akun Anda…" en="Loading session…" /></p>
+  if (isPending)
+    return (
+      <p role='status'>
+        <UiText id='Menyiapkan akun Anda…' en='Loading session…' />
+      </p>
+    )
   if (!isAuthenticated) return <Navigate to='/sign-in-2' />
 
   return (
@@ -175,7 +180,7 @@ export function Onboarding() {
       {/* Progress rail */}
       <div
         data-sidebar='sidebar'
-        className='border-sidebar-border bg-sidebar text-sidebar-foreground relative hidden w-80 flex-col justify-between border-r p-8 lg:flex xl:w-95'
+        className='border-sidebar-border bg-sidebar text-sidebar-foreground relative hidden w-80 shrink-0 flex-col justify-between border-r p-8 lg:flex xl:w-95'
       >
         <div>
           <div className='mb-20 flex items-center gap-2'>
@@ -186,8 +191,15 @@ export function Onboarding() {
           </div>
 
           <div className='mb-6'>
-            <p className='text-sidebar-foreground/60 font-sans tabular-nums text-xs tracking-widest uppercase'><UiText id="Siapkan usaha Anda" en="Workspace setup" /></p>
-            <p className='text-sidebar-foreground/75 mt-2 text-sm leading-relaxed'><UiText id="Isi beberapa detail untuk mulai mengelola usaha Anda." en="A few details now, a ready-to-run business workspace next." /></p>
+            <p className='text-sidebar-foreground/60 font-sans text-xs tracking-widest uppercase tabular-nums'>
+              <UiText id='Siapkan usaha Anda' en='Workspace setup' />
+            </p>
+            <p className='text-sidebar-foreground/75 mt-2 text-sm leading-relaxed'>
+              <UiText
+                id='Isi beberapa detail untuk mulai mengelola usaha Anda.'
+                en='A few details now, a ready-to-run business workspace next.'
+              />
+            </p>
           </div>
 
           <nav className='space-y-2' aria-label='Account setup progress'>
@@ -232,23 +244,26 @@ export function Onboarding() {
           </nav>
         </div>
 
-        <p className='text-sidebar-foreground/50 text-xs'><UiText id="Butuh bantuan?" en="Need help?" />{' '}
+        <p className='text-sidebar-foreground/50 text-xs'>
+          <UiText id='Butuh bantuan?' en='Need help?' />{' '}
           <a
             href='mailto:support@calterras.com'
             className='hover:text-sidebar-foreground underline'
-          ><UiText id="Hubungi bantuan" en="Contact support" /></a>
+          >
+            <UiText id='Hubungi bantuan' en='Contact support' />
+          </a>
         </p>
       </div>
 
       {/* Active step */}
-      <div className='bg-background flex flex-1 flex-col overflow-y-auto px-5 py-6 sm:px-10 sm:py-10'>
+      <div className='bg-background flex min-w-0 flex-1 flex-col overflow-y-auto px-5 py-6 sm:px-10 sm:py-10'>
         <div className='mx-auto flex w-full max-w-xl flex-1 flex-col justify-center'>
           <div className='mb-10 flex items-center justify-between lg:hidden'>
             <div className='flex items-center gap-2'>
               <Logo className='text-primary size-6' />
               <span className='font-semibold tracking-tight'>Ansilum POS</span>
             </div>
-            <span className='text-muted-foreground font-sans tabular-nums text-xs'>
+            <span className='text-muted-foreground font-sans text-xs tabular-nums'>
               {currentIndex + 1} / {STEPS.length}
             </span>
           </div>
@@ -265,12 +280,14 @@ export function Onboarding() {
           </div>
 
           <div className='animate-in fade-in-50 fill-mode-both space-y-3 duration-500'>
-            <p className='text-primary font-sans tabular-nums text-xs tracking-widest uppercase'><UiText id="Langkah" en="Step" />{currentIndex + 1} of {STEPS.length}
+            <p className='text-primary font-sans text-xs tracking-widest uppercase tabular-nums'>
+              <UiText id='Langkah' en='Step' />
+              {currentIndex + 1} of {STEPS.length}
             </p>
-            <h1 className='text-foreground text-3xl font-semibold tracking-tight sm:text-4xl'>
+            <h1 className='text-foreground text-[32px] font-bold tracking-[-0.03em]'>
               {getStepTitle()}
             </h1>
-            <p className='text-muted-foreground max-w-lg text-sm leading-relaxed'>
+            <p className='text-muted-foreground max-w-lg leading-relaxed'>
               {getStepDescription()}
             </p>
           </div>
@@ -284,7 +301,7 @@ export function Onboarding() {
             </div>
           )}
 
-          <div className='mt-10'>
+          <div className='mt-8'>
             {currentStep === 'business' && (
               <div className='animate-in fade-in-50 slide-in-from-bottom-2 duration-400'>
                 <BusinessStepForm
@@ -331,13 +348,27 @@ export function Onboarding() {
                 <Link
                   to='/sign-in'
                   className='hover:text-primary inline-flex items-center gap-1.5 transition-colors'
-                ><UiText id="Sudah punya akun?" en="Already have an account?" /><span className='text-foreground font-medium'><UiText id="Masuk" en="Sign in" /></span>
+                >
+                  <UiText
+                    id='Sudah punya akun?'
+                    en='Already have an account?'
+                  />
+                  <span className='text-foreground font-medium'>
+                    <UiText id='Masuk' en='Sign in' />
+                  </span>
                 </Link>
               ) : (
                 <span className='inline-flex items-center gap-1.5'>
-                  <ArrowLeft className='size-3.5' /><UiText id="Kembali untuk memeriksa" en="Use Back to review" /></span>
+                  <ArrowLeft className='size-3.5' />
+                  <UiText
+                    id='Kembali untuk memeriksa'
+                    en='Use Back to review'
+                  />
+                </span>
               )}
-              <span className='text-end'><UiText id="Terenkripsi" en="Encrypted and secure" /></span>
+              <span className='text-end'>
+                <UiText id='Terenkripsi' en='Encrypted and secure' />
+              </span>
             </div>
           )}
         </div>

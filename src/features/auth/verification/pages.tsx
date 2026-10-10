@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { UiText } from '@/components/ui-text'
 import { AuthLayout } from '../auth-layout'
+import { AuthPanel } from '../components/auth-panel'
 import { ResendForm } from './resend-form'
 
 export function CheckEmail() {
@@ -12,7 +12,10 @@ export function CheckEmail() {
         continue.
       </p>
       <ResendForm />
-      <Link to='/sign-up' className='block text-sm underline'>
+      <Link
+        to='/sign-up'
+        className='text-brand-ink inline-flex min-h-11 items-center text-sm font-semibold hover:underline'
+      >
         Correct your email or return to signup
       </Link>
     </VerificationCard>
@@ -43,22 +46,20 @@ function VerificationCard({
 }) {
   return (
     <AuthLayout>
-      <Card>
-        <CardHeader>
-          <CardTitle role='status' className='text-xl'>
-            {title}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className='space-y-5'>
-          {children}
+      <AuthPanel
+        title={title}
+        titleRole='status'
+        footer={
           <Link
             to='/sign-in-2'
-            className='text-primary block font-medium underline'
+            className='text-brand-ink inline-flex min-h-11 items-center font-semibold hover:underline'
           >
-            <UiText id='Masuk' en='Sign in' />
+            <UiText id='Masuk' en='Sign in' /> →
           </Link>
-        </CardContent>
-      </Card>
+        }
+      >
+        {children && <div className='space-y-5'>{children}</div>}
+      </AuthPanel>
     </AuthLayout>
   )
 }

@@ -1,4 +1,3 @@
-import { UiText } from '@/components/ui-text'
 import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
@@ -21,6 +20,7 @@ import {
   InputOTPSlot,
   InputOTPSeparator,
 } from '@/components/ui/input-otp'
+import { UiText } from '@/components/ui-text'
 
 const formSchema = z.object({
   otp: z
@@ -57,7 +57,7 @@ export function OtpForm({ className, ...props }: OtpFormProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('grid gap-2', className)}
+        className={cn('grid gap-5', className)}
         {...props}
       >
         <FormField
@@ -65,7 +65,9 @@ export function OtpForm({ className, ...props }: OtpFormProps) {
           name='otp'
           render={({ field }) => (
             <FormItem>
-              <FormLabel className='sr-only'><UiText id="Kode verifikasi" en="One-Time Password" /></FormLabel>
+              <FormLabel className='sr-only'>
+                <UiText id='Kode verifikasi' en='One-Time Password' />
+              </FormLabel>
               <FormControl>
                 <InputOTP
                   maxLength={6}
@@ -92,7 +94,9 @@ export function OtpForm({ className, ...props }: OtpFormProps) {
             </FormItem>
           )}
         />
-        <Button className='mt-2' disabled={otp.length < 6 || isLoading}><UiText id="Verifikasi" en="Verify" /></Button>
+        <Button className='mt-2' disabled={otp.length < 6 || isLoading}>
+          <UiText id='Verifikasi' en='Verify' />
+        </Button>
       </form>
     </Form>
   )

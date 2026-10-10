@@ -1,10 +1,10 @@
-import { UiText } from '@/components/ui-text'
 import { useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/stores/auth-store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { UiText } from '@/components/ui-text'
 import {
   AuthRequestError,
   logoutApi,
@@ -59,7 +59,7 @@ export function ResendForm() {
 
   return (
     <form
-      className='space-y-4'
+      className='grid gap-5'
       aria-busy={challenge.pending || signingOut}
       onSubmit={(event) => {
         event.preventDefault()
@@ -97,8 +97,10 @@ export function ResendForm() {
         })
       }}
     >
-      <div className='space-y-2'>
-        <Label htmlFor='verification-email'><UiText id="Alamat email" en="Email address" /></Label>
+      <div className='grid gap-2'>
+        <Label htmlFor='verification-email'>
+          <UiText id='Alamat email' en='Email address' />
+        </Label>
         <Input
           id='verification-email'
           type='email'
@@ -132,7 +134,12 @@ export function ResendForm() {
         </Button>
       )}
       {signingOut && (
-        <p role='status' className='text-sm'><UiText id="Keluar dari akun…" en="Signing out of the current account…" /></p>
+        <p role='status' className='text-sm'>
+          <UiText
+            id='Keluar dari akun…'
+            en='Signing out of the current account…'
+          />
+        </p>
       )}
       {message && (
         <p role='status' className='text-sm'>
@@ -141,7 +148,9 @@ export function ResendForm() {
       )}
       {cooldown.remaining > 0 && (
         <p role='status' className='text-muted-foreground text-sm'>
-          You can try again in {cooldown.remaining}<UiText id="detik." en="seconds." /></p>
+          You can try again in {cooldown.remaining}
+          <UiText id='detik.' en='seconds.' />
+        </p>
       )}
       <Button
         className='w-full'

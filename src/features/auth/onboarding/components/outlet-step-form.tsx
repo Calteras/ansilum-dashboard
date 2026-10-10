@@ -1,4 +1,3 @@
-import { UiText } from '@/components/ui-text'
 import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
@@ -15,6 +14,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { UiText } from '@/components/ui-text'
 import type { OnboardingFormData } from '../types'
 
 const outletSchema = z.object({
@@ -93,14 +93,16 @@ export function OutletStepForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-4'>
-        <div className='space-y-3'>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className='grid gap-5'>
+        <div className='grid gap-5'>
           <FormField
             control={form.control}
             name='outletName'
             render={({ field }) => (
               <FormItem>
-                <FormLabel><UiText id="Nama gerai atau cabang" en="Outlet/Branch Name" /></FormLabel>
+                <FormLabel>
+                  <UiText id='Nama gerai atau cabang' en='Outlet/Branch Name' />
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder='e.g., TerraCafe - Mall Central'
@@ -109,7 +111,12 @@ export function OutletStepForm({
                     onChange={(e) => handleOutletNameChange(e.target.value)}
                   />
                 </FormControl>
-                <FormDescription><UiText id="Nama gerai atau cabang usaha Anda" en="The name of your store or restaurant location" /></FormDescription>
+                <FormDescription>
+                  <UiText
+                    id='Nama gerai atau cabang usaha Anda'
+                    en='The name of your store or restaurant location'
+                  />
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -120,7 +127,9 @@ export function OutletStepForm({
             name='outletCode'
             render={({ field }) => (
               <FormItem>
-                <FormLabel><UiText id="Kode gerai" en="Outlet Code" /></FormLabel>
+                <FormLabel>
+                  <UiText id='Kode gerai' en='Outlet Code' />
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder='e.g., OUT-001'
@@ -128,7 +137,12 @@ export function OutletStepForm({
                     {...field}
                   />
                 </FormControl>
-                <FormDescription><UiText id="Kode pengenal gerai ini" en="Unique identifier for this outlet location" /></FormDescription>
+                <FormDescription>
+                  <UiText
+                    id='Kode pengenal gerai ini'
+                    en='Unique identifier for this outlet location'
+                  />
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -139,7 +153,9 @@ export function OutletStepForm({
             name='outletAddress'
             render={({ field }) => (
               <FormItem>
-                <FormLabel><UiText id="Alamat (opsional)" en="Address (Optional)" /></FormLabel>
+                <FormLabel>
+                  <UiText id='Alamat (opsional)' en='Address (Optional)' />
+                </FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder='Street address, city, and other location details'
@@ -158,7 +174,12 @@ export function OutletStepForm({
             name='outletPhone'
             render={({ field }) => (
               <FormItem>
-                <FormLabel><UiText id="Nomor telepon (opsional)" en="Phone Number (Optional)" /></FormLabel>
+                <FormLabel>
+                  <UiText
+                    id='Nomor telepon (opsional)'
+                    en='Phone Number (Optional)'
+                  />
+                </FormLabel>
                 <FormControl>
                   <Input
                     type='tel'
@@ -179,14 +200,16 @@ export function OutletStepForm({
           </div>
         )}
 
-        <div className='flex gap-3'>
+        <div className='mt-2 flex flex-col gap-3 sm:flex-row'>
           <Button
             type='button'
             variant='outline'
             className='flex-1'
             onClick={onBack}
             disabled={isLoading}
-          ><UiText id="Kembali" en="Back" /></Button>
+          >
+            <UiText id='Kembali' en='Back' />
+          </Button>
           <Button type='submit' className='flex-1' disabled={isLoading}>
             {isLoading ? 'Creating Outlet...' : 'Continue'}
           </Button>

@@ -1,7 +1,9 @@
 import * as React from 'react'
-import { Eye, EyeOff } from '@/components/icons'
 import { cn } from '@/lib/utils'
+import { useCopy } from '@/hooks/use-copy'
+import { Eye, EyeOff } from '@/components/icons'
 import { Button } from './ui/button'
+import { Input } from './ui/input'
 
 type PasswordInputProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -16,13 +18,14 @@ export function PasswordInput({
   ref,
   ...props
 }: PasswordInputProps) {
+  const copy = useCopy()
   const [showPassword, setShowPassword] = React.useState(false)
 
   return (
-    <div className={cn('relative rounded-md', className)}>
-      <input
+    <div className={cn('relative min-w-0 rounded-md', className)}>
+      <Input
         type={showPassword ? 'text' : 'password'}
-        className='border-input placeholder:text-muted-foreground focus-visible:ring-ring flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-none transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-1 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50'
+        className='pe-12'
         ref={ref}
         disabled={disabled}
         {...props}
@@ -32,10 +35,16 @@ export function PasswordInput({
         size='icon'
         variant='ghost'
         disabled={disabled}
-        className='text-muted-foreground absolute end-1 top-1/2 h-6 w-6 -translate-y-1/2 rounded-md'
+        className='text-muted-foreground absolute end-0.5 top-1/2 -translate-y-1/2 rounded-md'
+        aria-label={
+          showPassword
+            ? copy('Sembunyikan kata sandi', 'Hide password')
+            : copy('Tampilkan kata sandi', 'Show password')
+        }
+        aria-pressed={showPassword}
         onClick={() => setShowPassword((prev) => !prev)}
       >
-        {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
       </Button>
     </div>
   )

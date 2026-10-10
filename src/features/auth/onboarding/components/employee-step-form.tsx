@@ -1,4 +1,3 @@
-import { UiText } from '@/components/ui-text'
 import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
@@ -15,6 +14,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
+import { UiText } from '@/components/ui-text'
 import type { OnboardingFormData } from '../types'
 
 const employeeSchema = z.object({
@@ -78,14 +78,16 @@ export function EmployeeStepForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-4'>
-        <div className='space-y-3'>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className='grid gap-5'>
+        <div className='grid gap-5'>
           <FormField
             control={form.control}
             name='employeeNo'
             render={({ field }) => (
               <FormItem>
-                <FormLabel><UiText id="Nomor karyawan" en="Employee Number" /></FormLabel>
+                <FormLabel>
+                  <UiText id='Nomor karyawan' en='Employee Number' />
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder='e.g., EMP-001'
@@ -93,7 +95,12 @@ export function EmployeeStepForm({
                     {...field}
                   />
                 </FormControl>
-                <FormDescription><UiText id="Nomor pengenal karyawan ini" en="Unique identifier for this employee" /></FormDescription>
+                <FormDescription>
+                  <UiText
+                    id='Nomor pengenal karyawan ini'
+                    en='Unique identifier for this employee'
+                  />
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -104,7 +111,9 @@ export function EmployeeStepForm({
             name='employeeName'
             render={({ field }) => (
               <FormItem>
-                <FormLabel><UiText id="Nama karyawan" en="Employee Name" /></FormLabel>
+                <FormLabel>
+                  <UiText id='Nama karyawan' en='Employee Name' />
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder='John Cashier'
@@ -122,7 +131,9 @@ export function EmployeeStepForm({
             name='employeeEmail'
             render={({ field }) => (
               <FormItem>
-                <FormLabel><UiText id="Email (opsional)" en="Email (Optional)" /></FormLabel>
+                <FormLabel>
+                  <UiText id='Email (opsional)' en='Email (Optional)' />
+                </FormLabel>
                 <FormControl>
                   <Input
                     type='email'
@@ -141,7 +152,9 @@ export function EmployeeStepForm({
             name='employeePhone'
             render={({ field }) => (
               <FormItem>
-                <FormLabel><UiText id="Telepon (opsional)" en="Phone (Optional)" /></FormLabel>
+                <FormLabel>
+                  <UiText id='Telepon (opsional)' en='Phone (Optional)' />
+                </FormLabel>
                 <FormControl>
                   <Input
                     type='tel'
@@ -160,7 +173,9 @@ export function EmployeeStepForm({
             name='employeePin'
             render={({ field }) => (
               <FormItem>
-                <FormLabel><UiText id="PIN kasir" en="PIN for POS Terminal" /></FormLabel>
+                <FormLabel>
+                  <UiText id='PIN kasir' en='PIN for POS Terminal' />
+                </FormLabel>
                 <FormControl>
                   <PasswordInput
                     placeholder='••••'
@@ -170,7 +185,12 @@ export function EmployeeStepForm({
                     inputMode='numeric'
                   />
                 </FormControl>
-                <FormDescription><UiText id="PIN 4–6 angka untuk masuk ke kasir" en="4-6 digit PIN for POS terminal login" /></FormDescription>
+                <FormDescription>
+                  <UiText
+                    id='PIN 4–6 angka untuk masuk ke kasir'
+                    en='4-6 digit PIN for POS terminal login'
+                  />
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -183,21 +203,25 @@ export function EmployeeStepForm({
           </div>
         )}
 
-        <div className='flex gap-2'>
+        <div className='mt-2 flex flex-col gap-3 sm:flex-row'>
           <Button
             type='button'
             variant='outline'
             className='flex-1'
             onClick={onBack}
             disabled={isLoading}
-          ><UiText id="Kembali" en="Back" /></Button>
+          >
+            <UiText id='Kembali' en='Back' />
+          </Button>
           <Button
             type='button'
             variant='ghost'
             className='flex-1'
             onClick={onSkip}
             disabled={isLoading}
-          ><UiText id="Lewati" en="Skip" /></Button>
+          >
+            <UiText id='Lewati' en='Skip' />
+          </Button>
           <Button type='submit' className='flex-1' disabled={isLoading}>
             {isLoading ? 'Creating Employee...' : 'Continue'}
           </Button>

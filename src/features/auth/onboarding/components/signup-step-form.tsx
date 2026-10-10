@@ -1,4 +1,3 @@
-import { UiText } from '@/components/ui-text'
 import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
@@ -15,6 +14,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
+import { UiText } from '@/components/ui-text'
 import { signUpApi, AuthRequestError } from '../../api/auth.api'
 import { TurnstileChallenge } from '../../components/turnstile-challenge'
 import { useChallenge } from '../../hooks/use-challenge'
@@ -85,23 +85,25 @@ export function SignupStepForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-5'>
-        <div className='space-y-4'>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className='grid gap-5'>
+        <div className='grid gap-5'>
           <FormField
             control={form.control}
             name='name'
             render={({ field }) => (
               <FormItem>
-                <FormLabel className='text-foreground text-sm font-semibold'><UiText id="Nama lengkap" en="Full Name" /></FormLabel>
+                <FormLabel>
+                  <UiText id='Nama lengkap' en='Full Name' />
+                </FormLabel>
                 <FormControl>
                   <Input
+                    autoComplete='name'
                     placeholder='John Doe'
                     disabled={isLoading}
-                    className='border-input bg-background/50 focus:border-primary focus:ring-primary/20 h-10 transition-colors duration-200 focus:ring-2'
                     {...field}
                   />
                 </FormControl>
-                <FormMessage className='text-xs' />
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -111,17 +113,19 @@ export function SignupStepForm() {
             name='email'
             render={({ field }) => (
               <FormItem>
-                <FormLabel className='text-foreground text-sm font-semibold'><UiText id="Alamat email" en="Email Address" /></FormLabel>
+                <FormLabel>
+                  <UiText id='Alamat email' en='Email Address' />
+                </FormLabel>
                 <FormControl>
                   <Input
                     type='email'
+                    autoComplete='email'
                     placeholder='john@example.com'
                     disabled={isLoading}
-                    className='border-input bg-background/50 focus:border-primary focus:ring-primary/20 h-10 transition-colors duration-200 focus:ring-2'
                     {...field}
                   />
                 </FormControl>
-                <FormMessage className='text-xs' />
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -131,16 +135,18 @@ export function SignupStepForm() {
             name='password'
             render={({ field }) => (
               <FormItem>
-                <FormLabel className='text-foreground text-sm font-semibold'><UiText id="Kata sandi" en="Password" /></FormLabel>
+                <FormLabel>
+                  <UiText id='Kata sandi' en='Password' />
+                </FormLabel>
                 <FormControl>
                   <PasswordInput
+                    autoComplete='new-password'
                     placeholder='••••••••'
                     disabled={isLoading}
-                    className='border-input bg-background/50 focus:border-primary focus:ring-primary/20 h-10 transition-colors duration-200 focus:ring-2'
                     {...field}
                   />
                 </FormControl>
-                <FormMessage className='text-xs' />
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -150,16 +156,18 @@ export function SignupStepForm() {
             name='confirmPassword'
             render={({ field }) => (
               <FormItem>
-                <FormLabel className='text-foreground text-sm font-semibold'><UiText id="Ulangi kata sandi" en="Confirm Password" /></FormLabel>
+                <FormLabel>
+                  <UiText id='Ulangi kata sandi' en='Confirm Password' />
+                </FormLabel>
                 <FormControl>
                   <PasswordInput
+                    autoComplete='new-password'
                     placeholder='••••••••'
                     disabled={isLoading}
-                    className='border-input bg-background/50 focus:border-primary focus:ring-primary/20 h-10 transition-colors duration-200 focus:ring-2'
                     {...field}
                   />
                 </FormControl>
-                <FormMessage className='text-xs' />
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -178,7 +186,12 @@ export function SignupStepForm() {
         )}
 
         {error && (
-          <Link to='/auth/check-email' className='text-sm underline'><UiText id="Kirim email verifikasi" en="Request verification email" /></Link>
+          <Link to='/auth/check-email' className='text-sm underline'>
+            <UiText
+              id='Kirim email verifikasi'
+              en='Request verification email'
+            />
+          </Link>
         )}
         {!isLoading && (
           <TurnstileChallenge
@@ -187,16 +200,21 @@ export function SignupStepForm() {
           />
         )}
         {cooldown.remaining > 0 && (
-          <p role='status'><UiText id="Coba lagi dalam" en="Try again in" />{cooldown.remaining}<UiText id="detik." en="seconds." /></p>
+          <p role='status'>
+            <UiText id='Coba lagi dalam' en='Try again in' />{' '}
+            {cooldown.remaining} <UiText id='detik.' en='seconds.' />
+          </p>
         )}
         <Button
           type='submit'
-          className='bg-primary text-primary-foreground hover:bg-primary/90 h-11 w-full rounded-lg font-semibold shadow-none transition-colors duration-200 shadow-none disabled:cursor-not-allowed disabled:opacity-50'
+          className='mt-2 w-full'
           disabled={isLoading || !challenge.ready || cooldown.remaining > 0}
         >
           {isLoading ? (
             <span className='flex items-center justify-center gap-2'>
-              <div className='border-primary-foreground/30 border-t-primary-foreground h-4 w-4 animate-spin rounded-full border-2' /><UiText id="Membuat akun…" en="Creating Account..." /></span>
+              <div className='border-primary-foreground/30 border-t-primary-foreground h-4 w-4 animate-spin rounded-full border-2' />
+              <UiText id='Membuat akun…' en='Creating Account...' />
+            </span>
           ) : (
             'Continue'
           )}
