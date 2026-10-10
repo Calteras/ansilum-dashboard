@@ -1,10 +1,17 @@
-import type { HTMLAttributes } from 'react'
+import type { ImgHTMLAttributes } from 'react'
 import { cn } from '@/lib/utils'
 
-export function Logo({ className, ...props }: HTMLAttributes<HTMLSpanElement>) {
+export function Logo({
+  className,
+  ...props
+}: ImgHTMLAttributes<HTMLImageElement>) {
   return (
-    <span role='img' aria-label='Ansilum' className={cn('inline-flex size-8 shrink-0 items-center justify-center rounded-[30%] bg-brand font-sans text-[25px] leading-none font-bold tracking-[-0.06em] text-white', className)} {...props}>
-      <span aria-hidden='true'>a</span>
-    </span>
+    <img
+      src='/icon_bg.png'
+      alt='Ansilum'
+      className={cn('size-8 shrink-0 rounded-lg object-cover', className)}
+      draggable={false}
+      {...props}
+    />
   )
 }
