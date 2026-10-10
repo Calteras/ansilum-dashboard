@@ -348,14 +348,15 @@ export function Dashboard() {
               isLoading={isLoadingSummary}
             />
 
-            <div className='grid gap-5 xl:grid-cols-[1.45fr_0.85fr]'>
-              <PaymentBreakdownChart
-                paymentBreakdown={transactionSummary?.paymentBreakdown ?? {}}
-                isLoading={isLoadingSummary}
-              />
+            <div className='grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(340px,0.75fr)]'>
               <SalesTrendChart
                 transactions={transactions}
                 isLoading={isLoadingTransactions}
+              />
+
+              <PaymentBreakdownChart
+                paymentBreakdown={transactionSummary?.paymentBreakdown ?? {}}
+                isLoading={isLoadingSummary}
               />
             </div>
 

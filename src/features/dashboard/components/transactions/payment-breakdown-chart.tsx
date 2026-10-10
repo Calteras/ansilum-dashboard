@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import { PieChart, Pie, Cell, ResponsiveContainer, Sector } from 'recharts'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from 'recharts'
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 interface PaymentBreakdownChartProps {
   paymentBreakdown: Record<string, number>
@@ -15,7 +17,7 @@ const COLORS: Record<string, string> = {
   CREDIT_CARD: 'var(--chart-3)',
   DEBIT_CARD: 'var(--chart-2)',
   E_WALLET: 'var(--chart-1)',
-  OTHER: 'var(--chart-5)',
+  OTHER: 'var(--muted-foreground)',
 }
 
 const LABEL_KEYS: Record<string, string> = {
@@ -28,12 +30,19 @@ const LABEL_KEYS: Record<string, string> = {
 }
 
 function formatCompact(value: number): string {
-  if (value >= 1_000_000_000)
-    return `${(value / 1_000_000_000).toFixed(1).replace(/\.0$/, '')}M`
-  if (value >= 1_000_000)
+  if (value >= 1_000_000_000) {
+    return `${(value / 1_000_000_000).toFixed(1).replace(/\.0$/, '')} M`
+  }
+
+  if (value >= 1_000_000) {
     return `${(value / 1_000_000).toFixed(1).replace(/\.0$/, '')} Jt`
-  if (value >= 1_000) return `${(value / 1_000).toFixed(0)}K`
-  return value.toLocaleString()
+  }
+
+  if (value >= 1_000) {
+    return `${(value / 1_000).toFixed(0)}K`
+  }
+
+  return value.toLocaleString('id-ID')
 }
 
 export function PaymentBreakdownChart({
@@ -41,15 +50,38 @@ export function PaymentBreakdownChart({
   isLoading,
 }: PaymentBreakdownChartProps) {
   const { t } = useTranslation()
+
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
-  const data = Object.entries(paymentBreakdown).map(([method, amount]) => ({
-    name: LABEL_KEYS[method] ? t(LABEL_KEYS[method] as any) as string : method,
-    value: amount,
-    color: COLORS[method] || COLORS.OTHER,
-  }))
+  const data = useMemo(
+    () =>
+      Object.entries(paymentBreakdown)
+        .map(([method, amount]) => ({
+          key: method,
+          name: LABEL_KEYS[method]
+            ? (t(LABEL_KEYS[method] as any) as string)
+            : method,
+          value: amount,
+          color: COLORS[method] || COLORS.OTHER,
+        }))
+        .filter((item) => item.value > 0)
+        .sort((a, b) => b.value - a.value),
+    [paymentBreakdown, t]
+  )
 
   const totalAmount = data.reduce((acc, item) => acc + item.value, 0)
+
+  const activeItem = activeIndex !== null ? data[activeIndex] : null
+
+  const topMethod = data[0]
+
+  const activePercentage =
+    activeItem && totalAmount > 0
+      ? (activeItem.value / totalAmount) * 100
+      : null
+
+  const topPercentage =
+    topMethod && totalAmount > 0 ? (topMethod.value / totalAmount) * 100 : 0
 
   const renderActiveShape = (props: unknown) => {
     const p = props as {
@@ -61,50 +93,66 @@ export function PaymentBreakdownChart({
       endAngle: number
       fill: string
     }
+
     return (
-      <g>
-        <Sector
-          cx={p.cx}
-          cy={p.cy}
-          innerRadius={p.innerRadius}
-          outerRadius={p.outerRadius + 6}
-          startAngle={p.startAngle}
-          endAngle={p.endAngle}
-          fill={p.fill}
-        />
-      </g>
+      <Sector
+        cx={p.cx}
+        cy={p.cy}
+        innerRadius={p.innerRadius}
+        outerRadius={p.outerRadius + 7}
+        startAngle={p.startAngle}
+        endAngle={p.endAngle}
+        fill={p.fill}
+      />
     )
   }
 
   return (
-    <div className='bg-card flex w-full flex-col gap-5 overflow-hidden rounded-xl border p-4 sm:p-6 xl:w-[410px]'>
+    <div className='bg-card flex w-full min-w-0 flex-col gap-5 rounded-2xl border p-5 shadow-[0_12px_40px_-32px_var(--brand-ink)] sm:p-6'>
       {/* Header */}
-      <p className='text-foreground text-xs font-semibold tracking-wide uppercase'>
-        {t('dashboard.paymentChart.title')}
-      </p>
+      <div>
+        <p className='text-brand-ink text-[11px] font-bold tracking-[0.18em] uppercase'>
+          {t('dashboard.paymentChart.title')}
+        </p>
+
+        {!isLoading && topMethod && (
+          <div className='mt-2 flex items-center justify-between gap-3'>
+            <span className='text-muted-foreground text-xs'>
+              {t('dashboard.paymentChart.topMethod', 'Top payment method')}
+            </span>
+
+            <span className='truncate text-xs font-semibold'>
+              {topMethod.name} · {topPercentage.toFixed(1)}%
+            </span>
+          </div>
+        )}
+      </div>
 
       {isLoading ? (
-        <div className='flex h-52 items-center justify-center'>
-          <p className='text-muted-foreground font-sans tabular-nums text-xs'>{t('dashboard.paymentChart.loading')}</p>
+        <div className='flex h-56 items-center justify-center'>
+          <p className='text-muted-foreground text-xs'>
+            {t('dashboard.paymentChart.loading')}
+          </p>
         </div>
       ) : data.length === 0 ? (
-        <div className='flex h-52 items-center justify-center'>
-          <p className='text-muted-foreground font-sans tabular-nums text-xs'>
+        <div className='flex h-56 items-center justify-center'>
+          <p className='text-muted-foreground text-xs'>
             {t('dashboard.paymentChart.noData')}
           </p>
         </div>
       ) : (
-        <div className='flex flex-col items-center gap-5 sm:flex-row'>
+        <>
           {/* Donut */}
-          <div className='relative size-52 shrink-0'>
+          <div className='relative mx-auto size-48'>
             <ResponsiveContainer width='100%' height='100%'>
               <PieChart>
-                <Pie isAnimationActive={false}
+                <Pie
+                  isAnimationActive={false}
                   data={data}
                   cx='50%'
                   cy='50%'
-                  innerRadius='44%'
-                  outerRadius='68%'
+                  innerRadius='52%'
+                  outerRadius='72%'
                   paddingAngle={3}
                   dataKey='value'
                   strokeWidth={0}
@@ -112,34 +160,43 @@ export function PaymentBreakdownChart({
                   onMouseEnter={(_, index) => setActiveIndex(index)}
                   onMouseLeave={() => setActiveIndex(null)}
                 >
-                  {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  {data.map((entry) => (
+                    <Cell key={entry.key} fill={entry.color} />
                   ))}
                 </Pie>
               </PieChart>
             </ResponsiveContainer>
-            {/* Centre label */}
-            <div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-0.5'>
-              <span className='font-sans font-bold text-xl leading-none'>
-                Rp{formatCompact(totalAmount)}
+
+            {/* Centre */}
+            <div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-6 text-center'>
+              <span className='text-lg leading-none font-bold tabular-nums'>
+                Rp
+                {formatCompact(activeItem?.value ?? totalAmount)}
               </span>
-              <span className='text-muted-foreground font-sans tabular-nums text-xs tracking-widest uppercase'>
-                {t('dashboard.paymentChart.total')}
+
+              <span className='text-muted-foreground mt-1 max-w-24 truncate text-[10px] tracking-wider uppercase'>
+                {activeItem
+                  ? activeItem.name
+                  : t('dashboard.paymentChart.total')}
               </span>
+
+              {activePercentage !== null && (
+                <span className='text-muted-foreground mt-1 text-[10px] tabular-nums'>
+                  {activePercentage.toFixed(1)}%
+                </span>
+              )}
             </div>
           </div>
 
-          {/* Legend */}
-          <div className='w-full flex-1 space-y-2'>
+          {/* Ranked payment methods */}
+          <div className='space-y-3'>
             {data.map((item, index) => {
-              const pct =
-                totalAmount > 0
-                  ? ((item.value / totalAmount) * 100).toFixed(1)
-                  : '0'
+              const pct = totalAmount > 0 ? (item.value / totalAmount) * 100 : 0
+
               return (
                 <div
-                  key={item.name}
-                  className={`group flex cursor-pointer items-center gap-2.5 transition-opacity ${
+                  key={item.key}
+                  className={`cursor-pointer transition-opacity ${
                     activeIndex !== null && activeIndex !== index
                       ? 'opacity-40'
                       : ''
@@ -147,27 +204,45 @@ export function PaymentBreakdownChart({
                   onMouseEnter={() => setActiveIndex(index)}
                   onMouseLeave={() => setActiveIndex(null)}
                 >
-                  <div
-                    className='h-5 w-[3px] shrink-0 rounded-sm'
-                    style={{ backgroundColor: item.color }}
-                  />
-                  <span className='text-muted-foreground flex-1 truncate text-xs'>
-                    {item.name}
-                  </span>
-                  <span className='text-muted-foreground font-sans tabular-nums text-xs'>
-                    {pct}%
-                  </span>
-                  <span className='font-sans tabular-nums text-xs font-medium tabular-nums'>
-                    Rp{formatCompact(item.value)}
-                  </span>
+                  <div className='mb-1.5 flex items-center gap-2'>
+                    <div
+                      className='h-2.5 w-2.5 shrink-0 rounded-sm'
+                      style={{
+                        backgroundColor: item.color,
+                      }}
+                    />
+
+                    <span className='text-muted-foreground min-w-0 flex-1 truncate text-xs'>
+                      {item.name}
+                    </span>
+
+                    <span className='text-xs font-medium tabular-nums'>
+                      Rp{formatCompact(item.value)}
+                    </span>
+
+                    <span className='text-muted-foreground w-11 text-right text-[11px] tabular-nums'>
+                      {pct.toFixed(1)}%
+                    </span>
+                  </div>
+
+                  {/* Share bar */}
+                  <div className='bg-muted h-1 overflow-hidden rounded-full'>
+                    <div
+                      className='h-full rounded-full transition-all duration-300'
+                      style={{
+                        width: `${pct}%`,
+                        backgroundColor: item.color,
+                      }}
+                    />
+                  </div>
                 </div>
               )
             })}
           </div>
-        </div>
+        </>
       )}
 
-      <p className='text-muted-foreground font-sans tabular-nums text-xs tracking-[0.12em] uppercase'>
+      <p className='text-muted-foreground mt-auto text-[10px] tracking-[0.12em] uppercase'>
         {t('dashboard.paymentChart.footer')}
       </p>
     </div>
