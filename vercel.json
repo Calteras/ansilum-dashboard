@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/app/terrapos/webhooks/gofood/:path*",
-      "destination": "https://terrapos.calterras.com/app/terrapos/webhooks/gofood/:path*"
+      "destination": "https://api.ansilum.com/app/terrapos/webhooks/gofood/:path*"
     },
     {
       "source": "/api/:path*",
-      "destination": "https://terrapos.calterras.com/app/terrapos/:path*"
+      "destination": "https://api.ansilum.com/app/terrapos/:path*"
     },
     {
       "source": "/((?!api/).*)",

@@ -1,12 +1,12 @@
 [[redirects]]
   from = "/app/terrapos/webhooks/gofood/*"
-  to = "https://terrapos.calterras.com/app/terrapos/webhooks/gofood/:splat"
+  to = "https://api.ansilum.com/app/terrapos/webhooks/gofood/:splat"
   status = 200
   force = true
 
 [[redirects]]
   from = "/api/*"
-  to = "https://terrapos.calterras.com/app/terrapos/:splat"
+  to = "https://api.ansilum.com/app/terrapos/:splat"
   status = 200
   force = true
 

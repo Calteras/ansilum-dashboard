@@ -1,4 +1,4 @@
-curl -b cookies.txt -X POST https://terrapos.calterras.com/app/terrapos/transactions \
+curl -b cookies.txt -X POST https://api.ansilum.com/app/terrapos/transactions \
   -H "Content-Type: application/json" \
   -H "x-tenant-id: cf0c369e-2cf5-49ca-9338-dc1f08dd9474" \
   -d '{

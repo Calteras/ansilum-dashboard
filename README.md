@@ -107,9 +107,9 @@ proxies them to the selected target to support same-origin cookie authentication
 
 | Environment | Config file        | Backend API target                            |
 | ----------- | ------------------ | --------------------------------------------- |
-| Development | `.env.development` | `https://dev-terrapos.calterras.com/app/terrapos` |
+| Development | `.env.development` | `https://api.ansilum.com/app/terrapos` |
 | Staging     | `.env.staging`     | `https://staging-terrapos.calterras.com/app/terrapos` |
-| Production  | `.env.production`  | `https://terrapos.calterras.com/app/terrapos` |
+| Production  | `.env.production`  | `https://api.ansilum.com/app/terrapos` |
 
 | Environment | Run locally           | Build                   | Preview the build locally |
 | ----------- | --------------------- | ----------------------- | ------------------------- |
@@ -132,7 +132,7 @@ changing environment files. See [Vite's environment documentation](https://vite.
 
 ### Local login through a Cloudflare tunnel
 
-With `VITE_API_URL=https://dev-terrapos.calterras.com/app/terrapos`, the browser
+With `VITE_API_URL=https://api.ansilum.com/app/terrapos`, the browser
 still calls `/api` on localhost. Vite forwards requests to the tunnel and changes
 the upstream `Host`, while preserving the browser's `Origin` (for example,
 `http://localhost:5173`). The backend must trust that exact frontend origin,

@@ -4,7 +4,7 @@
 
 TerraPOS uses React 19, Vite, TanStack Router file routes, TanStack Query, Zustand, react-hook-form/Zod, shadcn components, and Sonner. Tests use Vitest, jsdom, and Testing Library. `package.json` declares Better Auth `^1.3.34`; the installed SDK is **1.4.7**. Its `dist/client/proxy.mjs` accepts per-call `fetchOptions` (including headers), but the existing active email-auth implementation already uses `fetch`. This change retains that implementation so HTTP status, `Retry-After`, and the backend's generic signup response remain available.
 
-`API_BASE_URL` is `/api`. Vite proxies it to `VITE_API_URL`; Vercel and Netlify rewrite it to `https://terrapos.calterras.com/app/terrapos`. Calls use `/api/auth/...`, mapping to `/app/terrapos/auth/...` exactly once. All authentication requests use `credentials: 'include'`. No bearer token is created or persisted by signup. Logout and tenant switching retain their existing endpoints.
+`API_BASE_URL` is `/api`. Vite proxies it to `VITE_API_URL`; Vercel and Netlify rewrite it to `https://api.ansilum.com/app/terrapos`. Calls use `/api/auth/...`, mapping to `/app/terrapos/auth/...` exactly once. All authentication requests use `credentials: 'include'`. No bearer token is created or persisted by signup. Logout and tenant switching retain their existing endpoints.
 
 Previously, signup expected an authenticated user and entered business onboarding immediately. The unused signup form and password-reset form were demos that logged form values. There was no CAPTCHA integration. The authenticated layout also needed an explicit unauthenticated redirect after session restoration. These paths now use the verification flow and fail closed without a confirmed session.
 
@@ -88,7 +88,6 @@ Actual inbox delivery, deployed cookie behavior, and real Turnstile validation w
 - [ ] Refresh a protected route, expire the cookie, and log out. Confirm protected content never renders without session confirmation.
 - [ ] Request password reset. Confirm CAPTCHA header, generic feedback and backend-configured reset destination.
 - [ ] Inspect telemetry/logging configuration: exclude credentials, cookies, email values, CAPTCHA tokens and verification URLs. Verify existing employee/POS and tenant-switch workflows against the backend.
-
 
 ## Files created and modified
 
