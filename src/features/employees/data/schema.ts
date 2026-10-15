@@ -34,6 +34,7 @@ export const employeeSchema = z.object({
   phone: z.string().optional(),
   role: employeeRoleSchema,
   isActive: z.boolean(),
+  image: z.string().nullish(),
   outlets: z.array(employeeOutletSchema),
   createdAt: z.string(),
   updatedAt: z.string(),

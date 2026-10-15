@@ -1,5 +1,6 @@
 import { type ColumnDef } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/data-table'
@@ -58,9 +59,17 @@ export const employeesColumns: ColumnDef<Employee>[] = [
       <DataTableColumnHeader column={column} title='Name' />
     ),
     cell: ({ row }) => (
-      <LongText className='max-w-36'>{row.getValue('name')}</LongText>
+      <div className='flex items-center gap-2'>
+        <Avatar className='size-7'>
+          <AvatarImage src={row.original.image ?? undefined} alt='' className='object-cover' />
+          <AvatarFallback className='text-xs'>
+            {row.original.name.slice(0, 2).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <LongText className='max-w-36'>{row.getValue('name')}</LongText>
+      </div>
     ),
-    meta: { className: 'w-36' },
+    meta: { className: 'w-44' },
   },
   {
     accessorKey: 'email',

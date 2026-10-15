@@ -209,6 +209,28 @@
   }
 }
 
+/* Checkout summary printed as a till receipt, the slip Ansilum merchants hand out daily. */
+@utility receipt-edge {
+  --tooth: 7px;
+  padding-bottom: calc(var(--tooth) * 3);
+  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / calc(var(--tooth) * 2) 100%;
+}
+
+@keyframes stamp-in {
+  from {
+    opacity: 0;
+    transform: rotate(-14deg) scale(1.6);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-8deg) scale(1);
+  }
+}
+
+@utility stamp-in {
+  animation: stamp-in 420ms var(--ease-out) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -127,7 +127,6 @@ export interface UpdateProductRequest {
   variants?: Omit<CreateVariantRequest, never>[]
   modifierGroupIds?: string[]
   recipes?: Omit<ProductRecipe, 'id' | 'ingredient'>[]
-  photo?: File
 }
 
 export interface SetProductOutletsRequest {

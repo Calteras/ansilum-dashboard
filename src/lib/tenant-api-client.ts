@@ -9,7 +9,7 @@ type RequestOptions = Omit<RequestInit, 'body'> & {
 /**
  * Get the current active tenant ID from the auth store
  */
-function getActiveTenantId(): string | null {
+export function getActiveTenantId(): string | null {
   const state = useAuthStore.getState()
   return state.activeTenant?.id ?? state.session?.activeTenantId ?? null
 }
@@ -51,8 +51,12 @@ export async function tenantFetch<T>(
 
   if (!response.ok) {
     if (response.status === 401) notifyAuthSessionExpired()
-    const error = await response.json().catch(() => ({ message: 'Request failed' }))
-    throw new Error(error.message || `Request failed with status ${response.status}`)
+    const error = await response
+      .json()
+      .catch(() => ({ message: 'Request failed' }))
+    throw new Error(
+      error.message || `Request failed with status ${response.status}`
+    )
   }
 
   // Handle empty responses (204 No Content)
@@ -66,7 +70,10 @@ export async function tenantFetch<T>(
 /**
  * GET request with tenant context
  */
-export function tenantGet<T>(endpoint: string, options?: RequestOptions): Promise<T> {
+export function tenantGet<T>(
+  endpoint: string,
+  options?: RequestOptions
+): Promise<T> {
   return tenantFetch<T>(endpoint, { ...options, method: 'GET' })
 }
 
@@ -106,46 +113,11 @@ export function tenantPatch<T>(
 /**
  * DELETE request with tenant context
  */
-export function tenantDelete<T>(endpoint: string, options?: RequestOptions): Promise<T> {
-  return tenantFetch<T>(endpoint, { ...options, method: 'DELETE' })
-}
-
-/**
- * Multipart/form-data request with tenant context.
- * Content-Type is intentionally omitted so the browser sets it automatically
- * with the correct multipart boundary.
- */
-export async function tenantFormFetch<T>(
+export function tenantDelete<T>(
   endpoint: string,
-  method: 'POST' | 'PUT' | 'PATCH',
-  formData: FormData
+  options?: RequestOptions
 ): Promise<T> {
-  const tenantId = getActiveTenantId()
-
-  if (!tenantId) {
-    throw new Error('No active tenant selected. Please select a tenant first.')
-  }
-
-  const url = `${API_BASE_URL}${endpoint}`
-  const response = await fetch(url, {
-    method,
-    // Do NOT set Content-Type — browser must set multipart/form-data + boundary
-    headers: { 'x-tenant-id': tenantId },
-    credentials: 'include',
-    body: formData,
-  })
-
-  if (!response.ok) {
-    if (response.status === 401) notifyAuthSessionExpired()
-    const error = await response.json().catch(() => ({ message: 'Request failed' }))
-    throw new Error(error.message || `Request failed with status ${response.status}`)
-  }
-
-  if (response.status === 204) {
-    return undefined as T
-  }
-
-  return response.json()
+  return tenantFetch<T>(endpoint, { ...options, method: 'DELETE' })
 }
 
 /**
@@ -158,6 +130,8 @@ export const tenantApiPaths = {
     get: (id: string) => `/employees/${id}`,
     update: (id: string) => `/employees/${id}`,
     delete: (id: string) => `/employees/${id}`,
+    uploadPhoto: (id: string) => `/employees/${id}/photo`,
+    deletePhoto: (id: string) => `/employees/${id}/photo`,
   },
   outlets: {
     list: '/outlets',
@@ -222,6 +196,21 @@ export const tenantApiPaths = {
     current: '/subscriptions/current',
     subscribe: '/subscriptions/subscribe',
     order: (id: string) => `/subscriptions/orders/${id}`,
+    pendingOrder: '/subscriptions/orders/pending',
+    cancelOrder: (id: string) => `/subscriptions/orders/${id}/cancel`,
+    chargeCard: (id: string) => `/subscriptions/orders/${id}/card-charge`,
+    billing: '/subscriptions/billing',
+    card: '/subscriptions/billing/card',
+    autoRenew: '/subscriptions/billing/auto-renew',
+    payments: '/subscriptions/payments',
+    invoice: (id: string) => `/subscriptions/payments/${id}/invoice`,
+    cancel: '/subscriptions/cancel',
+    resume: '/subscriptions/resume',
+  },
+  notifications: {
+    list: '/notifications',
+    read: (id: string) => `/notifications/${id}/read`,
+    readAll: '/notifications/read-all',
   },
   reservations: {
     list: '/transactions/reservations',
@@ -238,14 +227,17 @@ export const tenantApiPaths = {
     calculate: '/cogs/calculate',
     productCost: (productId: string) => `/cogs/product/${productId}/cost`,
     marginForecast: '/cogs/margin-forecast',
-    productOverhead: (productId: string) => `/cogs/product/${productId}/overhead`,
+    productOverhead: (productId: string) =>
+      `/cogs/product/${productId}/overhead`,
     deleteOverhead: (overheadId: string) => `/cogs/overhead/${overheadId}`,
   },
   outletInventory: {
     byOutlet: (outletId: string) => `/outlet-inventory/${outletId}`,
     lowStock: (outletId: string) => `/outlet-inventory/${outletId}/low-stock`,
-    stockValue: (outletId: string) => `/outlet-inventory/${outletId}/stock-value`,
-    byIngredient: (ingredientId: string) => `/outlet-inventory/ingredient/${ingredientId}`,
+    stockValue: (outletId: string) =>
+      `/outlet-inventory/${outletId}/stock-value`,
+    byIngredient: (ingredientId: string) =>
+      `/outlet-inventory/ingredient/${ingredientId}`,
   },
   tableLayout: {
     // API_BASE_URL (/api) is rewritten to /app/terrapos upstream.
@@ -257,7 +249,6 @@ export const tenantApiPaths = {
       `/table-layout/${outletId}/tables/${tableId}/status`,
     release: (outletId: string, tableId: string) =>
       `/table-layout/${outletId}/tables/${tableId}/release`,
-    monitoring: (outletId: string) =>
-      `/table-layout/${outletId}/monitoring`,
+    monitoring: (outletId: string) => `/table-layout/${outletId}/monitoring`,
   },
 }

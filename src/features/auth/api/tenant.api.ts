@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '@/config/api.config'
+import { deleteImage, uploadImage } from '@/lib/image-upload'
 import type { Tenant, TenantMembership } from './auth.types'
 
 /**
@@ -151,4 +152,44 @@ export async function getActiveTenantApi(): Promise<Tenant | null> {
   } catch {
     return null
   }
+}
+
+/**
+ * Raw tenant row returned by the logo endpoints (unwrapped auth route)
+ */
+type TenantRow = Omit<TenantApiItem, 'role' | 'memberSince'>
+
+function toTenant(item: TenantRow): Tenant {
+  return {
+    id: item.id,
+    name: item.name,
+    slug: item.slug,
+    code: item.code,
+    logo: item.logo || undefined,
+    isActive: item.isActive,
+    createdAt: item.createdAt,
+  }
+}
+
+/**
+ * Upload or replace a tenant's logo. Requires OWNER or ADMIN membership.
+ */
+export async function uploadTenantLogoApi(
+  tenantId: string,
+  file: File
+): Promise<Tenant> {
+  const row = await uploadImage<TenantRow>(
+    `/auth/tenants/${tenantId}/logo`,
+    'logo',
+    file
+  )
+  return toTenant(row)
+}
+
+/**
+ * Remove a tenant's logo. Requires OWNER or ADMIN membership.
+ */
+export async function deleteTenantLogoApi(tenantId: string): Promise<Tenant> {
+  const row = await deleteImage<TenantRow>(`/auth/tenants/${tenantId}/logo`)
+  return toTenant(row)
 }

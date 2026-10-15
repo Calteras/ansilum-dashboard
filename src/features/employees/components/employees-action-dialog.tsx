@@ -1,10 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CheckIcon, ChevronsUpDown } from '@/components/icons'
 import { cn } from '@/lib/utils'
+import { ImagePicker } from '@/components/image-picker'
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -42,7 +44,9 @@ import { SelectDropdown } from '@/components/select-dropdown'
 import { useOutletsQuery } from '@/features/outlets/api/outlets.queries'
 import {
   useCreateEmployeeMutation,
+  useDeleteEmployeePhotoMutation,
   useUpdateEmployeeMutation,
+  useUploadEmployeePhotoMutation,
 } from '../api/employees.queries'
 import { employeeRoles } from '../data/data'
 import type { Employee } from '../data/schema'
@@ -118,7 +122,20 @@ export function EmployeesActionDialog({
   const createMutation = useCreateEmployeeMutation()
   const updateMutation = useUpdateEmployeeMutation()
   const { data: outletsData, isLoading: outletsLoading } = useOutletsQuery()
-  const isLoading = createMutation.isPending || updateMutation.isPending
+  const uploadPhotoMutation = useUploadEmployeePhotoMutation()
+  const deletePhotoMutation = useDeleteEmployeePhotoMutation()
+  const isPhotoPending =
+    uploadPhotoMutation.isPending || deletePhotoMutation.isPending
+  const isLoading =
+    createMutation.isPending || updateMutation.isPending || isPhotoPending
+
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  // Edit only: the existing photo is deleted on save, not immediately.
+  const [removePhoto, setRemovePhoto] = useState(false)
+  const resetPhoto = () => {
+    setPhotoFile(null)
+    setRemovePhoto(false)
+  }
 
   const form = useForm<EmployeeForm>({
     resolver: zodResolver(formSchema),
@@ -166,6 +183,16 @@ export function EmployeesActionDialog({
             outletIds: values.outletIds,
           },
         })
+        // Photo changes go through the dedicated endpoint after the details
+        // are saved, so a rejected image never discards the other edits.
+        if (photoFile) {
+          await uploadPhotoMutation.mutateAsync({
+            id: currentRow.id,
+            photo: photoFile,
+          })
+        } else if (removePhoto && currentRow.image) {
+          await deletePhotoMutation.mutateAsync(currentRow.id)
+        }
       } else {
         await createMutation.mutateAsync({
           employeeNo: values.employeeNo,
@@ -175,8 +202,10 @@ export function EmployeesActionDialog({
           role: values.role as Employee['role'],
           pin: values.pin,
           outletIds: values.outletIds,
+          photo: photoFile ?? undefined,
         })
       }
+      resetPhoto()
       form.reset()
       onOpenChange(false)
     } catch {
@@ -191,6 +220,7 @@ export function EmployeesActionDialog({
       open={open}
       onOpenChange={(state) => {
         if (!isLoading) {
+          resetPhoto()
           form.reset()
           onOpenChange(state)
         }
@@ -215,6 +245,37 @@ export function EmployeesActionDialog({
               onSubmit={form.handleSubmit(onSubmit)}
               className='space-y-4 px-0.5'
             >
+              <div className='grid grid-cols-6 items-start gap-x-4 gap-y-1'>
+                <span className='col-span-2 pt-2 text-end text-sm font-medium'>
+                  Photo
+                </span>
+                <div className='col-span-4'>
+                  <ImagePicker
+                    shape='circle'
+                    src={removePhoto ? null : currentRow?.image}
+                    file={photoFile}
+                    alt='Employee photo'
+                    fallback={
+                      currentRow ? (
+                        <span className='text-lg font-medium'>
+                          {currentRow.name.slice(0, 2).toUpperCase()}
+                        </span>
+                      ) : undefined
+                    }
+                    busy={isPhotoPending}
+                    disabled={isLoading}
+                    onSelect={setPhotoFile}
+                    onRemove={() => {
+                      if (photoFile) setPhotoFile(null)
+                      else setRemovePhoto(true)
+                    }}
+                    uploadLabel='Upload photo'
+                    changeLabel='Change photo'
+                    removeLabel='Remove'
+                    hint='Optional. JPG, PNG or WebP. Max 10 MB.'
+                  />
+                </div>
+              </div>
               <FormField
                 control={form.control}
                 name='employeeNo'

@@ -2,6 +2,7 @@ import { formatMoney } from '@/lib/format'
 import { type ColumnDef } from '@tanstack/react-table'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/data-table'
@@ -65,9 +66,17 @@ export function useProductsColumns(): ColumnDef<Product>[] {
         <DataTableColumnHeader column={column} title={t('products.columns.name')} />
       ),
       cell: ({ row }) => (
-        <LongText className='max-w-48'>{row.getValue('name')}</LongText>
+        <div className='flex items-center gap-2'>
+          <Avatar className='size-8 rounded-md'>
+            <AvatarImage src={row.original.imageUrl} alt='' className='object-cover' />
+            <AvatarFallback className='rounded-md text-xs'>
+              {row.original.name.slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <LongText className='max-w-40'>{row.getValue('name')}</LongText>
+        </div>
       ),
-      meta: { className: 'w-48' },
+      meta: { className: 'w-56' },
     },
     {
       id: 'category',

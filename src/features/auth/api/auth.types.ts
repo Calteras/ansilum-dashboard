@@ -16,6 +16,7 @@ export interface User {
   email: string
   name: string
   emailVerified: boolean
+  image?: string | null
   createdAt: string
   updatedAt: string
 }

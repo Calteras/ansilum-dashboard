@@ -6,6 +6,8 @@ import {
   createEmployeeApi,
   updateEmployeeApi,
   deleteEmployeeApi,
+  uploadEmployeePhotoApi,
+  deleteEmployeePhotoApi,
 } from './employees.api'
 import type {
   CreateEmployeeRequest,
@@ -104,6 +106,53 @@ export function useDeleteEmployeeMutation() {
     },
     onError: (error: Error) => {
       toast.error('Failed to delete employee', {
+        description: error.message,
+      })
+    },
+  })
+}
+
+/**
+ * Mutation hook to upload or replace an employee's photo
+ */
+export function useUploadEmployeePhotoMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, photo }: { id: string; photo: File }) =>
+      uploadEmployeePhotoApi(id, photo),
+    onSuccess: (employee) => {
+      queryClient.invalidateQueries({ queryKey: employeeKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: employeeKeys.detail(employee.id) })
+      toast.success('Photo updated', {
+        description: `${employee.name}'s photo has been updated.`,
+      })
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to upload photo', {
+        description: error.message,
+      })
+    },
+  })
+}
+
+/**
+ * Mutation hook to remove an employee's photo
+ */
+export function useDeleteEmployeePhotoMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => deleteEmployeePhotoApi(id),
+    onSuccess: (employee) => {
+      queryClient.invalidateQueries({ queryKey: employeeKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: employeeKeys.detail(employee.id) })
+      toast.success('Photo removed', {
+        description: `${employee.name}'s photo has been removed.`,
+      })
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to remove photo', {
         description: error.message,
       })
     },

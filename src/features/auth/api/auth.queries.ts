@@ -7,6 +7,7 @@ import {
   clearPendingVerification,
 } from '../verification/pending-email'
 import { AuthRequestError, loginApi, logoutApi } from './auth.api'
+import { deleteProfileImageApi, uploadProfileImageApi } from './profile.api'
 import type { LoginCredentials } from './auth.types'
 import { listTenantsApi, setActiveTenantApi } from './tenant.api'
 
@@ -166,5 +167,41 @@ export function useTenantsQuery() {
       return tenants
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+}
+
+/**
+ * Upload or replace the current user's profile image
+ */
+export function useUploadProfileImageMutation() {
+  const { setUser } = useAuthStore()
+
+  return useMutation({
+    mutationFn: (file: File) => uploadProfileImageApi(file),
+    onSuccess: (user) => {
+      setUser(user)
+      toast.success('Profile photo updated')
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to upload photo', { description: error.message })
+    },
+  })
+}
+
+/**
+ * Remove the current user's profile image
+ */
+export function useDeleteProfileImageMutation() {
+  const { setUser } = useAuthStore()
+
+  return useMutation({
+    mutationFn: () => deleteProfileImageApi(),
+    onSuccess: (user) => {
+      setUser(user)
+      toast.success('Profile photo removed')
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to remove photo', { description: error.message })
+    },
   })
 }

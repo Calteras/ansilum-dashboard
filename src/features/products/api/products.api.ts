@@ -1,8 +1,9 @@
+import { deleteImage, unwrapEntity, uploadImage } from '@/lib/image-upload'
 import {
   tenantGet,
+  tenantPost,
   tenantPut,
   tenantDelete,
-  tenantFormFetch,
   tenantApiPaths,
 } from '@/lib/tenant-api-client'
 import type {
@@ -42,22 +43,23 @@ export async function createProductApi(
   data: CreateProductRequest
 ): Promise<Product> {
   const { photo, ...productData } = data
-  const formData = new FormData()
-  formData.append('data', JSON.stringify(productData))
-  if (photo) formData.append('photo', photo)
-  return tenantFormFetch<Product>(
-    tenantApiPaths.products.create,
-    'POST',
-    formData
-  )
+  const path = tenantApiPaths.products.create
+  // The photo is stored before the product row is written, so a failed upload
+  // creates nothing and the request can simply be retried.
+  if (photo) {
+    return uploadImage<Product>(path, 'photo', photo, {
+      method: 'POST',
+      data: productData,
+    })
+  }
+  return unwrapEntity<Product>(path, await tenantPost(path, productData))
 }
 
 export async function updateProductApi(
   id: string,
   data: UpdateProductRequest
 ): Promise<Product> {
-  const { photo: _photo, ...productData } = data
-  return tenantPut<Product>(tenantApiPaths.products.update(id), productData)
+  return tenantPut<Product>(tenantApiPaths.products.update(id), data)
 }
 
 export async function softDeleteProductApi(id: string): Promise<Product> {
@@ -72,17 +74,11 @@ export async function uploadProductPhotoApi(
   id: string,
   photo: File
 ): Promise<Product> {
-  const formData = new FormData()
-  formData.append('photo', photo)
-  return tenantFormFetch<Product>(
-    tenantApiPaths.products.uploadPhoto(id),
-    'PUT',
-    formData
-  )
+  return uploadImage<Product>(tenantApiPaths.products.uploadPhoto(id), 'photo', photo)
 }
 
 export async function deleteProductPhotoApi(id: string): Promise<Product> {
-  return tenantDelete<Product>(tenantApiPaths.products.deletePhoto(id))
+  return deleteImage<Product>(tenantApiPaths.products.deletePhoto(id))
 }
 
 export async function getProductOutletsApi(id: string): Promise<OutletRef[]> {

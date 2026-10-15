@@ -1,13 +1,14 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { z } from 'zod'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
-import { Plus, Trash2, Upload, X } from '@/components/icons'
+import { Plus, Trash2 } from '@/components/icons'
 import { useTranslation } from 'react-i18next'
 import { tenantGet, tenantApiPaths } from '@/lib/tenant-api-client'
+import { ImagePicker } from '@/components/image-picker'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -39,7 +40,9 @@ import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import {
   useCreateProductMutation,
+  useDeleteProductPhotoMutation,
   useUpdateProductMutation,
+  useUploadProductPhotoMutation,
 } from '../api/products.queries'
 import type {
   OutletRef,
@@ -126,11 +129,17 @@ export function ProductsActionDialog({
   const isEdit = !!currentRow
   const createMutation = useCreateProductMutation()
   const updateMutation = useUpdateProductMutation()
-  const isLoading = createMutation.isPending || updateMutation.isPending
+  const uploadPhotoMutation = useUploadProductPhotoMutation()
+  const deletePhotoMutation = useDeleteProductPhotoMutation()
+  const isLoading =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    uploadPhotoMutation.isPending ||
+    deletePhotoMutation.isPending
 
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  // Edit only: the existing photo is deleted on save, not immediately.
+  const [removePhoto, setRemovePhoto] = useState(false)
 
   const { data: categoriesData } = useQuery({
     queryKey: ['categories', 'list'],
@@ -202,22 +211,6 @@ export function ProductsActionDialog({
     name: 'variants',
   })
 
-  // Revoke object URL on cleanup to avoid memory leaks
-  useEffect(() => {
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl)
-    }
-  }, [previewUrl])
-
-  // Reset photo state when dialog opens/closes
-  useEffect(() => {
-    if (!open) {
-      setPhotoFile(null)
-      setPreviewUrl(null)
-      if (fileInputRef.current) fileInputRef.current.value = ''
-    }
-  }, [open])
-
   useEffect(() => {
     if (open) {
       form.reset(
@@ -285,6 +278,16 @@ export function ProductsActionDialog({
                 : undefined,
           },
         })
+        // Photo changes go through the dedicated endpoint after the details
+        // are saved, so a rejected image never discards the other edits.
+        if (photoFile) {
+          await uploadPhotoMutation.mutateAsync({
+            id: currentRow.id,
+            photo: photoFile,
+          })
+        } else if (removePhoto && currentRow.imageUrl) {
+          await deletePhotoMutation.mutateAsync(currentRow.id)
+        }
       } else {
         await createMutation.mutateAsync({
           name: values.name,
@@ -304,6 +307,7 @@ export function ProductsActionDialog({
           photo: photoFile ?? undefined,
         })
       }
+      resetPhoto()
       form.reset()
       onOpenChange(false)
     } catch {
@@ -311,11 +315,17 @@ export function ProductsActionDialog({
     }
   }
 
+  const resetPhoto = () => {
+    setPhotoFile(null)
+    setRemovePhoto(false)
+  }
+
   return (
     <Dialog
       open={open}
       onOpenChange={(state) => {
         if (!isLoading) {
+          resetPhoto()
           form.reset()
           onOpenChange(state)
         }
@@ -476,60 +486,23 @@ export function ProductsActionDialog({
               <span className='col-span-2 pt-2 text-end text-sm font-medium'>
                 {t('products.form.photo')}
               </span>
-              <div className='col-span-4 space-y-2'>
-                {/* Preview: newly selected file takes priority over existing photoUrl */}
-                {(previewUrl ?? currentRow?.imageUrl) && (
-                  <div className='relative'>
-                    <img
-                      src={previewUrl ?? currentRow?.imageUrl}
-                      alt='Product photo'
-                      className='h-32 w-full rounded-md border object-cover'
-                    />
-                    {previewUrl && (
-                      <button
-                        type='button'
-                        onClick={() => {
-                          URL.revokeObjectURL(previewUrl)
-                          setPhotoFile(null)
-                          setPreviewUrl(null)
-                          if (fileInputRef.current)
-                            fileInputRef.current.value = ''
-                        }}
-                        className='absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80'
-                      >
-                        <X size={12} />
-                      </button>
-                    )}
-                  </div>
-                )}
-                <input
-                  ref={fileInputRef}
-                  type='file'
-                  accept='image/*'
-                  className='hidden'
-                  onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    if (!file) return
-                    if (previewUrl) URL.revokeObjectURL(previewUrl)
-                    setPhotoFile(file)
-                    setPreviewUrl(URL.createObjectURL(file))
+              <div className='col-span-4'>
+                <ImagePicker
+                  src={removePhoto ? null : currentRow?.imageUrl}
+                  file={photoFile}
+                  alt={t('products.form.photo')}
+                  busy={uploadPhotoMutation.isPending || deletePhotoMutation.isPending}
+                  disabled={isLoading}
+                  onSelect={setPhotoFile}
+                  onRemove={() => {
+                    if (photoFile) setPhotoFile(null)
+                    else setRemovePhoto(true)
                   }}
+                  uploadLabel={t('products.form.uploadPhoto')}
+                  changeLabel={t('products.form.changePhoto')}
+                  removeLabel={t('products.form.removePhoto')}
+                  hint={t('products.form.photoHint')}
                 />
-                <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
-                  className='w-full'
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload size={14} className='mr-1.5' />
-                  {previewUrl
-                    ? t('products.form.changePhoto')
-                    : t('products.form.uploadPhoto')}
-                </Button>
-                <p className='text-muted-foreground text-xs'>
-                  {t('products.form.photoHint')}
-                </p>
               </div>
             </div>
 

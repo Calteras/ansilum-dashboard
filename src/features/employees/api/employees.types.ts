@@ -26,6 +26,7 @@ export interface Employee {
   phone?: string
   role: EmployeeRole
   isActive: boolean
+  image?: string | null
   outlets: EmployeeOutlet[]
   createdAt: string
   updatedAt: string
@@ -39,6 +40,7 @@ export interface CreateEmployeeRequest {
   pin: string
   role: EmployeeRole
   outletIds: string[]
+  photo?: File
 }
 
 export interface UpdateEmployeeRequest {

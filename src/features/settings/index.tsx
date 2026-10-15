@@ -1,6 +1,6 @@
 import { useCopy } from '@/hooks/use-copy'
 import { Outlet } from '@tanstack/react-router'
-import { Monitor, Bell, Palette, Wrench, UserCog, CreditCard } from '@/components/icons'
+import { Monitor, Bell, Palette, Wrench, UserCog, CreditCard, Building2 } from '@/components/icons'
 import { Separator } from '@/components/ui/separator'
 import { AppHeader } from '@/components/layout/app-header'
 import { Main } from '@/components/layout/main'
@@ -11,6 +11,11 @@ const sidebarNavItems = [
     title: 'Profile',
     href: '/settings',
     icon: <UserCog size={18} />,
+  },
+  {
+    title: 'Business',
+    href: '/settings/business',
+    icon: <Building2 size={18} />,
   },
   {
     title: 'Account',
@@ -41,7 +46,7 @@ const sidebarNavItems = [
 
 export function Settings() {
   const copy = useCopy()
-  const labels: Record<string, string> = { Profile: copy("Profil", "Profile"), Account: copy("Akun", "Account"), Appearance: copy("Tampilan", "Appearance"), Notifications: copy("Notifikasi", "Notifications"), Display: copy("Isi dasbor", "Display"), Subscription: copy("Langganan", "Subscription") }
+  const labels: Record<string, string> = { Profile: copy("Profil", "Profile"), Business: copy("Usaha", "Business"), Account: copy("Akun", "Account"), Appearance: copy("Tampilan", "Appearance"), Notifications: copy("Notifikasi", "Notifications"), Display: copy("Isi dasbor", "Display"), Subscription: copy("Langganan", "Subscription") }
   return (
     <>
       {/* ===== Top Heading ===== */}

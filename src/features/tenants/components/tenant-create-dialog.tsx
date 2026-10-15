@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
 import { Lock } from '@/components/icons'
+import { ImagePicker } from '@/components/image-picker'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -57,6 +58,7 @@ export function TenantCreateDialog({
   const limit = subscription?.data?.limits.tenants ?? 1
   const tenantCount = subscription?.data?.usage.tenants ?? 0
   const limitReached = subscription?.data?.canCreateTenant === false
+  const [logoFile, setLogoFile] = useState<File | null>(null)
 
   const form = useForm<TenantForm>({
     resolver: zodResolver(formSchema),
@@ -82,7 +84,11 @@ export function TenantCreateDialog({
 
   const onSubmit = async (values: TenantForm) => {
     try {
-      await createMutation.mutateAsync(values)
+      await createMutation.mutateAsync({
+        ...values,
+        logoFile: logoFile ?? undefined,
+      })
+      setLogoFile(null)
       form.reset()
       onOpenChange(false)
     } catch {
@@ -95,6 +101,7 @@ export function TenantCreateDialog({
       open={open}
       onOpenChange={(state) => {
         if (!createMutation.isPending) {
+          setLogoFile(null)
           form.reset()
           onOpenChange(state)
         }
@@ -143,6 +150,20 @@ export function TenantCreateDialog({
                 onSubmit={form.handleSubmit(onSubmit)}
                 className='space-y-4'
               >
+                <div className='space-y-2'>
+                  <span className='text-sm font-medium'>Logo</span>
+                  <ImagePicker
+                    file={logoFile}
+                    alt='Tenant logo'
+                    disabled={createMutation.isPending}
+                    onSelect={setLogoFile}
+                    onRemove={() => setLogoFile(null)}
+                    uploadLabel='Upload logo'
+                    changeLabel='Change logo'
+                    removeLabel='Remove'
+                    hint='Optional. JPG, PNG or WebP. Max 10 MB.'
+                  />
+                </div>
                 <FormField
                   control={form.control}
                   name='name'

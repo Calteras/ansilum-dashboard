@@ -13,19 +13,17 @@ vi.mock('./subscription.api', () => ({
   getSubscriptionOrderApi: vi.fn(),
 }))
 const login = (id: string) =>
-  useAuthStore
-    .getState()
-    .setAuth(
-      {
-        id,
-        name: id,
-        email: `${id}@example.test`,
-        emailVerified: true,
-        createdAt: '',
-        updatedAt: '',
-      },
-      { id: 'session', userId: id, token: '', expiresAt: '2030-01-01' }
-    )
+  useAuthStore.getState().setAuth(
+    {
+      id,
+      name: id,
+      email: `${id}@example.test`,
+      emailVerified: true,
+      createdAt: '',
+      updatedAt: '',
+    },
+    { id: 'session', userId: id, token: '', expiresAt: '2030-01-01' }
+  )
 const entitlement = (tier: 'FULL' | 'BASIC', id = 'account') => ({
   data: {
     tier,
@@ -63,15 +61,13 @@ it('loads the account before tenant selection and keeps FULL across tenant switc
   await waitFor(() => expect(result.current.data?.data.tier).toBe('FULL'))
   for (const id of ['tenant-a', 'tenant-b']) {
     act(() =>
-      useAuthStore
-        .getState()
-        .setActiveTenant({
-          id,
-          name: id,
-          slug: id,
-          isActive: true,
-          createdAt: '',
-        })
+      useAuthStore.getState().setActiveTenant({
+        id,
+        name: id,
+        slug: id,
+        isActive: true,
+        createdAt: '',
+      })
     )
     expect(result.current.data?.data.tier).toBe('FULL')
     expect(result.current.data?.data.usage.outlets).toBe(5)

@@ -108,9 +108,11 @@ export function TenantSwitcher() {
                 className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
                 disabled={isLoading}
               >
-                <div className='bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg'>
+                <div className='bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg'>
                   {isLoading ? (
                     <Loader2 className='size-4 animate-spin' />
+                  ) : activeTenant?.logo ? (
+                    <img src={activeTenant.logo} alt='' className='size-full object-cover' />
                   ) : (
                     <Building2 className='size-4' />
                   )}
@@ -142,8 +144,12 @@ export function TenantSwitcher() {
                   className='gap-2 p-2'
                   disabled={isLoading}
                 >
-                  <div className='flex size-6 items-center justify-center rounded-sm border'>
-                    <Building2 className='size-4 shrink-0' />
+                  <div className='flex size-6 items-center justify-center overflow-hidden rounded-sm border'>
+                    {membership.tenant.logo ? (
+                      <img src={membership.tenant.logo} alt='' className='size-full object-cover' />
+                    ) : (
+                      <Building2 className='size-4 shrink-0' />
+                    )}
                   </div>
                   <div className='flex flex-1 flex-col'>
                     <span className='truncate'>{membership.tenant.name}</span>

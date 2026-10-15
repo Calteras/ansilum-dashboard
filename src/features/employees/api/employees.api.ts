@@ -1,3 +1,4 @@
+import { deleteImage, unwrapEntity, uploadImage } from '@/lib/image-upload'
 import {
   tenantGet,
   tenantPost,
@@ -52,7 +53,15 @@ export async function getEmployeeApi(id: string): Promise<Employee> {
 export async function createEmployeeApi(
   data: CreateEmployeeRequest
 ): Promise<Employee> {
-  return tenantPost<Employee>(tenantApiPaths.employees.create, data)
+  const { photo, ...employeeData } = data
+  const path = tenantApiPaths.employees.create
+  if (photo) {
+    return uploadImage<Employee>(path, 'photo', photo, {
+      method: 'POST',
+      data: employeeData,
+    })
+  }
+  return unwrapEntity<Employee>(path, await tenantPost(path, employeeData))
 }
 
 /**
@@ -70,4 +79,21 @@ export async function updateEmployeeApi(
  */
 export async function deleteEmployeeApi(id: string): Promise<void> {
   return tenantDelete<void>(tenantApiPaths.employees.delete(id))
+}
+
+/**
+ * Upload or replace an employee's profile photo
+ */
+export async function uploadEmployeePhotoApi(
+  id: string,
+  photo: File
+): Promise<Employee> {
+  return uploadImage<Employee>(tenantApiPaths.employees.uploadPhoto(id), 'photo', photo)
+}
+
+/**
+ * Remove an employee's profile photo
+ */
+export async function deleteEmployeePhotoApi(id: string): Promise<Employee> {
+  return deleteImage<Employee>(tenantApiPaths.employees.deletePhoto(id))
 }

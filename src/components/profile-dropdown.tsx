@@ -35,7 +35,7 @@ export function ProfileDropdown() {
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' size='icon' aria-label={copy('Menu akun', 'Account menu')} className='relative'>
             <Avatar className='h-8 w-8'>
-              <AvatarImage src='/avatars/01.png' alt={user?.name} />
+              <AvatarImage src={user?.image ?? undefined} alt={user?.name} />
               <AvatarFallback>
                 {user ? getInitials(user.name) : 'U'}
               </AvatarFallback>

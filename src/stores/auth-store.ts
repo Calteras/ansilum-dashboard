@@ -17,6 +17,7 @@ interface AuthState {
 
   // Actions
   setAuth: (user: User, session: Session) => void
+  setUser: (user: User) => void
   setTenants: (tenants: TenantMembership[]) => void
   setActiveTenant: (tenant: Tenant) => void
   clearAuth: () => void
@@ -44,6 +45,9 @@ export const useAuthStore = create<AuthState>()((set) => ({
       isAuthenticated: true,
       isLoading: false,
     }),
+
+  // Replace the user profile, e.g. after an avatar change
+  setUser: (user) => set({ user }),
 
   // Set user's tenants
   setTenants: (tenants) => set({ tenants }),

@@ -2,6 +2,7 @@ import { LanguageSwitch } from '@/components/language-switch'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { NotificationBell } from '@/features/notifications/notification-bell'
 import { Header } from './header'
 
 export function AppHeader() {
@@ -12,6 +13,7 @@ export function AppHeader() {
     >
       <Search />
       <div className='ms-auto flex shrink-0 items-center gap-1 sm:gap-2'>
+        <NotificationBell />
         <LanguageSwitch />
         <ThemeSwitch />
         <ProfileDropdown />
