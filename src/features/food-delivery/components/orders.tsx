@@ -24,6 +24,7 @@ import {
   availableActions,
   reviewMessages,
 } from '../delivery.logic'
+import { providers } from '../delivery.providers'
 import {
   useDeliveryAccess,
   useDeliveryMutation,
@@ -330,8 +331,7 @@ function OrderDetails({ id }: { id: string }) {
     <div className='space-y-4'>
       <ErrorNotice error={query.error} />
       <h3 className='font-semibold'>
-        #{order.displayId} ·{' '}
-        {order.provider === 'GOFOOD' ? 'GoFood' : 'GrabFood'}
+        #{order.displayId} · {providers[order.provider].name}
       </h3>
       <div className='flex flex-wrap gap-2'>
         <Status value={order.state} />

@@ -13,11 +13,16 @@ and the global delivery flags. No new subscription tier is added.
   command outcomes, and operational history. Actions send the displayed order
   version and an idempotency key. Preparation and external inventory
   acknowledgment explicitly explain their inventory effects.
-- **Integrations:** provider accounts, server credential references, GoFood
-  merchant consent, outlet linking and independent effect flags, item/variant/
-  modifier mappings, reviewed provider menu JSON, and durable provider operations.
-  Setup checkmarks reflect saved configuration, not certification or full mapping
-  coverage. Menus remain separate from the POS catalog.
+- **Integrations:** a guided, six-step setup per provider for the selected
+  outlet: connect the account (server credential reference, plus GoFood merchant
+  consent), link the outlet, prepare the reviewed provider menu JSON, match
+  items/variants/modifiers, activate (connection flags and durable provider
+  operations in the recommended order), and go live (independent outlet effect
+  flags). The guide opens at the first unfinished step; later steps stay locked
+  until an account and outlet link exist. Setup checkmarks reflect saved
+  configuration, not certification or full mapping coverage, and GoFood consent
+  is not tracked because the API does not expose it. Menus remain separate from
+  the POS catalog.
 - **Recovery:** inbox health, blocked/failed event replay after correcting the
   cause, command/operation lookup by UUID, and evidence-based resolution of
   unknown commands. Unknown operations require provider/operator reconciliation;
@@ -26,6 +31,12 @@ and the global delivery flags. No new subscription tier is added.
   source-separated closed sales, and explicitly recorded delivery adjustments.
   Adjustment totals are combined across delivery providers because that is what
   the backend returns. Recording an adjustment never initiates a refund/payout.
+
+Provider logos live in `src/assets/delivery-providers/`. The GoFood logo and
+the Grab wordmark used in the app tile come from Wikimedia Commons; the GrabFood
+wordmarks are the RGB files from Grab's merchant brand centre. They are provider
+trademarks: keep their colours and proportions, use the white versions on dark
+surfaces, and do not use them outside this integration.
 
 ## API and synchronization
 

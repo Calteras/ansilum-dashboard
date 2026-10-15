@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { deliveryApi } from '../delivery.api'
 import { dateTime, parseMenu } from '../delivery.logic'
+import { operationInfo, providers } from '../delivery.providers'
 import {
   notifySaved,
   useDeliveryMutation,
@@ -46,12 +47,10 @@ export function ProviderMenu({ binding }: { binding: Binding }) {
     }
   )
   return (
-    <Panel title={`Reviewed provider menu · Version ${expectedVersion}`}>
-      <p className='text-muted-foreground text-sm'>
-        Save the menu in your provider’s reviewed JSON format. Delivery prices
-        are separate from POS prices. Validate it with provider tools before
-        publication.
-      </p>
+    <Panel
+      title={`Delivery menu (version ${expectedVersion})`}
+      description={`Paste the menu as JSON in ${providers[binding.provider].name}’s menu format. Check it with ${providers[binding.provider].name}’s validation tools first, then save it here.`}
+    >
       {binding.menuVersion > expectedVersion && (
         <Notice>
           <div className='space-y-3'>
@@ -76,8 +75,14 @@ export function ProviderMenu({ binding }: { binding: Binding }) {
         </Notice>
       )}
       {binding.importedMenu && (
-        <details>
-          <summary className='cursor-pointer'>Provider-imported menu</summary>
+        <details className='space-y-3 rounded-lg border p-4'>
+          <summary className='cursor-pointer text-sm font-medium'>
+            Start from the menu {providers[binding.provider].name} sent
+          </summary>
+          <p className='text-muted-foreground text-sm'>
+            {providers[binding.provider].name} shared its current menu for this
+            store. Use it as your draft and adjust it below.
+          </p>
           <JsonDetails value={binding.importedMenu} />
           <Button
             variant='outline'
@@ -184,13 +189,12 @@ export function ProviderOperations({
     mutation.reset()
   }
   return (
-    <Panel title='Provider operations'>
+    <Panel
+      title={`${providers[binding.provider].name} actions`}
+      description='Run one action at a time. Later, come back here to recover missed orders.'
+    >
       <p className='text-muted-foreground text-sm'>
-        Activate your store, publish a reviewed menu, or recover provider
-        orders. Each operation is tracked until its outcome is confirmed.
-      </p>
-      <p className='text-sm'>
-        Last reconciliation: {dateTime(binding.reconciledAt)}
+        Last order recovery: {dateTime(binding.reconciledAt)}
       </p>
       <form
         className='space-y-4'
@@ -207,6 +211,7 @@ export function ProviderOperations({
       >
         <Choice
           label='Operation'
+          hint={operationInfo[action].description}
           value={action}
           onChange={(event) => {
             setAction(event.target.value as OperationAction)
@@ -216,7 +221,7 @@ export function ProviderOperations({
         >
           {actions.map((item) => (
             <option key={item} value={item}>
-              {item.toLowerCase().replace(/_/g, ' ')}
+              {operationInfo[item].label}
             </option>
           ))}
         </Choice>
@@ -247,12 +252,7 @@ export function ProviderOperations({
           />
         )}
         {action === 'PUBLISH_MENU' && !binding.menu && (
-          <Notice>Save a reviewed menu before publishing.</Notice>
-        )}
-        {action === 'PAUSE_STORE' && (
-          <Notice>
-            This requests a pause of the GrabFood marketplace store.
-          </Notice>
+          <Notice>Save a delivery menu in step 3 before publishing.</Notice>
         )}
         {!session.id && (
           <label className='flex items-start gap-2 text-sm'>
@@ -267,7 +267,9 @@ export function ProviderOperations({
         )}
         {(!connection.enabled || !connection.writesEnabled) && (
           <Notice>
-            Enable the connection and provider writes before queuing operations.
+            Switch on “Connection active” and “Send updates to{' '}
+            {providers[binding.provider].name}” above, then save, before running
+            an action.
           </Notice>
         )}
         <ErrorNotice error={mutation.error} />

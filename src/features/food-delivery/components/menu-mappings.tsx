@@ -5,6 +5,7 @@ import type { ModifierGroup } from '@/features/modifier-groups/api/modifier-grou
 import type { Product } from '@/features/products/api/products.types'
 import { deliveryApi } from '../delivery.api'
 import { validateMapping } from '../delivery.logic'
+import { providers } from '../delivery.providers'
 import {
   notifySaved,
   useDeliveryMutation,
@@ -76,11 +77,10 @@ export function MenuMappings({ binding }: { binding: Binding }) {
     )
   )
   return (
-    <Panel title='Menu mappings'>
-      <p className='text-muted-foreground text-sm'>
-        Match provider IDs to local products, variants, and modifiers. Saving an
-        existing provider ID replaces its mapping.
-      </p>
+    <Panel
+      title='Item matches'
+      description={`Add one match for each item and option on your ${providers[binding.provider].name} menu. Saving an ID that’s already matched replaces its old match.`}
+    >
       <ErrorNotice error={query.error ?? products.error ?? groups.error} />
       <form
         className='space-y-4'
@@ -91,7 +91,8 @@ export function MenuMappings({ binding }: { binding: Binding }) {
       >
         <div className='grid gap-4 sm:grid-cols-2'>
           <Choice
-            label='Mapping kind'
+            label='What are you matching?'
+            hint='Options are extras or choices on an item, such as a size or a topping.'
             value={kind}
             onChange={(event) => {
               setKind(event.target.value as 'ITEM' | 'OPTION')
@@ -99,11 +100,12 @@ export function MenuMappings({ binding }: { binding: Binding }) {
               setModifierId('')
             }}
           >
-            <option value='ITEM'>Item</option>
+            <option value='ITEM'>Menu item</option>
             <option value='OPTION'>Option</option>
           </Choice>
           <Field
-            label='Provider item / option ID'
+            label={`${providers[binding.provider].name} item or option ID`}
+            hint='Copy it from the delivery menu you saved in step 3.'
             value={externalId}
             onChange={(event) => setExternalId(event.target.value)}
             maxLength={256}
@@ -111,7 +113,7 @@ export function MenuMappings({ binding }: { binding: Binding }) {
           />
           {kind === 'OPTION' && (
             <Choice
-              label='Option target'
+              label='Counts in Ansilum as'
               value={target}
               onChange={(event) => setTarget(event.target.value)}
             >
@@ -188,15 +190,18 @@ export function MenuMappings({ binding }: { binding: Binding }) {
       {query.isPending ? (
         <p role='status'>Loading mappings…</p>
       ) : !query.data?.length ? (
-        <Notice>No mappings saved for this outlet.</Notice>
+        <Notice>
+          No items matched yet. Start with your best sellers, then work through
+          the rest of the menu.
+        </Notice>
       ) : (
         <div className='overflow-x-auto'>
           <table className='w-full text-left text-sm'>
             <thead>
               <tr className='border-b'>
-                <th className='p-2'>Kind</th>
-                <th className='p-2'>Provider ID</th>
-                <th className='p-2'>Local target</th>
+                <th className='p-2'>Type</th>
+                <th className='p-2'>{providers[binding.provider].name} ID</th>
+                <th className='p-2'>Ansilum item</th>
                 <th className='p-2'>
                   <span className='sr-only'>Actions</span>
                 </th>
@@ -205,7 +210,9 @@ export function MenuMappings({ binding }: { binding: Binding }) {
             <tbody>
               {query.data.map((mapping) => (
                 <tr key={mapping.id} className='border-b'>
-                  <td className='p-2'>{mapping.kind}</td>
+                  <td className='p-2'>
+                    {mapping.kind === 'ITEM' ? 'Menu item' : 'Option'}
+                  </td>
                   <td className='p-2 break-all'>{mapping.externalId}</td>
                   <td className='p-2 break-all'>
                     {productNames.get(mapping.productId ?? '') ??

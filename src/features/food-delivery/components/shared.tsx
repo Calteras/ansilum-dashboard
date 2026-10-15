@@ -1,25 +1,39 @@
 import { useId, type ReactNode } from 'react'
-import { Bike, CircleCheck, CircleDashed, Inbox } from '@/components/icons'
+import { Inbox } from '@/components/icons'
 import { cn } from '@/lib/utils'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { providers } from '../delivery.providers'
 import type { Provider } from '../delivery.types'
 
 export function Panel({
   title,
+  description,
   children,
 }: {
   title: string
+  description?: ReactNode
   children: ReactNode
 }) {
   return (
     <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
+        {description && (
+          <CardDescription className='leading-relaxed'>
+            {description}
+          </CardDescription>
+        )}
       </CardHeader>
       <CardContent className='space-y-4'>{children}</CardContent>
     </Card>
@@ -39,51 +53,77 @@ export function ErrorNotice({ error }: { error: Error | null }) {
     </Alert>
   ) : null
 }
+function Hint({ id, children }: { id: string; children: ReactNode }) {
+  return (
+    <p id={id} className='text-muted-foreground text-xs leading-relaxed'>
+      {children}
+    </p>
+  )
+}
 export function Field({
   label,
+  hint,
   ...props
-}: React.ComponentProps<typeof Input> & { label: string }) {
+}: React.ComponentProps<typeof Input> & { label: string; hint?: ReactNode }) {
   const id = useId()
+  const hintId = useId()
   return (
     <div className='space-y-2'>
       <Label htmlFor={id}>{label}</Label>
-      <Input id={id} {...props} />
+      <Input id={id} aria-describedby={hint ? hintId : undefined} {...props} />
+      {hint && <Hint id={hintId}>{hint}</Hint>}
     </div>
   )
 }
 export function Choice({
   label,
+  hint,
   children,
   ...props
-}: React.ComponentProps<'select'> & { label: string }) {
+}: React.ComponentProps<'select'> & { label: string; hint?: ReactNode }) {
   const id = useId()
+  const hintId = useId()
   return (
     <div className='space-y-2'>
       <Label htmlFor={id}>{label}</Label>
       <select
         id={id}
+        aria-describedby={hint ? hintId : undefined}
         className='border-input bg-background h-9 w-full rounded-md border px-3 text-sm focus-visible:ring-2 disabled:opacity-50'
         {...props}
       >
         {children}
       </select>
+      {hint && <Hint id={hintId}>{hint}</Hint>}
     </div>
   )
 }
 export function Toggle({
   label,
+  description,
   checked,
   onChange,
 }: {
   label: string
+  description?: ReactNode
   checked: boolean
   onChange: (value: boolean) => void
 }) {
   const id = useId()
+  const hintId = useId()
   return (
-    <div className='flex items-center justify-between gap-4'>
-      <Label htmlFor={id}>{label}</Label>
-      <Switch id={id} checked={checked} onCheckedChange={onChange} />
+    <div className='flex items-start justify-between gap-4'>
+      <div className='space-y-1'>
+        <Label htmlFor={id}>{label}</Label>
+        {description && <Hint id={hintId}>{description}</Hint>}
+      </div>
+      <Switch
+        id={id}
+        className='mt-0.5'
+        checked={checked}
+        onCheckedChange={onChange}
+        aria-describedby={description ? hintId : undefined}
+      />
     </div>
   )
 }
@@ -122,18 +162,37 @@ export function Status({ value }: { value: string }) {
 }
 
 export function ProviderMark({ provider }: { provider: Provider }) {
+  const info = providers[provider]
   return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-semibold',
-        provider === 'GOFOOD'
-          ? 'bg-red-50 text-red-700 dark:bg-red-950/50 dark:text-red-300'
-          : 'bg-leaf-soft text-leaf  '
-      )}
-    >
-      <Bike className='size-4' aria-hidden='true' />
-      {provider === 'GOFOOD' ? 'GoFood' : 'GrabFood'}
+    <span className='bg-muted inline-flex items-center gap-2 rounded-lg py-1 pr-2.5 pl-1 text-sm font-semibold'>
+      <img src={info.icon} alt='' className='size-5 shrink-0' />
+      {info.name}
     </span>
+  )
+}
+
+/** Official wordmark, swapped for the light or dark theme. */
+export function ProviderLogo({
+  provider,
+  className,
+}: {
+  provider: Provider
+  className?: string
+}) {
+  const info = providers[provider]
+  return (
+    <>
+      <img
+        src={info.logo}
+        alt={info.name}
+        className={cn('w-auto dark:hidden', className)}
+      />
+      <img
+        src={info.logoOnDark}
+        alt={info.name}
+        className={cn('hidden w-auto dark:block', className)}
+      />
+    </>
   )
 }
 
@@ -160,39 +219,6 @@ export function EmptyState({
   )
 }
 
-export function SetupStep({
-  label,
-  complete,
-  onClick,
-}: {
-  label: string
-  complete: boolean
-  onClick?: () => void
-}) {
-  const Icon = complete ? CircleCheck : CircleDashed
-  return (
-    <button
-      type='button'
-      onClick={onClick}
-      disabled={!onClick}
-      className='bg-card enabled:hover:bg-muted flex items-center gap-3 rounded-lg border p-3 text-left text-sm focus-visible:ring-2'
-    >
-      <Icon
-        className={cn(
-          'size-5 shrink-0',
-          complete ? 'text-leaf' : 'text-muted-foreground'
-        )}
-        aria-hidden='true'
-      />
-      <span>
-        {label}
-        <span className='text-muted-foreground block text-xs'>
-          {complete ? 'Configured' : 'To configure'}
-        </span>
-      </span>
-    </button>
-  )
-}
 export function JsonDetails({ value }: { value: unknown }) {
   return (
     <pre className='bg-muted max-h-72 overflow-auto rounded-md p-3 text-xs break-all whitespace-pre-wrap'>
