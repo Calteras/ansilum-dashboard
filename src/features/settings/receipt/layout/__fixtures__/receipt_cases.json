@@ -1,0 +1,287 @@
+[
+  {
+    "name": "standard",
+    "merchant": {
+      "businessName": "Kedai Senja",
+      "outletName": "Kedai Senja Dago",
+      "address": "Jl. Ir. H. Juanda No. 12\nDago, Bandung",
+      "phone": "0812 3456 7890",
+      "hasLogo": true
+    },
+    "template": {},
+    "document": {
+      "id": "0192f1c4-7a3b-7cde-8f00-1234abcd5678",
+      "issuedAt": "2026-10-16T19:05:00",
+      "cashierName": "Ayu",
+      "customerName": "Budi Santoso",
+      "tableNumber": "4",
+      "orderType": "dineIn",
+      "items": [
+        {
+          "name": "Kopi susu gula aren",
+          "quantity": 2,
+          "unitPriceMinor": 2700000,
+          "totalMinor": 5400000,
+          "variant": "Besar",
+          "modifiers": ["Extra shot", "Gula 50%"],
+          "note": "Es sedikit"
+        },
+        {
+          "name": "Nasi goreng kampung",
+          "quantity": 1,
+          "unitPriceMinor": 3500000,
+          "totalMinor": 3500000
+        },
+        {
+          "name": "Air mineral",
+          "quantity": 3,
+          "unitPriceMinor": 500000,
+          "totalMinor": 1500000
+        }
+      ],
+      "subtotalMinor": 10400000,
+      "discountMinor": 500000,
+      "taxMinor": 1144000,
+      "taxBasisPoints": 1100,
+      "serviceMinor": 520000,
+      "serviceBasisPoints": 500,
+      "totalMinor": 11564000,
+      "payments": [
+        { "method": "cash", "amountMinor": 11564000, "receivedMinor": 12000000 }
+      ],
+      "changeMinor": 436000
+    }
+  },
+  {
+    "name": "split_payment",
+    "merchant": {
+      "businessName": "Toko Roti Mentari",
+      "outletName": "Toko Roti Mentari",
+      "address": "Jl. Pemuda 88, Semarang",
+      "phone": "024 355 1234"
+    },
+    "template": {
+      "header": { "taxId": "01.234.567.8-901.000" },
+      "footer": {
+        "thankYou": "Terima kasih, sampai jumpa lagi!",
+        "policy": "Barang yang sudah dibeli tidak dapat ditukar.",
+        "website": "www.rotimentari.id",
+        "showQr": true,
+        "qrValue": "https://rotimentari.id/ulasan"
+      }
+    },
+    "document": {
+      "id": "0192f1c4-0000-7000-8000-00000000abcd",
+      "number": "TRM-20261016-0007",
+      "issuedAt": "2026-10-16T08:30:00",
+      "cashierName": "Dewi Anggraini",
+      "customerName": "Rina",
+      "orderType": "takeaway",
+      "items": [
+        {
+          "name": "Roti sobek cokelat keju",
+          "quantity": 2,
+          "unitPriceMinor": 2800000,
+          "totalMinor": 5600000
+        },
+        {
+          "name": "Croissant mentega",
+          "quantity": 1,
+          "unitPriceMinor": 1800000,
+          "totalMinor": 1800000,
+          "note": "Dihangatkan"
+        }
+      ],
+      "subtotalMinor": 7400000,
+      "discountMinor": 740000,
+      "taxMinor": 0,
+      "totalMinor": 6660000,
+      "payments": [
+        { "method": "bankTransfer", "amountMinor": 5000000 },
+        { "method": "cash", "amountMinor": 1660000, "receivedMinor": 2000000 }
+      ],
+      "changeMinor": 340000,
+      "rewardName": "Diskon member 10%",
+      "loyalty": { "earnedPoints": 66, "redeemedPoints": 100, "projectedPoints": 412 }
+    }
+  },
+  {
+    "name": "balance_due",
+    "merchant": {
+      "businessName": "Rumah Makan Sederhana",
+      "outletName": "Cabang Kemang",
+      "address": "Jl. Kemang Raya 5, Jakarta Selatan",
+      "hasLogo": true
+    },
+    "template": {
+      "language": "en",
+      "header": { "showLogo": false, "showPhone": false },
+      "footer": { "thankYou": "Thank you for your reservation" }
+    },
+    "document": {
+      "id": "res-0001",
+      "number": "RMS-R-0042",
+      "issuedAt": "2026-10-18T12:00:00",
+      "customerName": "Keluarga Hartono",
+      "tableNumber": "Teras 2",
+      "orderType": "reservation",
+      "items": [
+        {
+          "name": "Paket keluarga A",
+          "quantity": 1,
+          "unitPriceMinor": 450000000,
+          "totalMinor": 450000000,
+          "modifiers": ["Es teh manis", "Sambal terpisah"]
+        },
+        {
+          "name": "Gurame bakar",
+          "quantity": 2,
+          "unitPriceMinor": 22500000,
+          "totalMinor": 45000000
+        }
+      ],
+      "subtotalMinor": 495000000,
+      "taxMinor": 54450000,
+      "taxBasisPoints": 1100,
+      "totalMinor": 549450000,
+      "payments": [{ "method": "bankTransfer", "amountMinor": 200000000 }],
+      "remainingMinor": 349450000
+    }
+  },
+  {
+    "name": "long_content",
+    "merchant": {
+      "businessName": "Warung Makan Ibu Sri Rejeki Sejahtera Abadi",
+      "outletName": "Cabang Bandara Internasional Soekarno-Hatta Terminal 3",
+      "address": "Kompleks Pergudangan Bandara Blok C7 No. 1234–1236, Kecamatan Benda, Kota Tangerang, Banten 15126",
+      "phone": "+62 21 5591 2345 ext. 6789"
+    },
+    "template": {},
+    "document": {
+      "id": "0192f1c4-7a3b-7cde-8f00-000000000001",
+      "issuedAt": "2026-12-31T23:59:00",
+      "cashierName": "Muhammad Fajar Ramadhan Saputra Wijaya",
+      "customerName": "PT Sinar Harapan Jaya Makmur Sentosa Indonesia",
+      "tableNumber": "VIP-12A",
+      "orderType": "dineIn",
+      "items": [
+        {
+          "name": "Paket nasi tumpeng mini lengkap dengan ayam goreng, telur balado, perkedel, dan sambal",
+          "quantity": 12,
+          "unitPriceMinor": 8750000,
+          "totalMinor": 105000000,
+          "variant": "Porsi besar (untuk 2 orang)",
+          "modifiers": ["Tambah kerupuk udang", "Sambal matah terpisah", "Tanpa bawang goreng"],
+          "note": "Antar ke ruang rapat lantai 3, jam 12.30 tepat – jangan terlambat"
+        },
+        {
+          "name": "Café crème brûlée ☕ spesial",
+          "quantity": 1,
+          "unitPriceMinor": 4500000,
+          "totalMinor": 4500000
+        },
+        {
+          "name": "Sewa ruang VIP",
+          "quantity": 1,
+          "unitPriceMinor": 123456789000,
+          "totalMinor": 123456789000
+        }
+      ],
+      "subtotalMinor": 123566289000,
+      "taxMinor": 13592291790,
+      "taxBasisPoints": 1100,
+      "serviceMinor": 6178314450,
+      "serviceBasisPoints": 500,
+      "totalMinor": 143336895240,
+      "payments": [{ "method": "debitCard", "amountMinor": 143336895240 }]
+    }
+  },
+  {
+    "name": "minimal",
+    "merchant": {
+      "businessName": "Kios Pak Joko",
+      "outletName": "Pasar Baru",
+      "address": "Los B-12",
+      "phone": "0811 222 333",
+      "hasLogo": true
+    },
+    "template": {
+      "header": {
+        "showLogo": false,
+        "businessName": "PAK JOKO",
+        "showOutletName": false,
+        "showAddress": false,
+        "showPhone": false,
+        "note": "Buka 06.00-14.00"
+      },
+      "transaction": {
+        "showCashier": false,
+        "showCustomer": false,
+        "showTable": false,
+        "showOrderType": false
+      },
+      "items": { "showModifiers": false, "showNotes": false, "showUnitPrice": false },
+      "footer": { "thankYou": "", "showPoweredBy": false }
+    },
+    "document": {
+      "id": "0192f1c4-7a3b-7cde-8f00-00000000beef",
+      "issuedAt": "2026-10-16T06:15:00",
+      "cashierName": "Joko",
+      "customerName": "Tamu",
+      "orderType": "takeaway",
+      "items": [
+        {
+          "name": "Gorengan campur",
+          "quantity": 5,
+          "unitPriceMinor": 100000,
+          "totalMinor": 500000,
+          "modifiers": ["Cabe rawit"],
+          "note": "Dibungkus"
+        },
+        {
+          "name": "Teh manis",
+          "quantity": 1,
+          "unitPriceMinor": 300000,
+          "totalMinor": 300000
+        }
+      ],
+      "subtotalMinor": 800000,
+      "totalMinor": 800000,
+      "payments": [{ "method": "qrCode", "amountMinor": 800000 }]
+    }
+  },
+  {
+    "name": "copy_basic_printer",
+    "copy": true,
+    "capabilities": { "qrCode": "no", "doubleSize": "no" },
+    "merchant": {
+      "businessName": "Kedai Senja",
+      "outletName": "Kedai Senja Dago",
+      "hasLogo": true
+    },
+    "template": {
+      "footer": { "showQr": true, "qrValue": "https://kedaisenja.id/menu" }
+    },
+    "document": {
+      "id": "0192f1c4-7a3b-7cde-8f00-1234abcd9999",
+      "number": "KS-0099",
+      "issuedAt": "2026-10-16T20:41:00",
+      "cashierName": "Ayu",
+      "orderType": "dineIn",
+      "items": [
+        {
+          "name": "Teh tarik",
+          "quantity": 2,
+          "unitPriceMinor": 1800000,
+          "totalMinor": 3600000
+        }
+      ],
+      "subtotalMinor": 3600000,
+      "totalMinor": 3600000,
+      "payments": [
+        { "method": "cash", "amountMinor": 3600000, "receivedMinor": 5000000 }
+      ],
+      "changeMinor": 1400000
+    }
+  }
+]

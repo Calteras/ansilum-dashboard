@@ -1,0 +1,25 @@
+L  Rumah Makan Sederhana
+                   Cabang Kemang
+         Jl. Kemang Raya 5, Jakarta Selatan
+  ------------------------------------------------
+  Receipt no.                           RMS-R-0042
+  Date                           18 Oct 2026 12:00
+  Customer                        Keluarga Hartono
+  Table                                    Teras 2
+  Order type                           Reservation
+  ------------------------------------------------
+  1x Paket keluarga A         4,500,000  4,500,000
+     + Es teh manis, Sambal terpisah
+  2x Gurame bakar               225,000    450,000
+  ------------------------------------------------
+  Subtotal                               4,950,000
+  Tax 11%                                  544,500
+  ------------------------------------------------
+L TOTAL        Rp5,494,500
+  ------------------------------------------------
+  Transfer                               2,000,000
+B Balance due                            3,494,500
+B                 NOT PAID IN FULL
+
+           Thank you for your reservation
+                 Powered by Ansilum

@@ -1,0 +1,22 @@
+I logo
+B                   Kedai Senja
+                  Kedai Senja Dago
+B                 *** SALINAN ***
+  ------------------------------------------------
+  No. struk                                KS-0099
+  Tanggal                        16 Okt 2026 20.41
+  Kasir                                        Ayu
+  Jenis pesanan                    Makan di tempat
+  ------------------------------------------------
+  2x Teh tarik                      18.000  36.000
+  ------------------------------------------------
+  Subtotal                                  36.000
+  ------------------------------------------------
+B TOTAL                                   Rp36.000
+  ------------------------------------------------
+  Tunai                                     50.000
+  Kembalian                                 14.000
+
+          Terima kasih atas kunjungan Anda
+             https://kedaisenja.id/menu
+                 Powered by Ansilum

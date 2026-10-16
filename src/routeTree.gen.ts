@@ -50,6 +50,7 @@ import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/c
 import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-up'
 import { Route as ClerkauthSignInRouteImport } from './routes/clerk/(auth)/sign-in'
 import { Route as AuthenticatedSettingsSubscriptionRouteImport } from './routes/_authenticated/settings/subscription'
+import { Route as AuthenticatedSettingsReceiptRouteImport } from './routes/_authenticated/settings/receipt'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsBusinessRouteImport } from './routes/_authenticated/settings/business'
@@ -279,6 +280,12 @@ const AuthenticatedSettingsSubscriptionRoute =
     path: '/subscription',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedSettingsReceiptRoute =
+  AuthenticatedSettingsReceiptRouteImport.update({
+    id: '/receipt',
+    path: '/receipt',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
 const AuthenticatedSettingsNotificationsRoute =
   AuthenticatedSettingsNotificationsRouteImport.update({
     id: '/notifications',
@@ -351,6 +358,7 @@ export interface FileRoutesByFullPath {
   '/settings/business': typeof AuthenticatedSettingsBusinessRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/settings/receipt': typeof AuthenticatedSettingsReceiptRoute
   '/settings/subscription': typeof AuthenticatedSettingsSubscriptionRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
@@ -398,6 +406,7 @@ export interface FileRoutesByTo {
   '/settings/business': typeof AuthenticatedSettingsBusinessRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/settings/receipt': typeof AuthenticatedSettingsReceiptRoute
   '/settings/subscription': typeof AuthenticatedSettingsSubscriptionRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
@@ -450,6 +459,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/business': typeof AuthenticatedSettingsBusinessRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/_authenticated/settings/receipt': typeof AuthenticatedSettingsReceiptRoute
   '/_authenticated/settings/subscription': typeof AuthenticatedSettingsSubscriptionRoute
   '/clerk/(auth)/sign-in': typeof ClerkauthSignInRoute
   '/clerk/(auth)/sign-up': typeof ClerkauthSignUpRoute
@@ -500,6 +510,7 @@ export interface FileRouteTypes {
     | '/settings/business'
     | '/settings/display'
     | '/settings/notifications'
+    | '/settings/receipt'
     | '/settings/subscription'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
@@ -547,6 +558,7 @@ export interface FileRouteTypes {
     | '/settings/business'
     | '/settings/display'
     | '/settings/notifications'
+    | '/settings/receipt'
     | '/settings/subscription'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
@@ -598,6 +610,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/business'
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
+    | '/_authenticated/settings/receipt'
     | '/_authenticated/settings/subscription'
     | '/clerk/(auth)/sign-in'
     | '/clerk/(auth)/sign-up'
@@ -931,6 +944,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsSubscriptionRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/settings/receipt': {
+      id: '/_authenticated/settings/receipt'
+      path: '/receipt'
+      fullPath: '/settings/receipt'
+      preLoaderRoute: typeof AuthenticatedSettingsReceiptRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
     '/_authenticated/settings/notifications': {
       id: '/_authenticated/settings/notifications'
       path: '/notifications'
@@ -996,6 +1016,7 @@ interface AuthenticatedSettingsRouteRouteChildren {
   AuthenticatedSettingsBusinessRoute: typeof AuthenticatedSettingsBusinessRoute
   AuthenticatedSettingsDisplayRoute: typeof AuthenticatedSettingsDisplayRoute
   AuthenticatedSettingsNotificationsRoute: typeof AuthenticatedSettingsNotificationsRoute
+  AuthenticatedSettingsReceiptRoute: typeof AuthenticatedSettingsReceiptRoute
   AuthenticatedSettingsSubscriptionRoute: typeof AuthenticatedSettingsSubscriptionRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
 }
@@ -1008,6 +1029,7 @@ const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteCh
     AuthenticatedSettingsDisplayRoute: AuthenticatedSettingsDisplayRoute,
     AuthenticatedSettingsNotificationsRoute:
       AuthenticatedSettingsNotificationsRoute,
+    AuthenticatedSettingsReceiptRoute: AuthenticatedSettingsReceiptRoute,
     AuthenticatedSettingsSubscriptionRoute:
       AuthenticatedSettingsSubscriptionRoute,
     AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,

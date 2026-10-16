@@ -16,3 +16,5 @@
 
 # Ignore auto generated routeTree.gen.ts
 /src/routeTree.gen.ts
+# Receipt layout fixtures are copied byte for byte from the POS app (ansilum-flutter test/receipt/fixtures)
+src/features/settings/receipt/layout/__fixtures__

@@ -1,0 +1,34 @@
+I logo
+L       Kedai Senja
+                  Kedai Senja Dago
+              Jl. Ir. H. Juanda No. 12
+                   Dago, Bandung
+                Telp 0812 3456 7890
+  ------------------------------------------------
+  No. struk                               ABCD5678
+  Tanggal                        16 Okt 2026 19.05
+  Kasir                                        Ayu
+  Pelanggan                           Budi Santoso
+  Meja                                           4
+  Jenis pesanan                    Makan di tempat
+  ------------------------------------------------
+  2x Kopi susu gula aren            27.000  54.000
+     Besar
+     + Extra shot, Gula 50%
+     Catatan: Es sedikit
+  1x Nasi goreng kampung            35.000  35.000
+  3x Air mineral                     5.000  15.000
+  ------------------------------------------------
+  Subtotal                                 104.000
+  Diskon                                    -5.000
+  Pajak 11%                                 11.440
+  Layanan 5%                                 5.200
+  ------------------------------------------------
+L TOTAL          Rp115.640
+  ------------------------------------------------
+  Tunai                                    120.000
+  Kembalian                                  4.360
+
+          Terima kasih atas kunjungan Anda
+                 Powered by Ansilum
+S             ID 0192f1c4-7a3b-7cde-8f00-1234abcd5678

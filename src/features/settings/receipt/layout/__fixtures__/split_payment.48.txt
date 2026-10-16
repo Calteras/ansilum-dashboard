@@ -1,0 +1,35 @@
+L    Toko Roti Mentari
+              Jl. Pemuda 88, Semarang
+                 Telp 024 355 1234
+             NPWP 01.234.567.8-901.000
+  ------------------------------------------------
+  No. struk                      TRM-20261016-0007
+  Tanggal                        16 Okt 2026 08.30
+  Kasir                             Dewi Anggraini
+  Pelanggan                                   Rina
+  Jenis pesanan                        Bawa pulang
+  ------------------------------------------------
+  2x Roti sobek cokelat keju        28.000  56.000
+  1x Croissant mentega              18.000  18.000
+     Catatan: Dihangatkan
+B Reward: Diskon member 10%
+  ------------------------------------------------
+  Subtotal                                  74.000
+  Diskon                                    -7.400
+  ------------------------------------------------
+L TOTAL           Rp66.600
+  ------------------------------------------------
+  Transfer                                  50.000
+  Tunai                                     20.000
+  Kembalian                                  3.400
+  ------------------------------------------------
+  Poin didapat                                  66
+  Poin ditukar                                 100
+  Saldo poin                                   412
+  Saldo bisa berubah setelah sinkron.
+
+          Terima kasih, sampai jumpa lagi!
+   Barang yang sudah dibeli tidak dapat ditukar.
+                 www.rotimentari.id
+Q https://rotimentari.id/ulasan
+                 Powered by Ansilum

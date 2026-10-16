@@ -1,7 +1,16 @@
-import { useCopy } from '@/hooks/use-copy'
 import { Outlet } from '@tanstack/react-router'
-import { Monitor, Bell, Palette, Wrench, UserCog, CreditCard, Building2 } from '@/components/icons'
+import { useCopy } from '@/hooks/use-copy'
 import { Separator } from '@/components/ui/separator'
+import {
+  Monitor,
+  Bell,
+  Palette,
+  Wrench,
+  UserCog,
+  CreditCard,
+  Building2,
+  Receipt,
+} from '@/components/icons'
 import { AppHeader } from '@/components/layout/app-header'
 import { Main } from '@/components/layout/main'
 import { SidebarNav } from './components/sidebar-nav'
@@ -16,6 +25,11 @@ const sidebarNavItems = [
     title: 'Business',
     href: '/settings/business',
     icon: <Building2 size={18} />,
+  },
+  {
+    title: 'Receipt',
+    href: '/settings/receipt',
+    icon: <Receipt size={18} />,
   },
   {
     title: 'Account',
@@ -46,7 +60,16 @@ const sidebarNavItems = [
 
 export function Settings() {
   const copy = useCopy()
-  const labels: Record<string, string> = { Profile: copy("Profil", "Profile"), Business: copy("Usaha", "Business"), Account: copy("Akun", "Account"), Appearance: copy("Tampilan", "Appearance"), Notifications: copy("Notifikasi", "Notifications"), Display: copy("Isi dasbor", "Display"), Subscription: copy("Langganan", "Subscription") }
+  const labels: Record<string, string> = {
+    Profile: copy('Profil', 'Profile'),
+    Business: copy('Usaha', 'Business'),
+    Receipt: copy('Struk & cetak', 'Receipt & printing'),
+    Account: copy('Akun', 'Account'),
+    Appearance: copy('Tampilan', 'Appearance'),
+    Notifications: copy('Notifikasi', 'Notifications'),
+    Display: copy('Isi dasbor', 'Display'),
+    Subscription: copy('Langganan', 'Subscription'),
+  }
   return (
     <>
       {/* ===== Top Heading ===== */}
@@ -58,13 +81,21 @@ export function Settings() {
             {copy('Pengaturan', 'Settings')}
           </h1>
           <p className='text-muted-foreground'>
-            {copy('Atur akun, tampilan, dan paket untuk usaha Anda.', 'Manage your account, appearance, and business subscription.')}
+            {copy(
+              'Atur akun, tampilan, dan paket untuk usaha Anda.',
+              'Manage your account, appearance, and business subscription.'
+            )}
           </p>
         </div>
         <Separator className='my-4 lg:my-6' />
         <div className='flex flex-1 flex-col space-y-2 overflow-hidden md:space-y-2 lg:flex-row lg:space-y-0 lg:space-x-12'>
           <aside className='top-0 lg:sticky lg:w-1/5'>
-            <SidebarNav items={sidebarNavItems.map((item) => ({ ...item, title: labels[item.title] }))} />
+            <SidebarNav
+              items={sidebarNavItems.map((item) => ({
+                ...item,
+                title: labels[item.title],
+              }))}
+            />
           </aside>
           <div className='flex w-full overflow-y-auto p-1'>
             <Outlet />

@@ -1,0 +1,47 @@
+L Warung Makan Ibu
+L    Sri Rejeki
+L Sejahtera Abadi
+    Cabang Bandara Internasional
+     Soekarno-Hatta Terminal 3
+    Kompleks Pergudangan Bandara
+  Blok C7 No. 1234-1236, Kecamatan
+   Benda, Kota Tangerang, Banten
+               15126
+  Telp +62 21 5591 2345 ext. 6789
+  --------------------------------
+  No. struk               00000001
+  Tanggal        31 Des 2026 23.59
+  Kasir
+   Muhammad Fajar Ramadhan Saputra
+                            Wijaya
+  Pelanggan
+      PT Sinar Harapan Jaya Makmur
+                 Sentosa Indonesia
+  Meja                     VIP-12A
+  Jenis pesanan    Makan di tempat
+  --------------------------------
+  Paket nasi tumpeng mini lengkap
+  dengan ayam goreng, telur
+  balado, perkedel, dan sambal
+    12 x 87.500          1.050.000
+    Porsi besar (untuk 2 orang)
+    + Tambah kerupuk udang, Sambal
+      matah terpisah, Tanpa bawang
+      goreng
+    Catatan: Antar ke ruang rapat
+    lantai 3, jam 12.30 tepat -
+    jangan terlambat
+  Cafe creme brulee spesial 45.000
+  Sewa ruang VIP     1.234.567.890
+  --------------------------------
+  Subtotal           1.235.662.890
+  Pajak 11%         135.922.917,90
+  Layanan 5%         61.783.144,50
+  --------------------------------
+B TOTAL         Rp1.433.368.952,40
+  --------------------------------
+  Kartu debit     1.433.368.952,40
+
+  Terima kasih atas kunjungan Anda
+         Powered by Ansilum
+S  ID 0192f1c4-7a3b-7cde-8f00-000000000001
