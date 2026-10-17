@@ -10,11 +10,10 @@ L    Sederhana
   Table                    Teras 2
   Order type           Reservation
   --------------------------------
-  Paket keluarga A       4,500,000
-    + Es teh manis, Sambal
-      terpisah
-  Gurame bakar
-    2 x 225,000            450,000
+  1x Paket keluarga A    4,500,000
+S     Es teh manis, Sambal terpisah
+  2x Gurame bakar          450,000
+S     2 x 225,000
   --------------------------------
   Subtotal               4,950,000
   Tax 11%                  544,500

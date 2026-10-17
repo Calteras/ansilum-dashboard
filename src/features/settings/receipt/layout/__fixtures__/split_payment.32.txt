@@ -10,10 +10,11 @@ L     Mentari
   Pelanggan                   Rina
   Jenis pesanan        Bawa pulang
   --------------------------------
-  Roti sobek cokelat keju
-    2 x 28.000              56.000
-  Croissant mentega         18.000
-    Catatan: Dihangatkan
+  2x Roti sobek cokelat     56.000
+     keju
+S     2 x 28.000
+  1x Croissant mentega      18.000
+     Catatan: Dihangatkan
 B Reward: Diskon member 10%
   --------------------------------
   Subtotal                  74.000

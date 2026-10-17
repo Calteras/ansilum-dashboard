@@ -261,9 +261,9 @@ export class ReceiptLayout {
   ): ReceiptLine[] {
     const show = template.items
     const amount = (minor: number) => formatAmount(minor, language)
+    const qtyWidth =
+      Math.max(0, ...items.map((item) => `${item.quantity}x`.length)) + 1
     if (this.wide) {
-      const qtyWidth =
-        Math.max(0, ...items.map((item) => `${item.quantity}x`.length)) + 1
       const totalWidth = Math.max(
         0,
         ...items.map((item) => amount(item.totalMinor).length)
@@ -294,36 +294,41 @@ export class ReceiptLayout {
       }
     }
     return items.flatMap((item) =>
-      this.narrowItem(item, template, labels, amount)
+      this.narrowItem(item, template, labels, qtyWidth, amount)
     )
   }
 
+  // `2x Kopi susu   54.000`: quantity, name and line total on one line,
+  // with the details under the name.
   private narrowItem(
     item: ReceiptItem,
     template: ReceiptTemplate,
     labels: ReceiptLabels,
+    qtyWidth: number,
     amount: (minor: number) => string
   ): ReceiptLine[] {
-    const name = printableLine(item.name)
-    const total = amount(item.totalMinor)
-    let rows: string[]
-    if (item.quantity > 1 && template.items.showUnitPrice) {
-      const each = `  ${item.quantity} x ${amount(item.unitPriceMinor)}`
-      rows = [
-        ...wrapText(name, this.columns),
-        ...(each.length + 1 + total.length <= this.columns
-          ? [
-              `${each}${' '.repeat(this.columns - each.length - total.length)}${total}`,
-            ]
-          : [each, total.padStart(this.columns)]),
-      ]
-    } else {
-      const prefix = item.quantity > 1 ? `${item.quantity}x ` : ''
-      rows = formatRow(`${prefix}${name}`, total, this.columns, prefix.length)
-    }
+    // The name and total fill the space after the quantity column, so
+    // wrapped names line up under the first one.
+    const rows = formatRow(
+      printableLine(item.name),
+      amount(item.totalMinor),
+      this.columns - qtyWidth
+    )
+    const quantity = `${item.quantity}x`.padEnd(qtyWidth)
     return [
-      ...rows.map((row) => text(row)),
-      ...this.itemDetails(item, template, labels, 2),
+      ...rows.map((row, index) =>
+        text(`${index === 0 ? quantity : ' '.repeat(qtyWidth)}${row}`)
+      ),
+      ...this.itemDetails(
+        item,
+        template,
+        labels,
+        qtyWidth,
+        // Narrow paper has no unit price column.
+        item.quantity > 1 && template.items.showUnitPrice
+          ? `${item.quantity} x ${amount(item.unitPriceMinor)}`
+          : undefined
+      ),
     ]
   }
 
@@ -356,26 +361,40 @@ export class ReceiptLayout {
     ]
   }
 
+  // Under an item's name: the variant and options in the small font
+  // (`Dingin, Gula 2x`), the unit price when narrow paper has no column
+  // for it, then the note.
   private itemDetails(
     item: ReceiptItem,
     template: ReceiptTemplate,
     labels: ReceiptLabels,
-    indent: number
+    indent: number,
+    unitPrice?: string
   ): ReceiptLine[] {
     const variant = printableLine(item.variant ?? '')
-    const modifiers = (item.modifiers ?? [])
-      .map(printableLine)
-      .filter((modifier) => modifier.length > 0)
+    const options = [
+      ...(variant ? [variant] : []),
+      ...(template.items.showModifiers ? counted(item.modifiers ?? []) : []),
+    ]
     const note = printableLine(item.note ?? '')
     const lines: ReceiptLine[] = []
-    if (variant) lines.push(...this.indented(variant, indent))
-    if (template.items.showModifiers && modifiers.length > 0) {
-      lines.push(...this.indented(`+ ${modifiers.join(', ')}`, indent, 2))
+    if (options.length > 0) {
+      lines.push(...this.small(options.join(', '), indent))
     }
+    if (unitPrice !== undefined) lines.push(...this.small(unitPrice, indent))
     if (template.items.showNotes && note) {
       lines.push(...this.indented(`${labels.note}: ${note}`, indent))
     }
     return lines
+  }
+
+  // `value` in the small font, wrapped, indented to line up under an
+  // item's name: `indent` normal columns, in small ones.
+  private small(value: string, indent: number): ReceiptLine[] {
+    const smallIndent = Math.round((indent * this.smallColumns) / this.columns)
+    return wrapText(value, this.smallColumns - smallIndent).map((line) =>
+      text(`${' '.repeat(smallIndent)}${line}`, 'small')
+    )
   }
 
   private total(label: string, amount: string): ReceiptLine[] {
@@ -491,6 +510,19 @@ export class ReceiptLayout {
       text(`${' '.repeat(indent + (index === 0 ? 0 : hang))}${line}`)
     )
   }
+}
+
+// Option names in order; one chosen more than once is listed once with its
+// count (`Gula 2x`).
+function counted(names: string[]): string[] {
+  const counts = new Map<string, number>()
+  for (const name of names) {
+    const printable = printableLine(name)
+    if (printable) counts.set(printable, (counts.get(printable) ?? 0) + 1)
+  }
+  return [...counts].map(([name, count]) =>
+    count > 1 ? `${name} ${count}x` : name
+  )
 }
 
 function text(value: string, style: ReceiptTextStyle = 'normal'): ReceiptLine {

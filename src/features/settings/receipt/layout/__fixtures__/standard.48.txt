@@ -13,8 +13,7 @@ L       Kedai Senja
   Jenis pesanan                    Makan di tempat
   ------------------------------------------------
   2x Kopi susu gula aren            27.000  54.000
-     Besar
-     + Extra shot, Gula 50%
+S     Besar, Extra shot, Gula 50%
      Catatan: Es sedikit
   1x Nasi goreng kampung            35.000  35.000
   3x Air mineral                     5.000  15.000

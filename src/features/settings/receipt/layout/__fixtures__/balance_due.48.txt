@@ -9,7 +9,7 @@ L  Rumah Makan Sederhana
   Order type                           Reservation
   ------------------------------------------------
   1x Paket keluarga A         4,500,000  4,500,000
-     + Es teh manis, Sambal terpisah
+S     Es teh manis, Sambal terpisah
   2x Gurame bakar               225,000    450,000
   ------------------------------------------------
   Subtotal                               4,950,000

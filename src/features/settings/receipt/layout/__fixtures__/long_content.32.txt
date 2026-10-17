@@ -20,19 +20,20 @@ L Sejahtera Abadi
   Meja                     VIP-12A
   Jenis pesanan    Makan di tempat
   --------------------------------
-  Paket nasi tumpeng mini lengkap
-  dengan ayam goreng, telur
-  balado, perkedel, dan sambal
-    12 x 87.500          1.050.000
-    Porsi besar (untuk 2 orang)
-    + Tambah kerupuk udang, Sambal
-      matah terpisah, Tanpa bawang
-      goreng
-    Catatan: Antar ke ruang rapat
-    lantai 3, jam 12.30 tepat -
-    jangan terlambat
-  Cafe creme brulee spesial 45.000
-  Sewa ruang VIP     1.234.567.890
+  12x Paket nasi tumpeng 1.050.000
+      mini lengkap dengan ayam
+      goreng, telur balado,
+      perkedel, dan sambal
+S      Porsi besar (untuk 2 orang), Tambah
+S      kerupuk udang, Sambal matah terpisah,
+S      Tanpa bawang goreng
+S      12 x 87.500
+      Catatan: Antar ke ruang
+      rapat lantai 3, jam 12.30
+      tepat - jangan terlambat
+  1x  Cafe creme brulee     45.000
+      spesial
+  1x  Sewa ruang VIP 1.234.567.890
   --------------------------------
   Subtotal           1.235.662.890
   Pajak 11%         135.922.917,90

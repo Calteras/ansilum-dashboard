@@ -8,8 +8,8 @@ B         *** SALINAN ***
   Kasir                        Ayu
   Jenis pesanan    Makan di tempat
   --------------------------------
-  Teh tarik
-    2 x 18.000              36.000
+  2x Teh tarik              36.000
+S     2 x 18.000
   --------------------------------
   Subtotal                  36.000
   --------------------------------

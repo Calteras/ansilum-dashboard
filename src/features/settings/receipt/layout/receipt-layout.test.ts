@@ -61,6 +61,47 @@ describe('receipt layout fixtures (shared with the POS app)', () => {
   }
 })
 
+describe('item details', () => {
+  it('prints the variant and options under the name in the small font', () => {
+    const document: ReceiptDocument = {
+      id: 'm1',
+      issuedAt: '2026-10-17T19:05:00',
+      items: [
+        {
+          name: 'Moccachino',
+          quantity: 1,
+          unitPriceMinor: 2300000,
+          totalMinor: 2300000,
+          variant: 'Dingin',
+          modifiers: ['Gula', 'Gula'],
+        },
+      ],
+      subtotalMinor: 2300000,
+      totalMinor: 2300000,
+    }
+    const merchant: ReceiptMerchant = { businessName: 'Kedai Senja' }
+    const narrow = receiptLinesToText(
+      new ReceiptLayout(PAPER_58, DEFAULT_CAPABILITIES).receipt(
+        document,
+        merchant,
+        readReceiptTemplate(null),
+        false
+      )
+    )
+    expect(narrow).toContain(`\n  ${'1x Moccachino'.padEnd(32 - 6)}23.000\n`)
+    expect(narrow).toContain('\nS     Dingin, Gula 2x\n')
+    const wide = receiptLinesToText(
+      new ReceiptLayout(PAPER_80, DEFAULT_CAPABILITIES).receipt(
+        document,
+        merchant,
+        readReceiptTemplate(null),
+        false
+      )
+    )
+    expect(wide).toContain('\nS     Dingin, Gula 2x\n')
+  })
+})
+
 describe('readReceiptTemplate', () => {
   it('fills every missing or odd key with its default', () => {
     const template = readReceiptTemplate({
