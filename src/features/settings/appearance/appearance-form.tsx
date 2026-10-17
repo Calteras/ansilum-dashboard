@@ -11,9 +11,9 @@ export function AppearanceForm() {
   return <div className='space-y-8'>
     <fieldset className='space-y-4'><legend className='text-sm font-semibold'>{copy('Tema', 'Theme')}</legend><p className='text-muted-foreground text-sm'>{copy('Pilih tampilan yang nyaman untuk Anda. Perubahan langsung tersimpan.', 'Choose a comfortable appearance. Changes save automatically.')}</p>
       <RadioGroup value={theme} onValueChange={(value) => setTheme(value as typeof theme)} className='grid gap-3 sm:grid-cols-3'>
-        {options.map(({ value, icon: Icon, label }) => <Label key={value} htmlFor={`theme-${value}`} className={`flex min-h-28 cursor-pointer flex-col items-start justify-between gap-4 rounded-xl border p-4 ${theme === value ? 'border-foreground bg-muted' : 'bg-card'}`}><Icon className='size-6' /><span className='flex w-full items-center justify-between gap-3'>{label}<RadioGroupItem value={value} id={`theme-${value}`} /></span></Label>)}
+        {options.map(({ value, icon: Icon, label }) => <Label key={value} htmlFor={`theme-${value}`} className={`flex min-h-28 cursor-pointer flex-col items-start justify-between gap-4 rounded-lg border p-4 ${theme === value ? 'border-foreground bg-muted' : 'bg-card'}`}><Icon className='size-6' /><span className='flex w-full items-center justify-between gap-3'>{label}<RadioGroupItem value={value} id={`theme-${value}`} /></span></Label>)}
       </RadioGroup>
     </fieldset>
-    <div className='space-y-3 border-t pt-6'><p className='text-sm font-semibold'>{copy('Tipografi', 'Typography')}</p><p className='text-2xl font-bold tracking-tight'>Plus Jakarta Sans</p><p className='text-muted-foreground text-sm'>{copy('Satu jenis huruf untuk tampilan Ansilum yang konsisten dan mudah dibaca.', 'One typeface keeps Ansilum consistent and easy to read.')}</p><p className='text-xl tabular-nums'>Rp12.000.000</p></div>
+    <div className='space-y-3 border-t pt-6'><p className='text-sm font-semibold'>{copy('Tipografi', 'Typography')}</p><p className='text-2xl font-semibold tracking-tight'>Plus Jakarta Sans</p><p className='text-muted-foreground text-sm'>{copy('Satu jenis huruf untuk tampilan Ansilum yang konsisten dan mudah dibaca.', 'One typeface keeps Ansilum consistent and easy to read.')}</p><p className='text-xl tabular-nums'>Rp12.000.000</p></div>
   </div>
 }

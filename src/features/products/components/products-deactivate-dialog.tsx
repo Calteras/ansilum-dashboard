@@ -36,7 +36,7 @@ export function ProductsDeactivateDialog({
       handleConfirm={handleConfirm}
       disabled={mutation.isPending}
       title={
-        <span className='flex items-center gap-2 text-orange-600'>
+        <span className='flex items-center gap-2 text-status-warning'>
           <PowerOff size={18} />
           {t('products.deactivateDialog.title')}
         </span>
@@ -44,7 +44,7 @@ export function ProductsDeactivateDialog({
       desc={
         <p>
           {t('products.deactivateDialog.desc')}{' '}
-          <span className='font-bold'>{currentRow.name}</span>?{' '}
+          <span className='font-semibold'>{currentRow.name}</span>?{' '}
           {t('products.deactivateDialog.descSuffix')}
         </p>
       }

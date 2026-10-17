@@ -59,12 +59,12 @@ const statusConfig: Record<
   low: {
     label: 'Low Stock',
     icon: AlertTriangle,
-    className: 'border-warning/30 bg-warning/10 text-warning',
+    className: 'border-status-warning/30 bg-status-warning/10 text-status-warning',
   },
   healthy: {
     label: 'Healthy',
     icon: CheckCircle2,
-    className: 'border-success/30 bg-success/10 text-success',
+    className: 'border-status-success/30 bg-status-success/10 text-status-success',
   },
 }
 
@@ -104,10 +104,10 @@ interface KpiCardProps {
 
 function KpiCard({ label, count, icon: Icon, className }: KpiCardProps) {
   return (
-    <div className={`flex items-center gap-3 rounded-xl border px-4 py-3 ${className}`}>
+    <div className={`flex items-center gap-3 rounded-lg border px-4 py-3 ${className}`}>
       <Icon className='h-5 w-5 shrink-0' />
       <div>
-        <div className='text-xl font-bold tabular-nums'>{count}</div>
+        <div className='text-xl font-semibold tabular-nums'>{count}</div>
         <div className='text-xs opacity-80'>{label}</div>
       </div>
     </div>
@@ -228,19 +228,19 @@ export function OutletInventoryTab() {
             label='Low Stock'
             count={lowCount}
             icon={AlertTriangle}
-            className='border-warning/30 bg-warning/5 text-warning'
+            className='border-status-warning/30 bg-status-warning/5 text-status-warning'
           />
           <KpiCard
             label='Healthy'
             count={healthyCount}
             icon={CheckCircle2}
-            className='border-success/30 bg-success/5 text-success'
+            className='border-status-success/30 bg-status-success/5 text-status-success'
           />
         </div>
       )}
 
       {/* ── Table ────────────────────────────────────────────── */}
-      <div className='border-border rounded-xl border'>
+      <div className='border-border rounded-lg border'>
         <Table>
           <TableHeader>
             <TableRow className='bg-muted/40 hover:bg-muted/40'>
@@ -313,7 +313,7 @@ export function OutletInventoryTab() {
                         isNegative
                           ? 'text-destructive'
                           : status === 'low'
-                            ? 'text-warning'
+                            ? 'text-status-warning'
                             : 'text-foreground'
                       }`}
                     >

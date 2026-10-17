@@ -425,7 +425,7 @@ export function SetupGuide({
             <p className='text-muted-foreground text-sm'>
               Step {index + 1} of {steps.length}
             </p>
-            <h3 className='text-2xl font-semibold tracking-tight'>
+            <h3 className='text-lg font-semibold tracking-[-0.01em]'>
               {active.title}
             </h3>
             <p className='text-muted-foreground max-w-prose text-sm leading-relaxed'>

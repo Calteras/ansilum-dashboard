@@ -61,7 +61,7 @@ export function ProductsDeleteDialog({
         <div className='space-y-4'>
           <p className='mb-2'>
             {t('products.deleteDialog.desc')}{' '}
-            <span className='font-bold'>{currentRow.name}</span>?
+            <span className='font-semibold'>{currentRow.name}</span>?
             <br />
             {t('products.deleteDialog.warning')}
           </p>

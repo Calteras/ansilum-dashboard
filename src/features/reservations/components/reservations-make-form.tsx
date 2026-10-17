@@ -491,8 +491,8 @@ export function ReservationsMakeForm({ outletId }: Props) {
       <CardContent className='p-0'>
         <div className='grid grid-cols-1 divide-y lg:grid-cols-2 lg:divide-x lg:divide-y-0'>
           {/* Left side: Form + Calendar */}
-          <div className='space-y-5 p-6'>
-            <h3 className='text-xl font-semibold'>Make a Reservation</h3>
+          <div className='space-y-5 p-4 sm:p-5'>
+            <h3 className='text-sm font-semibold'>Reservation details</h3>
 
             <Form {...form}>
               <form
@@ -505,7 +505,7 @@ export function ReservationsMakeForm({ outletId }: Props) {
                   name='customerName'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Customer Name</FormLabel>
+                      <FormLabel>Customer name</FormLabel>
                       <FormControl>
                         <Input placeholder='Enter customer name' {...field} />
                       </FormControl>
@@ -519,7 +519,7 @@ export function ReservationsMakeForm({ outletId }: Props) {
                   name='customerPhone'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className='text-muted-foreground text-xs tracking-wide uppercase'>
+                      <FormLabel className='text-fg-muted text-xs'>
                         Phone number
                       </FormLabel>
                       <FormControl>
@@ -539,7 +539,7 @@ export function ReservationsMakeForm({ outletId }: Props) {
                   name='reservationDate'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className='text-muted-foreground text-xs tracking-wide uppercase'>
+                      <FormLabel className='text-fg-muted text-xs'>
                         Date to come
                       </FormLabel>
                       <div className='rounded-lg border'>
@@ -563,7 +563,7 @@ export function ReservationsMakeForm({ outletId }: Props) {
                   name='time'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className='text-muted-foreground text-xs tracking-wide uppercase'>
+                      <FormLabel className='text-fg-muted text-xs'>
                         <Clock size={14} className='mr-1 inline' />
                         Time to come
                       </FormLabel>
@@ -594,7 +594,7 @@ export function ReservationsMakeForm({ outletId }: Props) {
                   name='numberOfPeople'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className='text-muted-foreground text-xs tracking-wide uppercase'>
+                      <FormLabel className='text-fg-muted text-xs'>
                         <Users size={14} className='mr-1 inline' />
                         Number of people
                       </FormLabel>
@@ -617,7 +617,7 @@ export function ReservationsMakeForm({ outletId }: Props) {
                   name='cashierId'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className='text-muted-foreground text-xs tracking-wide uppercase'>
+                      <FormLabel className='text-fg-muted text-xs'>
                         Cashier
                       </FormLabel>
                       <SelectDropdown
@@ -639,7 +639,7 @@ export function ReservationsMakeForm({ outletId }: Props) {
                   name='depositAmount'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className='text-muted-foreground text-xs tracking-wide uppercase'>
+                      <FormLabel className='text-fg-muted text-xs'>
                         Deposit amount
                       </FormLabel>
                       <FormControl>
@@ -695,7 +695,7 @@ export function ReservationsMakeForm({ outletId }: Props) {
           <div className='space-y-6 p-6'>
             {/* Table Selection */}
             <div className='space-y-4'>
-              <h3 className='text-xl font-semibold'>Choose a table</h3>
+              <h3 className='text-sm font-semibold'>Table</h3>
 
               <Tabs value={activeSection} onValueChange={setActiveSection}>
                 <TabsList className='w-full'>
@@ -726,7 +726,7 @@ export function ReservationsMakeForm({ outletId }: Props) {
                               })
                             }
                             className={cn(
-                              'relative flex aspect-square flex-col items-center justify-center rounded-xl border-2 p-4 transition-colors',
+                              'relative flex aspect-square flex-col items-center justify-center rounded-lg border-2 p-4 transition-colors',
                               isSelected && !isDisabled
                                 ? 'border-primary bg-primary/10 ring-primary/30 ring-2'
                                 : '',
@@ -734,7 +734,7 @@ export function ReservationsMakeForm({ outletId }: Props) {
                                 ? 'border-destructive/30 bg-destructive/5 cursor-not-allowed opacity-50'
                                 : '',
                               isReserved
-                                ? 'border-warning/30 bg-warning/5 cursor-not-allowed opacity-50'
+                                ? 'border-status-warning/30 bg-status-warning/5 cursor-not-allowed opacity-50'
                                 : '',
                               !isDisabled && !isSelected
                                 ? 'border-input hover:border-primary/50 hover:bg-muted/50 cursor-pointer'
@@ -850,7 +850,7 @@ export function ReservationsMakeForm({ outletId }: Props) {
                         Occupied
                       </div>
                       <div className='flex items-center gap-1.5'>
-                        <div className='border-warning/30 bg-warning/10 h-3 w-3 rounded border-2' />
+                        <div className='border-status-warning/30 bg-status-warning/10 h-3 w-3 rounded border-2' />
                         Reserved
                       </div>
                     </div>
@@ -870,10 +870,7 @@ export function ReservationsMakeForm({ outletId }: Props) {
             {/* Menu / Product Selection */}
             <div className='space-y-4'>
               <div className='flex items-center justify-between'>
-                <h3 className='text-xl font-semibold'>
-                  <UtensilsCrossed size={20} className='mr-2 mb-0.5 inline' />
-                  Pre-order Menu
-                </h3>
+                <h3 className='text-sm font-semibold'>Pre-order items</h3>
                 {fields.length > 0 && (
                   <Badge variant='secondary'>
                     {watchedItems.reduce((s, i) => s + i.quantity, 0)} item
@@ -908,7 +905,7 @@ export function ReservationsMakeForm({ outletId }: Props) {
                   // Grouped by category
                   Object.entries(categories).map(([catName, catProducts]) => (
                     <div key={catName}>
-                      <h4 className='text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase'>
+                      <h4 className='text-fg-muted mb-2 text-xs font-medium'>
                         {catName}
                       </h4>
                       <div className='space-y-2'>
@@ -923,7 +920,7 @@ export function ReservationsMakeForm({ outletId }: Props) {
               {fields.length > 0 && (
                 <div className='space-y-3'>
                   <Separator />
-                  <h4 className='text-muted-foreground text-sm font-semibold tracking-wide uppercase'>
+                  <h4 className='text-fg-muted text-sm font-medium'>
                     Order Summary
                   </h4>
                   <div className='space-y-2'>

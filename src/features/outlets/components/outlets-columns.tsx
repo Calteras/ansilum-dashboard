@@ -42,7 +42,7 @@ export const outletsColumns: ColumnDef<Outlet>[] = [
       <DataTableColumnHeader column={column} title='Code' />
     ),
     cell: ({ row }) => (
-      <div className='font-sans tabular-nums text-sm'>{row.getValue('code')}</div>
+      <div className='font-sans tabular-nums'>{row.getValue('code')}</div>
     ),
     meta: {
       className: cn(

@@ -33,11 +33,11 @@
   --accent-foreground: var(--ink);
   --destructive: #b42318;
   --destructive-foreground: #ffffff;
-  --border: var(--line);
-  --input: var(--line);
+  --border: var(--divider);
+  --input: var(--divider-strong);
   --ring: var(--brand-ink);
-  --chart-1: var(--brand);
-  --chart-2: var(--steel);
+  --chart-1: var(--series-primary);
+  --chart-2: var(--series-neutral);
   --chart-3: #677484;
   --chart-4: #bdc5cf;
   --chart-5: #d5dae1;
@@ -51,8 +51,30 @@
   --sidebar-primary-foreground: var(--canvas);
   --sidebar-accent: var(--mist);
   --sidebar-accent-foreground: var(--ink);
-  --sidebar-border: var(--line);
+  --sidebar-border: var(--divider);
   --sidebar-ring: var(--brand-ink);
+
+  /* Data surfaces: quiet elevation, hairline dividers, text that recedes in steps. */
+  --surface-subtle: #f7f8fa;
+  --surface-hover: #f2f4f6;
+  --surface-selected: #eceff3;
+  --divider: #eceef1;
+  --divider-strong: #d9dde3;
+  --fg-secondary: var(--soft);
+  --fg-muted: #66707c; /* 4.5:1 on --surface-subtle */
+  --status-success: #12805a;
+  --status-warning: #a15c07;
+  --status-danger: #b42318;
+  --status-info: #1f5fbf;
+  /* Validated pair: accent series + neutral (baseline or de-emphasis), both >= 3:1 on the surface. */
+  --series-primary: var(--brand);
+  --series-neutral: #7f8996;
+  --chart-grid: #eef0f3;
+
+  /* Shell and elevation. Only floating layers (menus, dialogs) cast a shadow. */
+  --app-header-height: 56px;
+  --overlay-shadow:
+    0 10px 28px -12px rgb(17 20 24 / 0.18), 0 2px 6px -2px rgb(17 20 24 / 0.08);
 }
 
 /* Dark mode keeps the same hierarchy and accessible semantic states. */
@@ -62,7 +84,7 @@
   --foreground: #ffffff;
   --card: #151b23;
   --card-foreground: #ffffff;
-  --popover: #151b23;
+  --popover: #1a212b;
   --popover-foreground: #ffffff;
   --primary: #f4f5f7;
   --primary-foreground: var(--ink);
@@ -78,8 +100,8 @@
   --leaf-soft: #132f26;
   --destructive: #fda29b;
   --destructive-foreground: #421610;
-  --border: #303b49;
-  --input: #455263;
+  --border: var(--divider);
+  --input: #3a4553;
   --ring: var(--sun);
   --chart-3: #c1c9d4;
   --chart-4: #677484;
@@ -92,8 +114,25 @@
   --sidebar-primary-foreground: var(--ink);
   --sidebar-accent: #212a35;
   --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #303b49;
+  --sidebar-border: var(--divider);
   --sidebar-ring: var(--sun);
+
+  /* Elevation through luminosity: canvas < surface < subtle < hover < selected. */
+  --surface-subtle: #1a212b;
+  --surface-hover: #1d2530;
+  --surface-selected: #242d39;
+  --divider: #232c37;
+  --divider-strong: #2f3946;
+  --fg-secondary: #b7c0cd;
+  --fg-muted: #8a95a4;
+  --status-success: #6ccf9f;
+  --status-warning: #f5b748;
+  --status-danger: #f97970;
+  --status-info: #7cb4f5;
+  --series-primary: #f2571c;
+  --series-neutral: #76818f;
+  --chart-grid: #1f2731;
+  --overlay-shadow: 0 12px 32px -12px rgb(0 0 0 / 0.6);
 }
 
 @theme inline {
@@ -104,8 +143,9 @@
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 8px;
-  --radius-xl: 16px;
-  --radius-2xl: 24px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
+  --radius-3xl: 12px;
   --color-canvas: var(--canvas);
   --color-mist: var(--mist);
   --color-line: var(--line);
@@ -155,4 +195,19 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-selected: var(--surface-selected);
+  --color-divider: var(--divider);
+  --color-divider-strong: var(--divider-strong);
+  --color-fg-secondary: var(--fg-secondary);
+  --color-fg-muted: var(--fg-muted);
+  --color-status-success: var(--status-success);
+  --color-status-warning: var(--status-warning);
+  --color-status-danger: var(--status-danger);
+  --color-status-info: var(--status-info);
+  --color-series-primary: var(--series-primary);
+  --color-series-neutral: var(--series-neutral);
+  --color-chart-grid: var(--chart-grid);
+  --shadow-overlay: var(--overlay-shadow);
 }

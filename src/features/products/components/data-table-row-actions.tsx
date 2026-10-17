@@ -74,7 +74,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
               setCurrentRow(row.original)
               setOpen('deactivate')
             }}
-            className='text-orange-500!'
+            className='text-status-warning!'
           >
             {t('products.rowActions.deactivate')}
             <DropdownMenuShortcut>
@@ -87,7 +87,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             setCurrentRow(row.original)
             setOpen('delete')
           }}
-          className='text-red-500!'
+          className='text-status-danger!'
         >
           {t('products.rowActions.delete')}
           <DropdownMenuShortcut>

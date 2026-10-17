@@ -44,7 +44,7 @@ export const reservationsColumns: ColumnDef<Reservation>[] = [
       <DataTableColumnHeader column={column} title='Transaction No' />
     ),
     cell: ({ row }) => (
-      <div className='font-sans tabular-nums text-sm'>
+      <div className='font-sans tabular-nums'>
         {row.getValue('transactionNo')}
       </div>
     ),
@@ -82,7 +82,7 @@ export const reservationsColumns: ColumnDef<Reservation>[] = [
     cell: ({ row }) => {
       const date = row.getValue('reservationDate') as string
       return (
-        <div className='text-sm text-nowrap'>
+        <div className='text-nowrap'>
           {date
             ? new Date(date).toLocaleDateString('id-ID', {
                 day: '2-digit',
@@ -135,7 +135,7 @@ export const reservationsColumns: ColumnDef<Reservation>[] = [
       <DataTableColumnHeader column={column} title='Grand Total' />
     ),
     cell: ({ row }) => (
-      <div className='text-sm font-medium text-nowrap'>
+      <div className='font-medium text-nowrap'>
         {formatCurrency(row.getValue('grandTotal'))}
       </div>
     ),
@@ -146,7 +146,7 @@ export const reservationsColumns: ColumnDef<Reservation>[] = [
       <DataTableColumnHeader column={column} title='Deposit' />
     ),
     cell: ({ row }) => (
-      <div className='text-sm text-nowrap'>
+      <div className='text-nowrap'>
         {formatCurrency(row.getValue('depositAmount'))}
       </div>
     ),
@@ -158,7 +158,7 @@ export const reservationsColumns: ColumnDef<Reservation>[] = [
       <DataTableColumnHeader column={column} title='Outlet' />
     ),
     cell: ({ row }) => (
-      <div className='text-sm'>{row.original.outlet?.name ?? '-'}</div>
+      <div>{row.original.outlet?.name ?? '-'}</div>
     ),
     enableSorting: false,
   },
@@ -169,7 +169,7 @@ export const reservationsColumns: ColumnDef<Reservation>[] = [
       <DataTableColumnHeader column={column} title='Cashier' />
     ),
     cell: ({ row }) => (
-      <div className='text-sm'>{row.original.cashier?.name ?? '-'}</div>
+      <div>{row.original.cashier?.name ?? '-'}</div>
     ),
     enableSorting: false,
   },

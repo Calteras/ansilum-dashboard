@@ -39,9 +39,9 @@ export function CompletionStep({
   return (
     <div className='space-y-6'>
       {/* Success Message */}
-      <div className='border-success/30 bg-success/10 rounded-lg border p-5 text-center'>
+      <div className='border-status-success/30 bg-status-success/10 rounded-lg border p-5 text-center'>
         <div className='mb-3 flex justify-center'>
-          <CheckCircle2 className='text-success h-12 w-12' />
+          <CheckCircle2 className='text-status-success h-12 w-12' />
         </div>
         <h2 className='text-foreground mb-1 text-xl font-semibold'><UiText id="Usaha Anda siap di Ansilum." en="Welcome to Ansilum POS!" /></h2>
         <p className='text-muted-foreground text-sm'><UiText id="Akun Anda siap digunakan" en="Your account has been successfully created and configured" /></p>

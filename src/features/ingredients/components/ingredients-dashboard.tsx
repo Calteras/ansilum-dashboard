@@ -1,23 +1,26 @@
 import {
-  AlertTriangle,
-  Beaker,
-  Building2,
-  CheckCircle2,
-  DollarSign,
-  XCircle,
-} from '@/components/icons'
-import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from 'recharts'
+import { STATUS_TONE } from '@/lib/status-tone'
+import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { DataPanel, SectionHeader } from '@/components/data-display/data-panel'
+import { EmptyState } from '@/components/data-display/data-states'
+import { Metric, MetricGroup } from '@/components/data-display/metric'
 import { useOutletsQuery } from '@/features/outlets/api/outlets.queries'
 import type { Outlet } from '@/features/outlets/api/outlets.types'
 import { useAllOutletsDashboardQueries } from '../api/ingredients.queries'
@@ -42,174 +45,24 @@ function fmtFull(value: number) {
   }).format(value)
 }
 
-// ── KPI card ──────────────────────────────────────────────────────────────
-
-interface KpiCardProps {
-  label: string
-  value: string | number
-  icon: React.ElementType
-  description?: string
-  variant?: 'default' | 'critical' | 'warning' | 'success'
-}
-
-function KpiCard({
-  label,
-  value,
-  icon: Icon,
-  description,
-  variant = 'default',
-}: KpiCardProps) {
-  const variantClass = {
-    default: 'border-border',
-    critical: 'border-destructive/30 bg-destructive/5',
-    warning: 'border-warning/30 bg-warning/5',
-    success: 'border-success/30 bg-success/5',
-  }[variant]
-
-  const iconClass = {
-    default: 'bg-muted text-muted-foreground',
-    critical: 'bg-destructive/10 text-destructive',
-    warning: 'bg-warning/10 text-warning',
-    success: 'bg-success/10 text-success',
-  }[variant]
-
-  const valueClass = {
-    default: 'text-foreground',
-    critical: 'text-destructive',
-    warning: 'text-warning',
-    success: 'text-success',
-  }[variant]
-
-  return (
-    <Card className={`gap-2 ${variantClass}`}>
-      <CardContent className='flex items-start gap-3 pt-4 pb-4'>
-        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${iconClass}`}>
-          <Icon className='h-5 w-5' />
-        </div>
-        <div className='min-w-0'>
-          <div className={`text-2xl font-bold tabular-nums ${valueClass}`}>{value}</div>
-          <div className='text-muted-foreground text-sm'>{label}</div>
-          {description && (
-            <div className='text-muted-foreground mt-0.5 text-xs'>{description}</div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
 // ── Outlet health card ────────────────────────────────────────────────────
 
 type OutletHealth = 'critical' | 'warning' | 'healthy'
 
-function getOutletHealth(criticalCount: number, lowCount: number, total: number): OutletHealth {
+function getOutletHealth(
+  criticalCount: number,
+  lowCount: number,
+  total: number
+): OutletHealth {
   if (criticalCount > 0) return 'critical'
   if (total > 0 && lowCount / total > 0.25) return 'warning'
   return 'healthy'
 }
 
-const healthChip: Record<OutletHealth, { label: string; className: string }> = {
-  critical: {
-    label: 'Critical',
-    className: 'border-destructive/30 bg-destructive/10 text-destructive',
-  },
-  warning: {
-    label: 'Warning',
-    className: 'border-warning/30 bg-warning/10 text-warning',
-  },
-  healthy: {
-    label: 'Healthy',
-    className: 'border-success/30 bg-success/10 text-success',
-  },
-}
-
-interface OutletHealthCardProps {
-  outlet: Outlet
-  stockValue: number
-  itemCount: number
-  criticalCount: number
-  lowCount: number
-  isLoading: boolean
-}
-
-function OutletHealthCard({
-  outlet,
-  stockValue,
-  itemCount,
-  criticalCount,
-  lowCount,
-  isLoading,
-}: OutletHealthCardProps) {
-  const health = getOutletHealth(criticalCount, lowCount, itemCount)
-  const chip = healthChip[health]
-
-  return (
-    <Card className='gap-0'>
-      <CardHeader className='pb-3'>
-        <div className='flex items-start justify-between gap-2'>
-          <div className='min-w-0'>
-            <CardTitle className='truncate text-sm font-semibold'>
-              {outlet.name}
-            </CardTitle>
-            <span className='text-muted-foreground font-sans tabular-nums text-xs'>
-              {outlet.code}
-            </span>
-          </div>
-          <span
-            className={`shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium ${chip.className}`}
-          >
-            {chip.label}
-          </span>
-        </div>
-      </CardHeader>
-      <CardContent className='space-y-3 pb-4'>
-        {isLoading ? (
-          <div className='space-y-2'>
-            {[1, 2].map((i) => (
-              <div key={i} className='bg-muted h-4 animate-pulse rounded' />
-            ))}
-          </div>
-        ) : (
-          <>
-            {/* Stock value */}
-            <div className='flex items-baseline gap-1.5'>
-              <span className='text-foreground text-lg font-bold tabular-nums'>
-                {fmtCompact(stockValue)}
-              </span>
-              <span className='text-muted-foreground text-xs'>stock value</span>
-            </div>
-
-            {/* Item count row */}
-            <div className='text-muted-foreground flex items-center gap-3 text-xs'>
-              <span>{itemCount} items tracked</span>
-            </div>
-
-            {/* Alert counts */}
-            <div className='flex flex-wrap gap-2'>
-              {criticalCount > 0 && (
-                <span className='border-destructive/30 bg-destructive/10 text-destructive inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium'>
-                  <XCircle className='h-3 w-3' />
-                  {criticalCount} critical
-                </span>
-              )}
-              {lowCount > 0 && (
-                <span className='border-warning/30 bg-warning/10 text-warning inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium'>
-                  <AlertTriangle className='h-3 w-3' />
-                  {lowCount} low stock
-                </span>
-              )}
-              {criticalCount === 0 && lowCount === 0 && (
-                <span className='border-success/30 bg-success/10 text-success inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium'>
-                  <CheckCircle2 className='h-3 w-3' />
-                  All items healthy
-                </span>
-              )}
-            </div>
-          </>
-        )}
-      </CardContent>
-    </Card>
-  )
+const HEALTH: Record<OutletHealth, { label: string; tone: string }> = {
+  critical: { label: 'Critical', tone: STATUS_TONE.danger },
+  warning: { label: 'Warning', tone: STATUS_TONE.warning },
+  healthy: { label: 'Healthy', tone: STATUS_TONE.success },
 }
 
 // ── Custom tooltip for BarChart ───────────────────────────────────────────
@@ -225,12 +78,11 @@ function ChartTooltip({
 }) {
   if (!active || !payload?.length) return null
   return (
-    <div
-      className='rounded-lg border px-3 py-2 text-sm shadow-none'
-      style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
-    >
-      <div className='text-muted-foreground mb-1 text-xs'>{label}</div>
-      <div className='text-foreground font-semibold'>{fmtFull(payload[0].value)}</div>
+    <div className='bg-popover text-popover-foreground border-divider-strong rounded-md border px-3 py-2 text-xs'>
+      <p className='text-fg-muted'>{label}</p>
+      <p className='mt-0.5 text-[13px] font-semibold tabular-nums'>
+        {fmtFull(payload[0].value)}
+      </p>
     </div>
   )
 }
@@ -244,30 +96,37 @@ interface AlertRow extends LowStockItem {
 function CriticalAlertsList({ alerts }: { alerts: AlertRow[] }) {
   if (alerts.length === 0) {
     return (
-      <div className='text-muted-foreground flex h-32 items-center justify-center text-sm'>
-        No critical or low-stock items — all outlets are healthy.
-      </div>
+      <EmptyState
+        title='No stock alerts.'
+        description='Every ingredient is above its minimum in all outlets.'
+        className='py-8'
+      />
     )
   }
 
   return (
-    <div className='divide-border divide-y'>
+    <div className='divide-divider divide-y'>
       {alerts.map((alert) => {
         const qty = parseFloat(alert.quantityOnHand)
         const isNegative = qty < 0
         return (
-          <div key={alert.id} className='flex items-center gap-3 py-3 text-sm'>
+          <div
+            key={alert.id}
+            className='flex items-center gap-3 py-2.5 text-[13px]'
+          >
             {/* Status dot */}
             <div
               className={`h-2 w-2 shrink-0 rounded-full ${
-                isNegative ? 'bg-destructive' : 'bg-warning'
+                isNegative ? 'bg-status-danger' : 'bg-status-warning'
               }`}
             />
 
             {/* Ingredient info */}
             <div className='min-w-0 flex-1'>
-              <div className='text-foreground truncate font-medium'>{alert.name}</div>
-              <div className='text-muted-foreground flex items-center gap-1.5 text-xs'>
+              <div className='text-foreground truncate font-medium'>
+                {alert.name}
+              </div>
+              <div className='text-fg-muted flex items-center gap-1.5 text-xs'>
                 <span className='font-sans tabular-nums'>{alert.code}</span>
                 <span>·</span>
                 <span>{alert.outletName}</span>
@@ -277,7 +136,9 @@ function CriticalAlertsList({ alerts }: { alerts: AlertRow[] }) {
             {/* Quantity */}
             <div
               className={`shrink-0 text-right tabular-nums ${
-                isNegative ? 'text-destructive font-semibold' : 'text-warning'
+                isNegative
+                  ? 'text-status-danger font-semibold'
+                  : 'text-status-warning'
               }`}
             >
               {qty.toLocaleString('id-ID')} {alert.unit}
@@ -295,13 +156,18 @@ interface IngredientsDashboardProps {
   totalIngredients: number
 }
 
-export function IngredientsDashboard({ totalIngredients }: IngredientsDashboardProps) {
+export function IngredientsDashboard({
+  totalIngredients,
+}: IngredientsDashboardProps) {
   const { data: outletsData, isLoading: isLoadingOutlets } = useOutletsQuery()
   const outlets = outletsData?.data ?? []
   const outletIds = outlets.map((o) => o.id)
 
-  const { lowStockQueries, stockValueQueries, isLoading: isLoadingData } =
-    useAllOutletsDashboardQueries(outletIds)
+  const {
+    lowStockQueries,
+    stockValueQueries,
+    isLoading: isLoadingData,
+  } = useAllOutletsDashboardQueries(outletIds)
 
   const isLoading = isLoadingOutlets || (outletIds.length > 0 && isLoadingData)
 
@@ -374,7 +240,9 @@ export function IngredientsDashboard({ totalIngredients }: IngredientsDashboardP
   const outletCardData: OutletCardData[] = outlets.map((outlet, i) => {
     const svData = stockValueQueries[i]?.data?.data
     const lsItems = lowStockQueries[i]?.data?.data ?? []
-    const critical = lsItems.filter((x) => parseFloat(x.quantityOnHand) < 0).length
+    const critical = lsItems.filter(
+      (x) => parseFloat(x.quantityOnHand) < 0
+    ).length
     const low = lsItems.filter((x) => parseFloat(x.quantityOnHand) >= 0).length
     return {
       outlet,
@@ -387,271 +255,354 @@ export function IngredientsDashboard({ totalIngredients }: IngredientsDashboardP
 
   // ── Render ──────────────────────────────────────────────────────────────
 
+  const metricValue = (value: string | number) => (isLoading ? '—' : value)
+
   return (
-    <div className='space-y-6'>
+    <div className='flex flex-col gap-4'>
+      <DataPanel aria-label='Inventory summary' className='overflow-hidden'>
+        <MetricGroup className='grid-cols-2 sm:grid-cols-3 lg:grid-cols-5'>
+          <Metric
+            label='Ingredients'
+            definition='Items in the master ingredient list.'
+            value={totalIngredients.toLocaleString('id-ID')}
+          />
+          <Metric
+            label='Stock value'
+            definition='Quantity on hand × weighted average cost, across all outlets.'
+            value={metricValue(fmtFull(totalStockValue))}
+          />
+          <Metric label='Outlets' value={outlets.length} />
+          <Metric
+            label='Negative stock'
+            definition='Ingredients whose quantity on hand is below zero.'
+            value={
+              <span
+                className={cn(
+                  !isLoading && criticalCount > 0 && 'text-status-danger'
+                )}
+              >
+                {metricValue(criticalCount)}
+              </span>
+            }
+          />
+          <Metric
+            label='Below minimum'
+            definition='Ingredients under their minimum stock level.'
+            value={
+              <span
+                className={cn(
+                  !isLoading && lowStockCount > 0 && 'text-status-warning'
+                )}
+              >
+                {metricValue(lowStockCount)}
+              </span>
+            }
+          />
+        </MetricGroup>
+      </DataPanel>
 
-      {/* ── KPI strip ──────────────────────────────────────── */}
-      <div className='grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5'>
-        <KpiCard
-          label='Total Ingredients'
-          value={totalIngredients}
-          icon={Beaker}
-          description='Master catalogue'
+      <DataPanel
+        aria-labelledby='outlet-health-title'
+        className='overflow-hidden'
+      >
+        <SectionHeader
+          id='outlet-health-title'
+          title='Outlet stock health'
+          description='Stock value and alerts per outlet'
+          className='p-4 sm:px-5'
         />
-        <KpiCard
-          label='Total Stock Value'
-          value={isLoading ? '—' : fmtCompact(totalStockValue)}
-          icon={DollarSign}
-          description='Across all outlets'
-        />
-        <KpiCard
-          label='Outlets Monitored'
-          value={outlets.length}
-          icon={Building2}
-          description='Active outlets'
-        />
-        <KpiCard
-          label='Critical Alerts'
-          value={isLoading ? '—' : criticalCount}
-          icon={XCircle}
-          description='Negative stock qty'
-          variant={criticalCount > 0 ? 'critical' : 'default'}
-        />
-        <KpiCard
-          label='Low Stock Items'
-          value={isLoading ? '—' : lowStockCount}
-          icon={AlertTriangle}
-          description='Below minimum'
-          variant={lowStockCount > 0 ? 'warning' : 'default'}
-        />
-      </div>
-
-      {/* ── Outlet health cards ─────────────────────────────── */}
-      <div>
-        <h3 className='text-foreground mb-3 text-sm font-semibold'>Outlet Health Overview</h3>
         {isLoadingOutlets ? (
-          <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+          <div role='status' className='space-y-2 px-4 pb-4 sm:px-5'>
             {[1, 2, 3].map((i) => (
-              <Card key={i} className='h-36 animate-pulse bg-muted/40' />
-            ))}
-          </div>
-        ) : outlets.length === 0 ? (
-          <div className='text-muted-foreground rounded-xl border py-10 text-center text-sm'>
-            No outlets found.
-          </div>
-        ) : (
-          <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
-            {outletCardData.map(({ outlet, stockValue, itemCount, criticalCount: cc, lowCount: lc }) => (
-              <OutletHealthCard
-                key={outlet.id}
-                outlet={outlet}
-                stockValue={stockValue}
-                itemCount={itemCount}
-                criticalCount={cc}
-                lowCount={lc}
-                isLoading={isLoadingData}
+              <div
+                key={i}
+                className='bg-surface-hover h-8 animate-pulse rounded'
               />
             ))}
           </div>
-        )}
-      </div>
-
-      {/* ── Charts + Alerts row ─────────────────────────────── */}
-      <div className='grid grid-cols-1 gap-4 xl:grid-cols-2'>
-
-        {/* Top ingredients by stock value */}
-        <Card>
-          <CardHeader className='pb-2'>
-            <CardTitle className='text-sm font-semibold'>
-              Top Ingredients by Stock Value
-            </CardTitle>
-            <p className='text-muted-foreground text-xs'>
-              Aggregated across all outlets · WAC × qty
-            </p>
-          </CardHeader>
-          <CardContent>
-            {isLoading || topIngredients.length === 0 ? (
-              <div className='flex h-48 items-center justify-center'>
-                {isLoading ? (
-                  <div className='bg-muted h-48 w-full animate-pulse rounded-lg' />
-                ) : (
-                  <span className='text-muted-foreground text-sm'>
-                    No stock value data yet.
-                  </span>
-                )}
-              </div>
-            ) : (
-              <ResponsiveContainer width='100%' height={220}>
-                <BarChart
-                  layout='vertical'
-                  data={topIngredients}
-                  margin={{ left: 0, right: 16, top: 4, bottom: 4 }}
-                >
-                  <CartesianGrid
-                    horizontal={false}
-                    strokeDasharray='3 3'
-                    stroke='var(--border)'
-                  />
-                  <XAxis
-                    type='number'
-                    tickFormatter={(v) => fmtCompact(v)}
-                    tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    type='category'
-                    dataKey='name'
-                    width={90}
-                    tick={{ fontSize: 12, fill: 'var(--foreground)' }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <Tooltip content={<ChartTooltip />} cursor={{ fill: 'var(--muted)' }} />
-                  <Bar isAnimationActive={false} dataKey='value' radius={[0, 4, 4, 0]} maxBarSize={18}>
-                    {topIngredients.map((_, i) => (
-                      <Cell
-                        key={i}
-                        fill={`var(--chart-${(i % 5) + 1})`}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Outlet stock value comparison (only if >1 outlet) */}
-        {outlets.length > 1 ? (
-          <Card>
-            <CardHeader className='pb-2'>
-              <CardTitle className='text-sm font-semibold'>
-                Stock Value by Outlet
-              </CardTitle>
-              <p className='text-muted-foreground text-xs'>
-                Total inventory value per outlet
-              </p>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width='100%' height={220}>
-                <BarChart
-                  data={outletChartData}
-                  margin={{ left: 0, right: 8, top: 4, bottom: 4 }}
-                >
-                  <CartesianGrid
-                    vertical={false}
-                    strokeDasharray='3 3'
-                    stroke='var(--border)'
-                  />
-                  <XAxis
-                    dataKey='name'
-                    tick={{ fontSize: 12, fill: 'var(--foreground)' }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    tickFormatter={(v) => fmtCompact(v)}
-                    tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <Tooltip content={<ChartTooltip />} cursor={{ fill: 'var(--muted)' }} />
-                  <Bar isAnimationActive={false} dataKey='value' fill='var(--chart-1)' radius={[4, 4, 0, 0]} maxBarSize={48} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+        ) : outlets.length === 0 ? (
+          <EmptyState title='No outlets yet.' className='py-8' />
         ) : (
-          /* Single outlet: show all-items breakdown as table instead */
-          <Card>
-            <CardHeader className='pb-2'>
-              <CardTitle className='text-sm font-semibold'>
-                Stock Value Breakdown
-              </CardTitle>
-              <p className='text-muted-foreground text-xs'>
-                Per-ingredient contribution to total value
-              </p>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className='bg-muted h-48 animate-pulse rounded-lg' />
-              ) : (
-                <div className='divide-border divide-y'>
+          <Table>
+            <TableHeader>
+              <TableRow className='hover:bg-transparent'>
+                <TableHead>Outlet</TableHead>
+                <TableHead className='text-right'>Stock value</TableHead>
+                <TableHead className='text-right'>Items</TableHead>
+                <TableHead className='text-right'>Negative</TableHead>
+                <TableHead className='text-right'>Below min.</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {outletCardData.map(
+                ({
+                  outlet,
+                  stockValue,
+                  itemCount,
+                  criticalCount: cc,
+                  lowCount: lc,
+                }) => {
+                  const health = HEALTH[getOutletHealth(cc, lc, itemCount)]
+                  return (
+                    <TableRow key={outlet.id}>
+                      <TableCell>
+                        <span className='font-medium'>{outlet.name}</span>
+                        <span className='text-fg-muted ms-2 text-xs'>
+                          {outlet.code}
+                        </span>
+                      </TableCell>
+                      <TableCell className='text-right'>
+                        {isLoadingData ? '—' : fmtFull(stockValue)}
+                      </TableCell>
+                      <TableCell className='text-fg-secondary text-right'>
+                        {isLoadingData ? '—' : itemCount}
+                      </TableCell>
+                      <TableCell
+                        className={cn(
+                          'text-right',
+                          cc > 0 && 'text-status-danger font-medium'
+                        )}
+                      >
+                        {isLoadingData ? '—' : cc}
+                      </TableCell>
+                      <TableCell
+                        className={cn(
+                          'text-right',
+                          lc > 0 && 'text-status-warning font-medium'
+                        )}
+                      >
+                        {isLoadingData ? '—' : lc}
+                      </TableCell>
+                      <TableCell>
+                        {!isLoadingData && (
+                          <Badge variant='outline' className={health.tone}>
+                            {health.label}
+                          </Badge>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  )
+                }
+              )}
+            </TableBody>
+          </Table>
+        )}
+      </DataPanel>
+
+      <DataPanel className='grid overflow-hidden xl:grid-cols-2'>
+        <section
+          aria-labelledby='top-ingredients-title'
+          className='flex min-w-0 flex-col gap-3 p-4 sm:p-5'
+        >
+          <SectionHeader
+            as='h3'
+            id='top-ingredients-title'
+            title='Top ingredients by stock value'
+            description='All outlets · quantity × weighted average cost'
+          />
+          {isLoading ? (
+            <div
+              role='status'
+              className='bg-surface-hover h-56 w-full animate-pulse rounded'
+            />
+          ) : topIngredients.length === 0 ? (
+            <EmptyState title='No stock value data yet.' className='h-56' />
+          ) : (
+            <ResponsiveContainer
+              width='100%'
+              height={topIngredients.length * 28 + 32}
+            >
+              <BarChart
+                layout='vertical'
+                data={topIngredients}
+                margin={{ left: 0, right: 16, top: 0, bottom: 0 }}
+              >
+                <CartesianGrid horizontal={false} stroke='var(--chart-grid)' />
+                <XAxis
+                  type='number'
+                  tickFormatter={(v) => fmtCompact(v)}
+                  tick={{ fontSize: 11, fill: 'var(--fg-muted)' }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickCount={4}
+                />
+                <YAxis
+                  type='category'
+                  dataKey='name'
+                  width={110}
+                  tick={{ fontSize: 12, fill: 'var(--fg-secondary)' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  content={<ChartTooltip />}
+                  cursor={{ fill: 'var(--surface-hover)' }}
+                  isAnimationActive={false}
+                />
+                <Bar
+                  isAnimationActive={false}
+                  dataKey='value'
+                  fill='var(--series-primary)'
+                  radius={[0, 4, 4, 0]}
+                  maxBarSize={16}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </section>
+
+        {outlets.length > 1 ? (
+          <section
+            aria-labelledby='outlet-value-title'
+            className='border-divider flex min-w-0 flex-col gap-3 border-t p-4 sm:p-5 xl:border-t-0 xl:border-l'
+          >
+            <SectionHeader
+              as='h3'
+              id='outlet-value-title'
+              title='Stock value by outlet'
+              description='Total inventory value per outlet'
+            />
+            <ResponsiveContainer width='100%' height={240}>
+              <BarChart
+                data={outletChartData}
+                margin={{ left: 0, right: 0, top: 4, bottom: 0 }}
+              >
+                <CartesianGrid vertical={false} stroke='var(--chart-grid)' />
+                <XAxis
+                  dataKey='name'
+                  tick={{ fontSize: 11, fill: 'var(--fg-muted)' }}
+                  axisLine={{ stroke: 'var(--divider-strong)' }}
+                  tickLine={false}
+                  tickMargin={8}
+                />
+                <YAxis
+                  tickFormatter={(v) => fmtCompact(v)}
+                  tick={{ fontSize: 11, fill: 'var(--fg-muted)' }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickCount={4}
+                  width={72}
+                />
+                <Tooltip
+                  content={<ChartTooltip />}
+                  cursor={{ fill: 'var(--surface-hover)' }}
+                  isAnimationActive={false}
+                />
+                <Bar
+                  isAnimationActive={false}
+                  dataKey='value'
+                  fill='var(--series-primary)'
+                  radius={[4, 4, 0, 0]}
+                  maxBarSize={24}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </section>
+        ) : (
+          <section
+            aria-labelledby='value-breakdown-title'
+            className='border-divider flex min-w-0 flex-col gap-3 border-t p-4 sm:p-5 xl:border-t-0 xl:border-l'
+          >
+            <SectionHeader
+              as='h3'
+              id='value-breakdown-title'
+              title='Stock value breakdown'
+              description='Share of total value by ingredient'
+            />
+            {isLoading ? (
+              <div
+                role='status'
+                className='bg-surface-hover h-48 animate-pulse rounded'
+              />
+            ) : (
+              <table className='w-full text-[13px] tabular-nums'>
+                <tbody>
                   {(stockValueQueries[0]?.data?.data.items ?? [])
                     .filter((i): i is typeof i => i.totalValue >= 0)
                     .sort((a, b) => b.totalValue - a.totalValue)
                     .map((item: StockValueItem) => {
-                      const total = stockValueQueries[0]?.data?.data.totalValue ?? 1
-                      const pct = total > 0 ? (item.totalValue / total) * 100 : 0
+                      const total =
+                        stockValueQueries[0]?.data?.data.totalValue ?? 1
+                      const pct =
+                        total > 0 ? (item.totalValue / total) * 100 : 0
                       return (
-                        <div key={item.id} className='py-2.5'>
-                          <div className='mb-1.5 flex items-center justify-between text-xs'>
-                            <span className='text-foreground font-medium'>{item.name}</span>
-                            <span className='text-muted-foreground tabular-nums'>
-                              {fmtFull(item.totalValue)}
-                            </span>
-                          </div>
-                          <div className='bg-muted h-1.5 overflow-hidden rounded-full'>
-                            <div
-                              className='bg-primary h-full rounded-full transition-colors'
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
-                        </div>
+                        <tr
+                          key={item.id}
+                          className='border-divider border-b last:border-0'
+                        >
+                          <th
+                            scope='row'
+                            className='w-full max-w-0 truncate py-2 pr-3 text-left font-medium'
+                          >
+                            {item.name}
+                          </th>
+                          <td className='py-2 pr-3 text-right whitespace-nowrap'>
+                            {fmtFull(item.totalValue)}
+                          </td>
+                          <td className='py-2'>
+                            <div className='flex items-center justify-end gap-2'>
+                              <span
+                                aria-hidden
+                                className='bg-surface-hover h-1 w-12 overflow-hidden rounded-full'
+                              >
+                                <span
+                                  className='bg-series-primary block h-full rounded-full'
+                                  style={{ width: `${Math.max(pct, 2)}%` }}
+                                />
+                              </span>
+                              <span className='text-fg-secondary w-12 text-right'>
+                                {pct.toFixed(1)}%
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
                       )
                     })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                </tbody>
+              </table>
+            )}
+          </section>
         )}
-      </div>
+      </DataPanel>
 
-      {/* ── Critical & low stock alerts ─────────────────────── */}
-      <Card>
-        <CardHeader className='pb-3'>
-          <div className='flex items-center justify-between'>
-            <CardTitle className='text-sm font-semibold'>
-              Stock Alerts
-            </CardTitle>
-            {allLowStockItems.length > 0 && (
-              <div className='flex gap-2'>
+      <DataPanel aria-labelledby='stock-alerts-title' className='p-4 sm:p-5'>
+        <SectionHeader
+          id='stock-alerts-title'
+          title='Stock alerts'
+          description='Ingredients below minimum or with negative quantity, across outlets'
+          actions={
+            allLowStockItems.length > 0 && (
+              <>
                 {criticalCount > 0 && (
-                  <Badge
-                    variant='outline'
-                    className='border-destructive/30 bg-destructive/10 text-destructive text-xs'
-                  >
-                    {criticalCount} critical
+                  <Badge variant='outline' className={STATUS_TONE.danger}>
+                    {criticalCount} negative
                   </Badge>
                 )}
                 {lowStockCount > 0 && (
-                  <Badge
-                    variant='outline'
-                    className='border-warning/30 bg-warning/10 text-warning text-xs'
-                  >
-                    {lowStockCount} low
+                  <Badge variant='outline' className={STATUS_TONE.warning}>
+                    {lowStockCount} below minimum
                   </Badge>
                 )}
-              </div>
-            )}
-          </div>
-          <p className='text-muted-foreground text-xs'>
-            All ingredients below minimum stock or with negative quantity across outlets
-          </p>
-        </CardHeader>
-        <CardContent>
+              </>
+            )
+          }
+        />
+        <div className='mt-2'>
           {isLoading ? (
-            <div className='space-y-3'>
+            <div role='status' className='space-y-2'>
               {[1, 2, 3].map((i) => (
-                <div key={i} className='bg-muted h-10 animate-pulse rounded-lg' />
+                <div
+                  key={i}
+                  className='bg-surface-hover h-9 animate-pulse rounded'
+                />
               ))}
             </div>
           ) : (
             <CriticalAlertsList alerts={allLowStockItems} />
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </DataPanel>
     </div>
   )
 }

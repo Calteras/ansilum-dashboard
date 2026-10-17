@@ -28,19 +28,19 @@ function formatRp(value: number) {
 
 function MarginGauge({ pct, label }: { pct: number; label: string }) {
   const color =
-    pct >= 50 ? 'bg-leaf' : pct >= 30 ? 'bg-amber-500' : 'bg-rose-500'
+    pct >= 50 ? 'bg-leaf' : pct >= 30 ? 'bg-status-warning' : 'bg-status-danger'
   const textColor =
     pct >= 50
       ? 'text-leaf '
       : pct >= 30
-        ? 'text-amber-600 dark:text-amber-400'
-        : 'text-rose-600 dark:text-rose-400'
+        ? 'text-status-warning'
+        : 'text-status-danger'
 
   return (
     <div className='space-y-1.5'>
       <div className='flex items-center justify-between text-xs'>
         <span className='text-muted-foreground'>{label}</span>
-        <span className={`font-sans tabular-nums font-bold ${textColor}`}>
+        <span className={`font-sans tabular-nums font-semibold ${textColor}`}>
           {pct.toFixed(1)}%
         </span>
       </div>
@@ -115,7 +115,7 @@ function ForecastSection({
   return (
     <div className='bg-muted/30 space-y-4 rounded-lg border p-4'>
       <div className='flex items-center justify-between'>
-        <p className='text-muted-foreground text-xs font-semibold tracking-wide uppercase'>
+        <p className='text-fg-muted text-xs font-medium'>
           {t('cogs.forecast.title')}
         </p>
         <div className='flex items-center gap-2'>
@@ -146,7 +146,7 @@ function ForecastSection({
         <div className='space-y-3'>
           <div className='grid grid-cols-2 gap-3'>
             <div>
-              <p className='text-muted-foreground mb-1 text-xs font-semibold tracking-widest uppercase'>
+              <p className='text-fg-muted mb-1 text-xs font-medium'>
                 {t('cogs.forecast.currentMargin')}
               </p>
               <MarginGauge
@@ -155,7 +155,7 @@ function ForecastSection({
               />
             </div>
             <div>
-              <p className='text-muted-foreground mb-1 text-xs font-semibold tracking-widest uppercase'>
+              <p className='text-fg-muted mb-1 text-xs font-medium'>
                 {t('cogs.forecast.simulatedMargin')}
               </p>
               <MarginGauge
@@ -167,7 +167,7 @@ function ForecastSection({
 
           {forecast.ingredientBreakdown.length > 0 && (
             <div className='space-y-1.5'>
-              <p className='text-muted-foreground text-xs font-semibold tracking-widest uppercase'>
+              <p className='text-fg-muted text-xs font-medium'>
                 {t('cogs.forecast.ingredientImpact')}
               </p>
               {forecast.ingredientBreakdown.map((ing) => (
@@ -181,7 +181,7 @@ function ForecastSection({
                   <div className='flex shrink-0 items-center gap-2'>
                     <span>{formatRp(ing.currentCost)}</span>
                     <span className='text-muted-foreground'>→</span>
-                    <span className='text-amber-600 dark:text-amber-400'>
+                    <span className='text-status-warning'>
                       {formatRp(ing.simulatedCost)}
                     </span>
                   </div>
@@ -275,7 +275,7 @@ export function ProductCostCard() {
           {/* Left: Stats */}
           <div className='flex flex-col gap-4 xl:w-[340px]'>
             {/* Cost summary */}
-            <div className='bg-border grid grid-cols-2 gap-px overflow-hidden rounded-xl border'>
+            <div className='bg-border grid grid-cols-2 gap-px overflow-hidden rounded-lg border'>
               {[
                 {
                   label: t('cogs.productCost.materialCost'),
@@ -300,11 +300,11 @@ export function ProductCostCard() {
                   key={s.label}
                   className='bg-card flex flex-col gap-1.5 p-4'
                 >
-                  <p className='text-muted-foreground text-xs font-semibold tracking-wide uppercase'>
+                  <p className='text-fg-muted text-xs font-medium'>
                     {s.label}
                   </p>
                   <p
-                    className={`font-sans tabular-nums tabular-nums ${s.bold ? 'text-lg font-bold' : 'text-sm'}`}
+                    className={`font-sans tabular-nums tabular-nums ${s.bold ? 'text-lg font-semibold' : 'text-sm'}`}
                   >
                     {formatRp(s.value)}
                   </p>
@@ -347,7 +347,7 @@ export function ProductCostCard() {
 
           {/* Right: breakdown */}
           <div className='bg-card flex-1 rounded-lg border p-4 sm:p-5'>
-            <p className='text-muted-foreground mb-4 text-xs font-semibold tracking-wide uppercase'>
+            <p className='text-fg-muted mb-4 text-xs font-medium'>
               {t('cogs.productCost.materialBreakdown')}
               <span className='text-muted-foreground ml-2 font-normal normal-case'>
                 ({cost.quantityEstimated} {t('cogs.productCost.units')})

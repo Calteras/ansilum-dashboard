@@ -102,7 +102,7 @@ function ProviderCard({
       aria-pressed={selected}
       onClick={onSelect}
       className={cn(
-        'bg-card hover:border-foreground/40 flex flex-col rounded-xl border p-5 text-left transition-colors focus-visible:ring-2',
+        'bg-card hover:border-foreground/40 flex flex-col rounded-lg border p-5 text-left transition-colors focus-visible:ring-2',
         selected && 'border-primary ring-primary/15 hover:border-primary ring-2'
       )}
     >

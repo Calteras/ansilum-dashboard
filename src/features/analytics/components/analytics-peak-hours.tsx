@@ -1,88 +1,150 @@
-import { useCopy } from '@/hooks/use-copy'
-import { ChartBar } from '@/components/icons'
 import {
   Bar,
   BarChart,
+  CartesianGrid,
   Cell,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from 'recharts'
+import { formatCount } from '@/lib/metrics'
+import { cn } from '@/lib/utils'
+import { useCopy } from '@/hooks/use-copy'
+import { SectionHeader } from '@/components/data-display/data-panel'
+import { EmptyState } from '@/components/data-display/data-states'
 import type { AnalyticsPeakHour } from '../api/analytics.types'
 
-function formatHour(hour: number) { return `${String(hour).padStart(2, '0')}:00` }
+const formatHour = (hour: number) => `${String(hour).padStart(2, '0')}:00`
+const formatHourSpan = (hour: number) =>
+  `${formatHour(hour)}–${formatHour((hour + 1) % 24)}`
 
 interface AnalyticsPeakHoursProps {
   peakHours: AnalyticsPeakHour[]
   isLoading: boolean
+  className?: string
 }
 
+/** A region of a DataPanel. One series; the busiest hour is the only accented bar. */
 export function AnalyticsPeakHours({
   peakHours,
   isLoading,
+  className,
 }: AnalyticsPeakHoursProps) {
   const copy = useCopy()
-  const data = peakHours.map((h) => ({
-    hour: formatHour(h.hour),
-    orders: h.orderCount,
-  }))
+  const active = peakHours.filter((h) => h.orderCount > 0)
+  const counts = new Map(peakHours.map((h) => [h.hour, h.orderCount]))
 
-  const peakMax = Math.max(...peakHours.map((h) => h.orderCount), 1)
+  // Trading hours only, gaps filled with zero so the axis stays continuous.
+  const first = Math.min(...active.map((h) => h.hour))
+  const last = Math.max(...active.map((h) => h.hour))
+  const data = active.length
+    ? Array.from({ length: last - first + 1 }, (_, i) => ({
+        hour: first + i,
+        label: formatHour(first + i),
+        orders: counts.get(first + i) ?? 0,
+      }))
+    : []
+  const busiest = data.reduce<(typeof data)[number] | null>(
+    (best, row) => (!best || row.orders > best.orders ? row : best),
+    null
+  )
 
   return (
-    <div className='bg-card flex flex-1 flex-col gap-4 rounded-xl border p-4 sm:p-5'>
-      <div className='flex items-center gap-2'>
-        <div className='bg-chart-3/10 rounded-md p-1.5'>
-          <ChartBar className='text-chart-3 size-4' />
-        </div>
-        <span className='text-sm font-medium'>{copy('Jam ramai', 'Busy hours')}</span>
-        <span className='text-muted-foreground ml-auto text-xs'>
-          {copy('pesanan per jam', 'orders per hour')}
-        </span>
-      </div>
+    <section
+      aria-labelledby='busy-hours-title'
+      className={cn('flex min-w-0 flex-col gap-3 p-4 sm:p-5', className)}
+    >
+      <SectionHeader
+        as='h3'
+        id='busy-hours-title'
+        title={copy('Jam ramai', 'Busy hours')}
+        description={
+          busiest
+            ? copy(
+                `Pesanan per jam · tersibuk ${formatHourSpan(busiest.hour)} (${formatCount(busiest.orders)} pesanan)`,
+                `Orders per hour · busiest ${formatHourSpan(busiest.hour)} (${formatCount(busiest.orders)} orders)`
+              )
+            : copy('Pesanan per jam', 'Orders per hour')
+        }
+      />
 
       {isLoading ? (
-        <div className='bg-muted h-45 w-full animate-pulse rounded-lg' />
+        <div
+          role='status'
+          className='bg-surface-hover h-48 w-full animate-pulse rounded'
+        >
+          <span className='sr-only'>{copy('Memuat…', 'Loading…')}</span>
+        </div>
+      ) : data.length === 0 ? (
+        <EmptyState
+          title={copy(
+            'Belum ada pesanan pada periode ini.',
+            'No orders in this period.'
+          )}
+          className='py-8'
+        />
       ) : (
-        <div className='h-45 w-full'>
+        <div className='h-48 w-full min-w-0'>
           <ResponsiveContainer width='100%' height='100%'>
             <BarChart
               data={data}
-              margin={{ top: 4, right: 4, left: -28, bottom: 0 }}
+              margin={{ top: 4, right: 0, left: 0, bottom: 0 }}
             >
+              <CartesianGrid vertical={false} stroke='var(--chart-grid)' />
               <XAxis
-                dataKey='hour'
-                tick={{ fontSize: 12, fill: 'var(--foreground)' }}
+                dataKey='label'
                 tickLine={false}
-                axisLine={false}
-                interval={3}
+                axisLine={{ stroke: 'var(--divider-strong)' }}
+                tick={{ fill: 'var(--fg-muted)', fontSize: 11 }}
+                tickMargin={8}
+                minTickGap={16}
               />
               <YAxis
-                tick={{ fontSize: 12, fill: 'var(--foreground)' }}
+                width={28}
                 tickLine={false}
                 axisLine={false}
                 allowDecimals={false}
+                tickCount={4}
+                tick={{ fill: 'var(--fg-muted)', fontSize: 11 }}
               />
               <Tooltip
-                contentStyle={{
-                  backgroundColor: 'var(--card)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '8px',
-                  fontSize: '12px',
+                cursor={{ fill: 'var(--surface-hover)' }}
+                isAnimationActive={false}
+                content={({ active: isActive, payload }) => {
+                  const row = payload?.[0]?.payload as
+                    | (typeof data)[number]
+                    | undefined
+                  if (!isActive || !row) return null
+                  return (
+                    <div className='bg-popover text-popover-foreground border-divider-strong rounded-md border px-3 py-2 text-xs'>
+                      <p className='text-fg-muted'>
+                        {formatHourSpan(row.hour)}
+                      </p>
+                      <p className='mt-0.5 text-[13px] font-semibold tabular-nums'>
+                        {formatCount(row.orders)}{' '}
+                        <span className='text-fg-muted text-xs font-normal'>
+                          {copy('pesanan', 'orders')}
+                        </span>
+                      </p>
+                    </div>
+                  )
                 }}
-                formatter={(v) => [v, copy('Pesanan', 'Orders')]}
-                labelFormatter={(label) => `${copy('Pukul', 'Hour')}: ${label}`}
               />
-              <Bar isAnimationActive={false} dataKey='orders' radius={[3, 3, 0, 0]} maxBarSize={20}>
-                {data.map((entry, i) => (
+              <Bar
+                dataKey='orders'
+                radius={[4, 4, 0, 0]}
+                maxBarSize={24}
+                isAnimationActive={false}
+              >
+                {data.map((row) => (
                   <Cell
-                    key={i}
+                    key={row.hour}
                     fill={
-                      entry.orders === peakMax
-                        ? 'var(--brand)' : 'var(--steel)'
+                      row.orders === busiest?.orders
+                        ? 'var(--series-primary)'
+                        : 'var(--series-neutral)'
                     }
-                    opacity={0.85}
                   />
                 ))}
               </Bar>
@@ -90,18 +152,6 @@ export function AnalyticsPeakHours({
           </ResponsiveContainer>
         </div>
       )}
-
-      <div className='flex items-center gap-4 text-xs'>
-        <div className='flex items-center gap-1.5'>
-          <span className='bg-brand inline-block size-2 rounded-full' />
-          <span className='text-muted-foreground'>{copy('Paling ramai', 'Busiest')}</span>
-        </div>
-
-        <div className='flex items-center gap-1.5'>
-          <span className='bg-steel inline-block size-2 rounded-full' />
-          <span className='text-muted-foreground'>{copy('Jam lainnya', 'Other hours')}</span>
-        </div>
-      </div>
-    </div>
+    </section>
   )
 }

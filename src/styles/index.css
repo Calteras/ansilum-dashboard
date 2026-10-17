@@ -16,15 +16,15 @@
   }
   body {
     @apply bg-background text-foreground min-h-svh w-full antialiased;
-    font-size: 15px;
-    line-height: 1.65;
+    font-size: 14px;
+    line-height: 1.5;
   }
   h1,
   h2,
   h3,
   h4 {
-    letter-spacing: -0.03em;
-    line-height: 1.25;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
   }
   button:not(:disabled),
   [role='button']:not(:disabled) {
@@ -67,42 +67,43 @@
   @apply after:from-background after:pointer-events-none after:absolute after:start-0 after:bottom-0 after:hidden after:h-16 after:w-full after:bg-linear-to-t after:to-transparent md:after:block;
 }
 
-/* Shared interaction rules also cover older feature-level size overrides. */
-[data-slot='button'] {
-  min-height: 48px;
-}
-[data-slot='button'][data-size='icon'] {
-  min-width: 44px;
-  min-height: 44px;
-}
-[data-slot='input'],
-[data-slot='select-trigger'] {
-  min-height: 48px;
-}
-[data-slot='tabs-trigger'] {
-  min-height: 44px;
-}
-[data-slot='tabs-list'] {
-  height: auto;
-  min-height: 52px;
-  max-width: 100%;
-  overflow-x: auto;
-  justify-content: flex-start;
-}
-[data-slot='dropdown-menu-item'],
-[data-slot='dropdown-menu-checkbox-item'],
-[data-slot='dropdown-menu-radio-item'],
-[data-slot='select-item'],
-[data-slot='command-item'] {
-  min-height: 44px;
+/*
+ * Density. Components set console-sized heights (32–36px) for a mouse; touch
+ * screens get 44px targets regardless of what a component asks for.
+ */
+@media (pointer: coarse) {
+  [data-slot='button'],
+  [data-slot='input'],
+  [data-slot='select-trigger'],
+  [data-slot='tabs-trigger'],
+  [data-sidebar='menu-button'],
+  [data-sidebar='menu-sub-button'] {
+    min-height: 44px;
+  }
+  [data-slot='button'][data-size='icon'],
+  [data-slot='dialog-close'],
+  [data-slot='sheet-close'] {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  [data-slot='dropdown-menu-item'],
+  [data-slot='dropdown-menu-checkbox-item'],
+  [data-slot='dropdown-menu-radio-item'],
+  [data-slot='select-item'],
+  [data-slot='command-item'] {
+    min-height: 44px;
+  }
 }
 [data-slot='dialog-close'],
 [data-slot='sheet-close'] {
-  min-width: 44px;
-  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+[data-slot='tabs-list'] {
+  max-width: 100%;
+  overflow-x: auto;
+  justify-content: flex-start;
 }
 [data-slot='badge'] {
   border-radius: 6px;
@@ -110,19 +111,25 @@
 [data-slot='table-cell'] {
   font-variant-numeric: tabular-nums;
 }
-[data-sidebar='menu-button'] {
-  min-height: 44px;
+/* Sidebar: icons recede until hovered or active; active sub-page marks the guide line. */
+[data-sidebar='menu-button'] > svg {
+  color: var(--fg-muted);
 }
-[data-sidebar='menu-button'][data-active='true'] {
-  background: var(--sidebar-primary);
-  color: var(--sidebar-primary-foreground);
-  font-weight: 600;
+[data-sidebar='menu-button']:hover > svg,
+[data-sidebar='menu-button'][data-active='true'] > svg {
+  color: var(--foreground);
 }
-[data-sidebar='menu-sub-button'] {
-  min-height: 44px;
+[data-sidebar='menu-sub-button'][data-active='true']::before {
+  content: '';
+  position: absolute;
+  inset-block: 6px;
+  inset-inline-start: -9px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--brand);
 }
 [data-sidebar='group-label'] {
-  color: var(--muted-foreground);
+  color: var(--fg-muted);
 }
 [data-sidebar='sidebar'] {
   background: var(--sidebar);
@@ -135,62 +142,13 @@
   font-variant-numeric: tabular-nums;
 }
 .recharts-default-tooltip {
-  border-radius: 8px !important;
-  box-shadow: none !important;
+  border-radius: 6px !important;
+  border-color: var(--divider-strong) !important;
+  background: var(--popover) !important;
+  box-shadow: var(--overlay-shadow) !important;
 }
-
 .app-main {
   min-width: 0;
-}
-.app-main::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto;
-  height: 220px;
-  z-index: -1;
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--brand-soft) 42%, transparent),
-    transparent
-  );
-  opacity: 0.55;
-}
-.app-main > :first-child:has(h1, h2) {
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--border);
-}
-.app-main > :first-child h1,
-.app-main > :first-child h2 {
-  font-size: clamp(26px, 2.5vw, 32px);
-  font-weight: 700;
-}
-.app-main > :first-child p {
-  margin-top: 8px;
-  max-width: 65ch;
-}
-.metric-grid {
-  display: grid;
-  gap: 1px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: var(--border);
-}
-.metric-grid > * {
-  background: var(--card);
-  min-width: 0;
-  padding: 24px;
-}
-.page-intro + * {
-  margin-top: 0;
-}
-[data-slot='card'] {
-  border-radius: 16px;
-  box-shadow: 0 14px 45px -36px var(--brand-ink);
-}
-[data-slot='table-container'] {
-  border-radius: 16px;
 }
 .CollapsibleContent {
   overflow: hidden;

@@ -1,122 +1,112 @@
+import { formatCompactMoney, formatMoney } from '@/lib/format'
+import { formatCount, formatPercent } from '@/lib/metrics'
+import { cn } from '@/lib/utils'
 import { useCopy } from '@/hooks/use-copy'
-import { formatCompactMoney } from '@/lib/format'
-import {
-  DollarSign,
-  Percent,
-  ShoppingBag,
-  TrendingUp,
-  Users,
-  RotateCcw,
-} from '@/components/icons'
+import { Metric, MetricGroup } from '@/components/data-display/metric'
 import type { AnalyticsSummaryKpis } from '../api/analytics.types'
-
-const fmtCurrency = formatCompactMoney
-
-interface KpiCardProps {
-  label: string
-  value: string
-  sub: string
-  icon: React.ElementType
-  color: string
-  bg: string
-  isLoading?: boolean
-}
-
-function KpiCard({ label, value, sub, icon: Icon, color, bg, isLoading }: KpiCardProps) {
-  return (
-    <div className='flex flex-col gap-2.5 p-3 sm:p-4'>
-      <div className='flex items-center justify-between'>
-        <span className='text-muted-foreground text-xs font-medium sm:text-xs'>
-          {label}
-        </span>
-        <div className={`rounded-md p-1 ${bg}`}>
-          <Icon className={`size-3 ${color}`} />
-        </div>
-      </div>
-      {isLoading ? (
-        <>
-          <div className='bg-muted h-5 w-24 animate-pulse rounded' />
-          <div className='bg-muted h-3 w-20 animate-pulse rounded' />
-        </>
-      ) : (
-        <>
-          <p className='text-xl leading-tight font-bold tracking-tight tabular-nums'>
-            {value}
-          </p>
-          <p className='text-muted-foreground text-xs font-medium sm:text-xs'>
-            {sub}
-          </p>
-        </>
-      )}
-    </div>
-  )
-}
 
 interface AnalyticsKpiStripProps {
   kpis: AnalyticsSummaryKpis | null
   isLoading: boolean
+  /** Hide revenue where the page already leads with sales totals; pending orders take its slot. */
+  showRevenue?: boolean
+  className?: string
 }
 
-export function AnalyticsKpiStrip({ kpis, isLoading }: AnalyticsKpiStripProps) {
+export function AnalyticsKpiStrip({
+  kpis,
+  isLoading,
+  showRevenue = true,
+  className,
+}: AnalyticsKpiStripProps) {
   const copy = useCopy()
-  const cards: KpiCardProps[] = [
-    {
-      label: copy('Penjualan', 'Total Revenue'),
-      value: kpis ? fmtCurrency(kpis.totalRevenue) : '—',
-      sub: kpis ? `${kpis.totalTransactions} ${copy('pesanan', 'orders')}` : '—',
-      icon: DollarSign,
-      color: 'text-muted-foreground',
-      bg: 'bg-muted',
+  const empty = '—'
+
+  const metrics = [
+    showRevenue && {
+      label: copy('Pendapatan', 'Revenue'),
+      value: kpis ? formatMoney(kpis.totalRevenue) : empty,
+      footer: kpis
+        ? `${formatCount(kpis.totalTransactions)} ${copy('pesanan', 'orders')}`
+        : null,
     },
     {
-      label: copy('Laba kotor', 'Gross Profit'),
-      value: kpis ? fmtCurrency(kpis.grossProfit) : '—',
-      sub: kpis ? `COGS ${fmtCurrency(kpis.totalCOGS)}` : '—',
-      icon: TrendingUp,
-      color: 'text-muted-foreground',
-      bg: 'bg-muted',
+      label: copy('Laba kotor', 'Gross profit'),
+      definition: copy(
+        'Pendapatan dikurangi HPP.',
+        'Revenue minus cost of goods sold.'
+      ),
+      value: kpis ? formatMoney(kpis.grossProfit) : empty,
+      footer: kpis
+        ? `${copy('HPP', 'COGS')} ${formatCompactMoney(kpis.totalCOGS)}`
+        : null,
     },
     {
-      label: copy('Margin laba', 'Profit Margin'),
-      value: kpis ? `${kpis.profitMargin.toFixed(1)}%` : '—',
-      sub: copy('dari total penjualan', 'of total revenue'),
-      icon: Percent,
-      color: 'text-muted-foreground',
-      bg: 'bg-muted',
+      label: copy('Margin laba', 'Profit margin'),
+      definition: copy(
+        'Laba kotor dibagi pendapatan.',
+        'Gross profit divided by revenue.'
+      ),
+      value: kpis ? formatPercent(kpis.profitMargin / 100) : empty,
     },
     {
-      label: copy('Produk terjual', 'Items Sold'),
-      value: kpis ? kpis.itemsSold.toLocaleString('id-ID') : '—',
-      sub: kpis ? `${kpis.totalTransactions} ${copy('pesanan', 'orders')}` : '—',
-      icon: ShoppingBag,
-      color: 'text-muted-foreground',
-      bg: 'bg-muted',
+      label: copy('Produk terjual', 'Items sold'),
+      value: kpis ? formatCount(kpis.itemsSold) : empty,
+      footer: kpis
+        ? `${copy('dari', 'across')} ${formatCount(kpis.totalTransactions)} ${copy('pesanan', 'orders')}`
+        : null,
     },
     {
-      label: copy('Pelanggan', 'Unique Customers'),
-      value: kpis ? kpis.totalUniqueCustomers.toLocaleString('id-ID') : '—',
-      sub: kpis ? `${kpis.repeatCustomers} ${copy('kembali', 'returned')}` : '—',
-      icon: Users,
-      color: 'text-muted-foreground',
-      bg: 'bg-muted',
+      label: copy('Pelanggan', 'Customers'),
+      definition: copy(
+        'Pelanggan unik yang tercatat.',
+        'Unique customers on record.'
+      ),
+      value: kpis ? formatCount(kpis.totalUniqueCustomers) : empty,
+      footer: kpis
+        ? `${formatCount(kpis.repeatCustomers)} ${copy('kembali', 'returning')}`
+        : null,
     },
     {
-      label: copy('Pelanggan kembali', 'Repeat Rate'),
-      value: kpis ? `${kpis.repeatRate.toFixed(1)}%` : '—',
-      sub: kpis
-        ? `${kpis.pendingOrders} ${copy('pesanan menunggu', 'pending orders')}`
-        : '—',
-      icon: RotateCcw,
-      color: 'text-muted-foreground',
-      bg: 'bg-muted',
+      label: copy('Tingkat kembali', 'Repeat rate'),
+      definition: copy(
+        'Porsi pelanggan yang datang lebih dari sekali.',
+        'Share of customers who ordered more than once.'
+      ),
+      value: kpis ? formatPercent(kpis.repeatRate / 100) : empty,
+      footer:
+        showRevenue && kpis
+          ? `${formatCount(kpis.pendingOrders)} ${copy('pesanan menunggu', 'pending orders')}`
+          : null,
     },
-  ]
+    !showRevenue && {
+      label: copy('Pesanan menunggu', 'Pending orders'),
+      definition: copy('Pesanan yang belum selesai.', 'Orders not yet closed.'),
+      value: kpis ? formatCount(kpis.pendingOrders) : empty,
+    },
+  ].filter(Boolean) as {
+    label: string
+    value: string
+    definition?: string
+    footer?: string | null
+  }[]
 
   return (
-    <div className='metric-grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6'>
-      {cards.map((card) => (
-        <KpiCard key={card.label} {...card} isLoading={isLoading} />
+    <MetricGroup
+      aria-label={copy('Laba dan pelanggan', 'Profit and customers')}
+      aria-busy={isLoading}
+      className={cn('grid-cols-2 sm:grid-cols-3 2xl:grid-cols-6', className)}
+    >
+      {metrics.map((metric) => (
+        <Metric
+          key={metric.label}
+          label={metric.label}
+          definition={metric.definition}
+          value={metric.value}
+          footer={metric.footer}
+          isLoading={isLoading}
+        />
       ))}
-    </div>
+    </MetricGroup>
   )
 }

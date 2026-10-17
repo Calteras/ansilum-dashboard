@@ -28,7 +28,7 @@ export function Employees() {
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <PageHeader
           title='Employees'
-          description='Manage your employees and their roles here.'
+          description='Staff accounts, roles and outlet access'
           actions={<EmployeesPrimaryButtons />}
         />
         <EmployeesTable

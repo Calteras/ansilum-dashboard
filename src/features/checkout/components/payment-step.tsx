@@ -43,7 +43,7 @@ function CopyField({ label, value }: { label: string; value: string }) {
     <div className='space-y-1.5'>
       <p className='text-muted-foreground text-sm'>{label}</p>
       <div className='flex items-center gap-2'>
-        <output className='bg-muted min-w-0 flex-1 rounded-md px-4 py-3 text-xl font-bold tracking-[0.06em] break-all tabular-nums'>
+        <output className='bg-muted min-w-0 flex-1 rounded-md px-4 py-3 text-xl font-semibold tracking-[0.06em] break-all tabular-nums'>
           {value}
         </output>
         <Button
@@ -203,7 +203,7 @@ export function PaymentStep({
       >
         <CheckCircle2 className='text-leaf size-10' />
         <div className='space-y-2'>
-          <h1 id='result-heading' className='text-2xl font-bold tracking-tight'>
+          <h1 id='result-heading' className='text-xl font-semibold tracking-[-0.02em]'>
             {copy(
               `Paket ${planName} sudah aktif`,
               `Your ${planName} plan is active`
@@ -243,7 +243,7 @@ export function PaymentStep({
       >
         <XCircle className='text-muted-foreground size-10' />
         <div className='space-y-2'>
-          <h1 id='result-heading' className='text-2xl font-bold tracking-tight'>
+          <h1 id='result-heading' className='text-xl font-semibold tracking-[-0.02em]'>
             {refunded
               ? copy(
                   'Pembayaran ini sudah dikembalikan',
@@ -331,7 +331,7 @@ export function PaymentStep({
     <section className='space-y-8' aria-labelledby='pay-heading'>
       <div className='space-y-1.5'>
         {method && <PaymentLogo method={method} className='mb-4' />}
-        <h1 id='pay-heading' className='text-2xl font-bold tracking-tight'>
+        <h1 id='pay-heading' className='text-xl font-semibold tracking-[-0.02em]'>
           {method
             ? copy(...method.title)
             : copy('Selesaikan pembayaran', 'Complete your payment')}

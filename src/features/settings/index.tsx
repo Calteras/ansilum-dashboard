@@ -13,6 +13,7 @@ import {
 } from '@/components/icons'
 import { AppHeader } from '@/components/layout/app-header'
 import { Main } from '@/components/layout/main'
+import { PageHeader } from '@/components/layout/page-header'
 import { SidebarNav } from './components/sidebar-nav'
 
 const sidebarNavItems = [
@@ -76,18 +77,14 @@ export function Settings() {
       <AppHeader />
 
       <Main fixed>
-        <div className='space-y-0.5'>
-          <h1 className='text-2xl font-bold tracking-tight md:text-3xl'>
-            {copy('Pengaturan', 'Settings')}
-          </h1>
-          <p className='text-muted-foreground'>
-            {copy(
-              'Atur akun, tampilan, dan paket untuk usaha Anda.',
-              'Manage your account, appearance, and business subscription.'
-            )}
-          </p>
-        </div>
-        <Separator className='my-4 lg:my-6' />
+        <PageHeader
+          title={copy('Pengaturan', 'Settings')}
+          description={copy(
+            'Akun, usaha, tampilan, struk, dan langganan',
+            'Account, business, appearance, receipts and subscription'
+          )}
+        />
+        <Separator className='my-4' />
         <div className='flex flex-1 flex-col space-y-2 overflow-hidden md:space-y-2 lg:flex-row lg:space-y-0 lg:space-x-12'>
           <aside className='top-0 lg:sticky lg:w-1/5'>
             <SidebarNav

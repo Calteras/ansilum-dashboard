@@ -39,7 +39,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
         <header className='flex items-center justify-between'>
           <Link to='/sign-in' className='flex min-h-12 items-center gap-3'>
             <Logo />
-            <span className='text-xl font-bold tracking-tight'>ansilum</span>
+            <span className='text-xl font-semibold tracking-tight'>ansilum</span>
           </Link>
           <LanguageSwitch />
         </header>
@@ -55,7 +55,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
       </div>
       <aside className='bg-night relative hidden flex-col justify-center overflow-hidden p-12 text-white lg:flex xl:p-20'>
         <div className='bg-brand mb-12 h-1 w-12 rounded-sm' />
-        <h2 className='max-w-lg text-[40px] leading-[1.15] font-bold tracking-[-0.04em]'>
+        <h2 className='max-w-lg text-[40px] leading-[1.15] font-semibold tracking-[-0.04em]'>
           {copy('Usaha jalan.', 'Business keeps moving.')}
           <br />
           <span className='text-white/70'>
@@ -71,12 +71,12 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
         <ol className='mt-12 divide-y divide-white/15'>
           {steps.map(({ icon: Icon, title, body }, index) => (
             <li key={title} className='flex gap-4 py-6'>
-              <span className='text-sun pt-0.5 text-xs font-bold tabular-nums'>
+              <span className='text-sun pt-0.5 text-xs font-semibold tabular-nums'>
                 0{index + 1}
               </span>
               <div className='min-w-0 flex-1'>
                 <div className='flex flex-wrap items-center gap-2'>
-                  <h3 className='text-base font-bold'>{title}</h3>
+                  <h3 className='text-base font-semibold'>{title}</h3>
                   {index === 2 && (
                     <Badge className='bg-sun text-ink border-0'>
                       {copy('Segera hadir', 'Coming soon')}

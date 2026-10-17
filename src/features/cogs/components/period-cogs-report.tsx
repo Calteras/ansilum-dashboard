@@ -1,21 +1,7 @@
 import { useState } from 'react'
-import { format, startOfMonth, endOfDay } from 'date-fns'
-import type { DateRange } from 'react-day-picker'
 import { useTranslation } from 'react-i18next'
+import { getPresetSpan, toApiDateTime, type DateSpan } from '@/lib/date-range'
 import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -24,7 +10,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { CalendarIcon, Calculator } from '@/components/icons'
+import { Calculator } from '@/components/icons'
+import { ContextToolbar } from '@/components/data-display/context-toolbar'
+import { DateRangePicker } from '@/components/date-range-picker'
+import { OutletSelect } from '@/components/outlet-select'
 import { useDashboardOutletsQuery } from '@/features/dashboard/api/dashboard.queries'
 import { useCalculatePeriodCogsMutation } from '../api/cogs.queries'
 import type { ByProductCogs, PeriodCogsData } from '../api/cogs.types'
@@ -35,8 +24,8 @@ function formatRp(value: number, dp = 0) {
 
 function marginColor(pct: number) {
   if (pct >= 50) return 'text-leaf '
-  if (pct >= 30) return 'text-amber-600 dark:text-amber-400'
-  return 'text-rose-600 dark:text-rose-400'
+  if (pct >= 30) return 'text-status-warning'
+  return 'text-status-danger'
 }
 
 function InventoryFlow({ data }: { data: PeriodCogsData }) {
@@ -65,8 +54,8 @@ function InventoryFlow({ data }: { data: PeriodCogsData }) {
     },
   ]
   return (
-    <div className='bg-card rounded-2xl border p-5 shadow-[0_14px_45px_-36px_var(--brand-ink)] sm:p-6'>
-      <p className='text-brand-ink mb-4 text-[11px] font-bold tracking-[0.18em] uppercase'>
+    <div className='bg-card rounded-lg border p-5 sm:p-6'>
+      <p className='text-fg-muted mb-4 text-xs font-medium'>
         {t('cogs.period.absorptionFormula')}
       </p>
       <div className='space-y-3'>
@@ -86,7 +75,7 @@ function InventoryFlow({ data }: { data: PeriodCogsData }) {
               {row.label}
             </span>
             <span
-              className={`font-sans text-sm tabular-nums ${row.bold ? 'text-brand-ink font-bold' : ''}`}
+              className={`font-sans text-sm tabular-nums ${row.bold ? 'font-semibold' : ''}`}
             >
               {formatRp(row.value)}
             </span>
@@ -111,17 +100,17 @@ function CogsComparisonCards({ data }: { data: PeriodCogsData }) {
 
   return (
     <div className='grid gap-4 xl:grid-cols-[1.15fr_0.85fr]'>
-      <div className='bg-card rounded-2xl border p-5 shadow-[0_14px_45px_-36px_var(--brand-ink)] sm:p-6'>
+      <div className='bg-card rounded-lg border p-5 sm:p-6'>
         <div className='flex items-start justify-between gap-4'>
           <div>
-            <p className='text-brand-ink text-[11px] font-bold tracking-[0.18em] uppercase'>
+            <p className='text-fg-muted text-xs font-medium'>
               {t('cogs.period.materialCogs')}
             </p>
-            <p className='mt-2 font-sans text-3xl leading-none font-bold tracking-tight tabular-nums'>
+            <p className='mt-2 text-2xl leading-8 font-semibold tracking-[-0.02em]'>
               {formatRp(data.materialCogs)}
             </p>
           </div>
-          <span className='bg-brand-soft text-brand-ink rounded-md px-2.5 py-1 text-xs font-semibold'>
+          <span className='bg-muted text-fg-secondary rounded-md px-2 py-0.5 text-xs font-medium'>
             {t('cogs.period.absorptionMethod')}
           </span>
         </div>
@@ -158,20 +147,20 @@ function CogsComparisonCards({ data }: { data: PeriodCogsData }) {
           ))}
         </div>
       </div>
-      <div className='bg-brand-ink rounded-2xl p-5 text-white shadow-[0_18px_50px_-30px_var(--brand-ink)] sm:p-6'>
-        <p className='text-[11px] font-bold tracking-[0.18em] text-white/60 uppercase'>
+      <div className='bg-card rounded-lg border p-5 sm:p-6'>
+        <p className='text-fg-muted text-xs font-medium'>
           {t('cogs.period.directCogs')}
         </p>
-        <p className='mt-3 font-sans text-3xl leading-none font-bold tracking-tight tabular-nums'>
+        <p className='mt-3 text-2xl leading-8 font-semibold tracking-[-0.02em]'>
           {formatRp(data.directMethodCogs, 2)}
         </p>
-        <p className='mt-3 text-sm leading-relaxed text-white/70'>
+        <p className='text-fg-secondary mt-3 text-sm leading-relaxed'>
           {diffPct > 0
             ? `${diffPct.toFixed(1)}% ${diff > 0 ? t('cogs.period.belowAbsorption') : t('cogs.period.aboveAbsorption')}`
             : t('cogs.period.exactMatch')}
         </p>
-        <div className='mt-8 border-t border-white/15 pt-4'>
-          <p className='text-xs text-white/60'>
+        <div className='border-divider mt-8 border-t pt-4'>
+          <p className='text-fg-muted text-xs'>
             {lowestMargin ? 'Lowest product margin' : 'Product coverage'}
           </p>
           <p className='mt-1 font-semibold'>
@@ -190,10 +179,10 @@ function ByProductTable({ rows }: { rows: ByProductCogs[] }) {
   const sorted = [...rows].sort((a, b) => a.grossMarginPct - b.grossMarginPct)
 
   return (
-    <div className='bg-card overflow-hidden rounded-2xl border shadow-[0_14px_45px_-36px_var(--brand-ink)]'>
+    <div className='bg-card overflow-hidden rounded-lg border'>
       <div className='flex items-center justify-between border-b px-4 py-4 sm:px-5'>
         <div>
-          <p className='text-brand-ink text-[11px] font-bold tracking-[0.18em] uppercase'>
+          <p className='text-fg-muted text-xs font-medium'>
             {t('cogs.period.byProduct')}
           </p>
           <p className='text-muted-foreground mt-1 text-sm'>
@@ -201,7 +190,7 @@ function ByProductTable({ rows }: { rows: ByProductCogs[] }) {
           </p>
         </div>
         <span className='bg-muted rounded-md px-2 py-1 font-sans text-xs font-semibold tabular-nums'>
-          <span className='bg-primary/10 text-primary ml-2 rounded px-1.5 py-0.5 font-sans text-xs tabular-nums'>
+          <span className='text-fg-muted text-[13px] tabular-nums'>
             {sorted.length}
           </span>
         </span>
@@ -220,7 +209,7 @@ function ByProductTable({ rows }: { rows: ByProductCogs[] }) {
               ].map((h) => (
                 <TableHead
                   key={h}
-                  className='text-muted-foreground px-4 py-2.5 text-xs font-semibold tracking-wide uppercase'
+                  className='text-fg-muted px-4 py-2.5 text-xs font-medium'
                 >
                   {h}
                 </TableHead>
@@ -231,7 +220,7 @@ function ByProductTable({ rows }: { rows: ByProductCogs[] }) {
             {sorted.map((row) => (
               <TableRow
                 key={row.productId}
-                className='hover:bg-muted/20 border-b last:border-0'
+                className='hover:bg-surface-hover border-b last:border-0'
               >
                 <TableCell className='px-4 py-3 text-sm font-medium'>
                   {row.productName}
@@ -256,8 +245,8 @@ function ByProductTable({ rows }: { rows: ByProductCogs[] }) {
                           row.grossMarginPct >= 50
                             ? 'bg-leaf'
                             : row.grossMarginPct >= 30
-                              ? 'bg-amber-500'
-                              : 'bg-rose-500'
+                              ? 'bg-status-warning'
+                              : 'bg-status-danger'
                         }`}
                         style={{
                           width: `${Math.min(row.grossMarginPct, 100)}%`,
@@ -282,10 +271,7 @@ function ByProductTable({ rows }: { rows: ByProductCogs[] }) {
 
 export function PeriodCogsReport() {
   const { t } = useTranslation()
-  const [dateRange, setDateRange] = useState<DateRange>({
-    from: startOfMonth(new Date()),
-    to: endOfDay(new Date()),
-  })
+  const [span, setSpan] = useState<DateSpan>(() => getPresetSpan('this-month'))
   const [selectedOutletId, setSelectedOutletId] = useState<string>('all')
 
   const { data: outletsData } = useDashboardOutletsQuery()
@@ -295,69 +281,40 @@ export function PeriodCogsReport() {
   const result = mutation.data?.data ?? null
 
   function handleCalculate() {
-    if (!dateRange.from || !dateRange.to) return
     mutation.mutate({
-      startDate: format(dateRange.from, "yyyy-MM-dd'T'HH:mm:ss"),
-      endDate: format(dateRange.to, "yyyy-MM-dd'T'HH:mm:ss"),
+      startDate: toApiDateTime(span.from),
+      endDate: toApiDateTime(span.to),
       outletId: selectedOutletId !== 'all' ? selectedOutletId : undefined,
     })
   }
 
   return (
     <div className='flex flex-col gap-5'>
-      {/* Filters */}
-      <div className='bg-card/80 flex flex-wrap items-center gap-3 rounded-2xl border p-3 shadow-[0_12px_40px_-32px_var(--brand-ink)] sm:p-4'>
+      <ContextToolbar
+        aria-label={t('cogs.page.title')}
+        actions={
+          <Button
+            size='sm'
+            onClick={handleCalculate}
+            disabled={mutation.isPending}
+          >
+            <Calculator className='size-4' aria-hidden />
+            {mutation.isPending
+              ? t('common.loading')
+              : t('cogs.period.calculate')}
+          </Button>
+        }
+      >
         {outlets.length > 0 && (
-          <Select value={selectedOutletId} onValueChange={setSelectedOutletId}>
-            <SelectTrigger className='h-11 w-[200px] rounded-xl text-sm'>
-              <SelectValue placeholder={t('dashboard.filters.selectOutlet')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='all'>{t('common.all')}</SelectItem>
-              {outlets.map((o) => (
-                <SelectItem key={o.id} value={o.id}>
-                  {o.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <OutletSelect
+            outlets={outlets}
+            value={selectedOutletId}
+            onValueChange={setSelectedOutletId}
+            allLabel={t('common.all')}
+          />
         )}
-
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant='outline'
-              className='h-11 w-[280px] justify-start rounded-xl text-sm font-normal'
-            >
-              {dateRange.from && dateRange.to
-                ? `${format(dateRange.from, 'dd MMM yyyy')} – ${format(dateRange.to, 'dd MMM yyyy')}`
-                : t('dashboard.filters.selectDateRange')}
-              <CalendarIcon className='ml-auto size-4 opacity-50' />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className='w-auto p-0' align='start'>
-            <Calendar
-              mode='range'
-              captionLayout='dropdown'
-              selected={dateRange}
-              onSelect={(range) => range && setDateRange(range)}
-              disabled={(d) => d > new Date()}
-              numberOfMonths={2}
-            />
-          </PopoverContent>
-        </Popover>
-
-        <Button
-          className='h-11 rounded-xl'
-          onClick={handleCalculate}
-          disabled={mutation.isPending || !dateRange.from || !dateRange.to}
-        >
-          <Calculator className='mr-2 size-4' />
-          {mutation.isPending
-            ? t('common.loading')
-            : t('cogs.period.calculate')}
-        </Button>
-      </div>
+        <DateRangePicker value={span} onChange={setSpan} />
+      </ContextToolbar>
 
       {/* Placeholder before first calculation */}
       {!result && !mutation.isPending && (

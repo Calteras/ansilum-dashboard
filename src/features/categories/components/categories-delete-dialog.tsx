@@ -59,7 +59,7 @@ export function CategoriesDeleteDialog({
         <div className='space-y-4'>
           <p className='mb-2'>
             Are you sure you want to delete{' '}
-            <span className='font-bold'>{currentRow.name}</span>?
+            <span className='font-semibold'>{currentRow.name}</span>?
             <br />
             This action will permanently remove the category and all associated
             data. This cannot be undone.

@@ -19,7 +19,7 @@ export function LanguageSwitch() {
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button variant='ghost' size='icon' className='relative'>
-          <Languages className='size-[1.2rem]' />
+          <Languages className='size-[18px]' />
           <span className='sr-only'>{copy('Pilih bahasa', 'Choose language')}</span>
         </Button>
       </DropdownMenuTrigger>

@@ -43,7 +43,7 @@ export const employeesColumns: ColumnDef<Employee>[] = [
       <DataTableColumnHeader column={column} title='Employee No' />
     ),
     cell: ({ row }) => (
-      <div className='font-sans tabular-nums text-sm'>{row.getValue('employeeNo')}</div>
+      <div className='font-sans tabular-nums'>{row.getValue('employeeNo')}</div>
     ),
     meta: {
       className: cn(
@@ -108,7 +108,7 @@ export const employeesColumns: ColumnDef<Employee>[] = [
           {roleData.icon && (
             <roleData.icon size={16} className='text-muted-foreground' />
           )}
-          <span className='text-sm'>{roleData.label}</span>
+          <span>{roleData.label}</span>
         </div>
       )
     },

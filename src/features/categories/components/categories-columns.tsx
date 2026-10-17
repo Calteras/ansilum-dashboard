@@ -87,7 +87,7 @@ export const categoriesColumns: ColumnDef<Category>[] = [
       <DataTableColumnHeader column={column} title='Icon' />
     ),
     cell: ({ row }) => (
-      <div className='font-sans tabular-nums text-sm'>
+      <div className='font-sans tabular-nums'>
         {row.getValue('icon') || '-'}
       </div>
     ),

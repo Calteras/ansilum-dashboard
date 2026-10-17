@@ -52,7 +52,7 @@ export function OrderSummary({
             ? copy(`Paket ${plan.name}`, `${plan.name} plan`)
             : copy('Memuat paket…', 'Loading plan…')}
         </p>
-        <p className='text-[2.5rem] leading-none font-bold tracking-[-0.03em] tabular-nums'>
+        <p className='text-[2.5rem] leading-none font-semibold tracking-[-0.03em] tabular-nums'>
           {amount !== undefined ? formatMoney(amount) : '—'}
         </p>
         <p className='text-muted-foreground text-[15px]'>
@@ -135,7 +135,7 @@ export function OrderSummary({
             <span className='font-semibold'>
               {copy('Total hari ini', 'Total due today')}
             </span>
-            <span className='text-base font-bold'>
+            <span className='text-base font-semibold'>
               {amount !== undefined ? formatMoney(amount) : '—'}
             </span>
           </div>

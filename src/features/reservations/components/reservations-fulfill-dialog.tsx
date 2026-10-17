@@ -40,7 +40,7 @@ export function ReservationsFulfillDialog({
       desc={
         <p>
           Are you sure you want to fulfill reservation{' '}
-          <span className='font-bold'>{currentRow.transactionNo}</span>? This
+          <span className='font-semibold'>{currentRow.transactionNo}</span>? This
           will transition the reservation to OPEN status and deduct stock for all
           items.
         </p>

@@ -33,7 +33,10 @@ export interface CreateModifierGroupRequest {
   isRequired?: boolean
   minSelection?: number
   maxSelection?: number
-  modifiers?: Omit<Modifier, 'id' | 'modifierGroupId' | 'isDefault' | 'isActive'>[]
+  modifiers?: Omit<
+    Modifier,
+    'id' | 'modifierGroupId' | 'isDefault' | 'isActive'
+  >[]
 }
 
 export interface UpdateModifierGroupRequest {
@@ -43,7 +46,7 @@ export interface UpdateModifierGroupRequest {
   minSelection?: number
   maxSelection?: number
   isActive?: boolean
-  modifiers?: Omit<Modifier, 'id' | 'modifierGroupId' | 'isDefault' | 'isActive'>[]
+  modifiers?: Omit<Modifier, 'modifierGroupId' | 'isDefault' | 'isActive'>[]
 }
 
 export interface ModifierGroupsResponse {

@@ -56,7 +56,7 @@ export function PlanSection({
       className='flex flex-wrap items-start justify-between gap-x-6 gap-y-4'
     >
       <div className='flex min-w-0 flex-1 gap-4'>
-        <div className='bg-muted flex size-14 shrink-0 items-center justify-center rounded-xl'>
+        <div className='bg-muted flex size-14 shrink-0 items-center justify-center rounded-lg'>
           <Icon className='text-foreground size-7' />
         </div>
         <div className='min-w-0 space-y-0.5'>

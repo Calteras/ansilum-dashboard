@@ -1,5 +1,10 @@
 import { API_BASE_URL } from '@/config/api.config'
-import type { LoginCredentials, SignUpData, AuthResponse } from './auth.types'
+import type {
+  LoginCredentials,
+  SignUpData,
+  AuthResponse,
+  User,
+} from './auth.types'
 
 export function retryAfterDeadline(
   value: string | null,
@@ -83,6 +88,18 @@ export async function getSessionApi(): Promise<AuthResponse | null> {
   )
   const data = result && ('data' in result ? result.data : result)
   return data?.user?.id && data?.session?.id ? data : null
+}
+
+export async function updateProfileApi(
+  data: Pick<User, 'name'>
+): Promise<User> {
+  await authFetch('/update-user', {
+    method: 'POST',
+    body: JSON.stringify({ name: data.name }),
+  })
+  const session = await getSessionApi()
+  if (!session) throw new AuthRequestError(401)
+  return session.user
 }
 
 export async function loginApi(

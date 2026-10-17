@@ -27,7 +27,7 @@ export function Outlets() {
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <PageHeader
           title='Outlets'
-          description='Manage your store outlets and locations here.'
+          description='Store locations in this business'
           actions={<OutletsPrimaryButtons />}
         />
         <OutletsTable

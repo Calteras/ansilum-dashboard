@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { format, parseISO } from 'date-fns'
 import { useTranslation } from 'react-i18next'
+import { formatMoney } from '@/lib/format'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -77,23 +78,23 @@ const STATUS_CONFIG: Record<
   { dot: string; text: string; labelKey: string }
 > = {
   OPEN: {
-    dot: 'bg-primary',
-    text: 'text-muted-foreground ',
+    dot: 'bg-status-info',
+    text: 'text-fg-secondary',
     labelKey: 'dashboard.transactionsTable.statusOpen',
   },
   PENDING: {
-    dot: 'bg-amber-500',
-    text: 'text-amber-600 dark:text-amber-400',
+    dot: 'bg-status-warning',
+    text: 'text-status-warning',
     labelKey: 'dashboard.transactionsTable.statusPending',
   },
   CLOSED: {
-    dot: 'bg-leaf',
-    text: 'text-leaf ',
+    dot: 'bg-status-success',
+    text: 'text-status-success',
     labelKey: 'dashboard.transactionsTable.statusClosed',
   },
   VOIDED: {
-    dot: 'bg-rose-500',
-    text: 'text-rose-600 dark:text-rose-400',
+    dot: 'bg-status-danger',
+    text: 'text-status-danger',
     labelKey: 'dashboard.transactionsTable.statusVoided',
   },
 }
@@ -153,53 +154,55 @@ export function TransactionsTable({
   }
 
   return (
-    <div className='bg-card overflow-hidden rounded-xl border'>
+    <div className='border-divider bg-card overflow-hidden rounded-lg border'>
       {/* Table toolbar */}
-      <div className='flex flex-col gap-3 border-b px-4 py-3.5 sm:flex-row sm:items-center sm:gap-4 sm:px-6'>
+      <div className='border-divider flex flex-col gap-3 border-b px-4 py-3 sm:flex-row sm:items-center sm:gap-4 sm:px-5'>
         <div className='flex flex-1 items-center gap-3'>
-          <p className='text-foreground text-xs font-semibold tracking-wide uppercase'>
+          <h2 className='text-sm leading-5 font-semibold tracking-[-0.01em]'>
             {t('dashboard.transactionsTable.title')}
-          </p>
-          <span className='bg-primary/10 text-primary rounded px-1.5 py-0.5 font-sans text-xs tabular-nums'>
+          </h2>
+          <span className='text-fg-muted text-[13px] tabular-nums'>
             {effectiveTotalRows}
           </span>
         </div>
 
         <div className='flex flex-wrap items-center gap-2'>
-          <div className='bg-background flex items-center gap-1 rounded border px-2 py-1.5'>
-            <SlidersHorizontal className='text-muted-foreground size-3' />
-            <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-              <SelectTrigger className='h-auto w-auto border-0 bg-transparent p-0 text-xs shadow-none focus:ring-0'>
-                <SelectValue
-                  placeholder={t('dashboard.transactionsTable.colStatus')}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='all'>
-                  {t('dashboard.transactionsTable.allStatus')}
-                </SelectItem>
-                <SelectItem value='OPEN'>
-                  {t('dashboard.transactionsTable.statusOpen')}
-                </SelectItem>
-                <SelectItem value='PENDING'>
-                  {t('dashboard.transactionsTable.statusPending')}
-                </SelectItem>
-                <SelectItem value='CLOSED'>
-                  {t('dashboard.transactionsTable.statusClosed')}
-                </SelectItem>
-                <SelectItem value='VOIDED'>
-                  {t('dashboard.transactionsTable.statusVoided')}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <Select value={statusFilter} onValueChange={onStatusFilterChange}>
+            <SelectTrigger
+              size='sm'
+              aria-label={t('dashboard.transactionsTable.colStatus')}
+              className='border-divider-strong h-8 text-[13px] dark:bg-transparent'
+            >
+              <SlidersHorizontal className='size-3.5' aria-hidden />
+              <SelectValue
+                placeholder={t('dashboard.transactionsTable.colStatus')}
+              />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>
+                {t('dashboard.transactionsTable.allStatus')}
+              </SelectItem>
+              <SelectItem value='OPEN'>
+                {t('dashboard.transactionsTable.statusOpen')}
+              </SelectItem>
+              <SelectItem value='PENDING'>
+                {t('dashboard.transactionsTable.statusPending')}
+              </SelectItem>
+              <SelectItem value='CLOSED'>
+                {t('dashboard.transactionsTable.statusClosed')}
+              </SelectItem>
+              <SelectItem value='VOIDED'>
+                {t('dashboard.transactionsTable.statusVoided')}
+              </SelectItem>
+            </SelectContent>
+          </Select>
 
           <div className='relative flex-1 sm:flex-none'>
             <Input
               placeholder={t('dashboard.transactionsTable.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className='h-8 w-full text-xs sm:w-[200px]'
+              className='border-divider-strong h-8 w-full text-[13px] sm:w-56'
             />
           </div>
         </div>
@@ -208,36 +211,36 @@ export function TransactionsTable({
       {/* Table */}
       <div className='overflow-x-auto'>
         <Table>
-          <TableHeader>
-            <TableRow className='border-b hover:bg-transparent'>
-              <TableHead className='text-muted-foreground w-[40px] px-4 py-2.5 text-xs font-semibold tracking-wide uppercase sm:px-6'>
+          <TableHeader className='bg-transparent'>
+            <TableRow className='border-divider bg-surface-subtle border-b hover:bg-transparent'>
+              <TableHead className='text-muted-foreground w-[40px] px-4 py-2.5 text-xs font-medium sm:px-6'>
                 {t('dashboard.transactionsTable.colNo')}
               </TableHead>
-              <TableHead className='text-muted-foreground min-w-[130px] px-4 py-2.5 text-xs font-semibold tracking-wide uppercase sm:px-6'>
+              <TableHead className='text-muted-foreground min-w-[130px] px-4 py-2.5 text-xs font-medium sm:px-6'>
                 {t('dashboard.transactionsTable.colTxNo')}
               </TableHead>
-              <TableHead className='text-muted-foreground min-w-[130px] px-2 py-2.5 text-xs font-semibold tracking-wide uppercase'>
+              <TableHead className='text-muted-foreground min-w-[130px] px-2 py-2.5 text-xs font-medium'>
                 {t('dashboard.transactionsTable.colDate')}
               </TableHead>
-              <TableHead className='text-muted-foreground min-w-[120px] px-2 py-2.5 text-xs font-semibold tracking-wide uppercase'>
+              <TableHead className='text-muted-foreground min-w-[120px] px-2 py-2.5 text-xs font-medium'>
                 {t('dashboard.transactionsTable.colCustomer')}
               </TableHead>
-              <TableHead className='text-muted-foreground min-w-[80px] px-2 py-2.5 text-xs font-semibold tracking-wide uppercase'>
+              <TableHead className='text-muted-foreground min-w-[80px] px-2 py-2.5 text-xs font-medium'>
                 {t('dashboard.transactionsTable.colStatus')}
               </TableHead>
-              <TableHead className='text-muted-foreground min-w-[50px] px-2 py-2.5 text-xs font-semibold tracking-wide uppercase'>
+              <TableHead className='text-muted-foreground min-w-[50px] px-2 py-2.5 text-xs font-medium'>
                 {t('dashboard.transactionsTable.colQty')}
               </TableHead>
-              <TableHead className='text-muted-foreground min-w-[110px] px-2 py-2.5 text-right text-xs font-semibold tracking-wide uppercase'>
+              <TableHead className='text-muted-foreground min-w-[110px] px-2 py-2.5 text-right text-xs font-medium'>
                 {t('dashboard.transactionsTable.colTotal')}
               </TableHead>
-              <TableHead className='text-muted-foreground hidden min-w-[80px] px-2 py-2.5 text-xs font-semibold tracking-wide uppercase md:table-cell'>
+              <TableHead className='text-muted-foreground hidden min-w-[80px] px-2 py-2.5 text-xs font-medium md:table-cell'>
                 {t('dashboard.transactionsTable.colMethod')}
               </TableHead>
-              <TableHead className='text-muted-foreground hidden min-w-[100px] px-2 py-2.5 text-xs font-semibold tracking-wide uppercase lg:table-cell'>
+              <TableHead className='text-muted-foreground hidden min-w-[100px] px-2 py-2.5 text-xs font-medium lg:table-cell'>
                 {t('dashboard.transactionsTable.colCashier')}
               </TableHead>
-              <TableHead className='text-muted-foreground w-[40px] px-2 py-2.5 text-xs font-semibold tracking-wide uppercase' />
+              <TableHead className='text-muted-foreground w-[40px] px-2 py-2.5 text-xs font-medium' />
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -273,20 +276,20 @@ export function TransactionsTable({
                 return (
                   <TableRow
                     key={tx.id}
-                    className='group hover:bg-muted/20 border-b last:border-0'
+                    className='group hover:bg-surface-hover border-divider border-b last:border-0'
                   >
-                    <TableCell className='text-muted-foreground px-4 py-3 font-sans text-xs tabular-nums sm:px-6'>
+                    <TableCell className='text-muted-foreground px-4 py-2 font-sans text-xs tabular-nums sm:px-6'>
                       {(currentPage - 1) * pageSize + index + 1}
                     </TableCell>
-                    <TableCell className='px-4 py-3 sm:px-6'>
+                    <TableCell className='px-4 py-2 sm:px-6'>
                       <span className='font-sans text-xs font-medium tabular-nums'>
                         {tx.transactionNo}
                       </span>
                     </TableCell>
-                    <TableCell className='text-muted-foreground px-2 py-3 font-sans text-xs tabular-nums'>
+                    <TableCell className='text-muted-foreground px-2 py-2 font-sans text-xs tabular-nums'>
                       {format(parseISO(tx.transactionDate), 'dd MMM yy HH:mm')}
                     </TableCell>
-                    <TableCell className='px-2 py-3'>
+                    <TableCell className='px-2 py-2'>
                       <div className='min-w-0'>
                         <span className='block truncate text-xs font-medium'>
                           {tx.customerName || '—'}
@@ -299,7 +302,7 @@ export function TransactionsTable({
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className='px-2 py-3'>
+                    <TableCell className='px-2 py-2'>
                       <div className='flex items-center gap-1.5'>
                         <span
                           className={`inline-block h-1.5 w-1.5 rounded-full ${statusCfg?.dot ?? 'bg-muted-foreground'}`}
@@ -311,13 +314,13 @@ export function TransactionsTable({
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className='px-2 py-3 text-center font-sans text-xs tabular-nums'>
+                    <TableCell className='px-2 py-2 text-center font-sans text-xs tabular-nums'>
                       {totalItems}
                     </TableCell>
-                    <TableCell className='px-2 py-3 text-right font-sans text-xs font-medium tabular-nums'>
-                      Rp{Number(tx.grandTotal).toLocaleString()}
+                    <TableCell className='px-2 py-2 text-right font-sans text-xs font-medium tabular-nums'>
+                      {formatMoney(tx.grandTotal)}
                     </TableCell>
-                    <TableCell className='hidden px-2 py-3 md:table-cell'>
+                    <TableCell className='hidden px-2 py-2 md:table-cell'>
                       <div className='flex flex-wrap gap-1'>
                         {paymentMethods.map((m) => (
                           <span
@@ -331,14 +334,14 @@ export function TransactionsTable({
                         ))}
                       </div>
                     </TableCell>
-                    <TableCell className='text-muted-foreground hidden px-2 py-3 text-xs lg:table-cell'>
+                    <TableCell className='text-muted-foreground hidden px-2 py-2 text-xs lg:table-cell'>
                       {tx.cashier.name}
                     </TableCell>
-                    <TableCell className='px-2 py-3'>
+                    <TableCell className='px-2 py-2'>
                       <Button
                         variant='ghost'
                         size='icon'
-                        className='size-7 opacity-0 transition-opacity group-hover:opacity-100'
+                        className='size-7 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100'
                       >
                         <Eye className='size-3.5' />
                       </Button>
@@ -353,7 +356,7 @@ export function TransactionsTable({
 
       {/* Pagination */}
       {effectiveTotalRows > 0 && (
-        <div className='flex flex-col items-center justify-between gap-3 border-t px-4 py-3 sm:flex-row sm:px-6'>
+        <div className='border-divider flex flex-col items-center justify-between gap-3 border-t px-4 py-3 sm:flex-row sm:px-5'>
           <div className='text-muted-foreground flex items-center gap-2 font-sans text-xs tabular-nums'>
             <span className='hidden sm:inline'>
               {t('dashboard.transactionsTable.rows')}

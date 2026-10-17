@@ -1,23 +1,14 @@
 import { type LinkProps } from '@tanstack/react-router'
 import type { SubscriptionTier } from '@/features/settings/subscription/subscription.types'
 
-type User = {
-  name: string
-  email: string
-  avatar: string
-}
-
-type Team = {
-  name: string
-  logo: React.ElementType
-  plan: string
-}
-
 type BaseNavItem = {
+  /** i18n key in the data file, translated text once resolved by `useNavigation`. */
   title: string
   badge?: string
   icon?: React.ElementType
   requiredTier?: SubscriptionTier
+  /** Extra terms the global search matches on (synonyms, Indonesian terms). */
+  keywords?: string[]
 }
 
 type NavLink = BaseNavItem & {
@@ -33,14 +24,15 @@ type NavCollapsible = BaseNavItem & {
 type NavItem = NavCollapsible | NavLink
 
 type NavGroup = {
-  title: string
+  /** Section label; omit for the unlabelled top section. */
+  title?: string
   items: NavItem[]
 }
 
 type SidebarData = {
-  user: User
-  teams: Team[]
   navGroups: NavGroup[]
+  /** Pinned to the bottom of the sidebar. */
+  footer: NavLink[]
 }
 
 export type { SidebarData, NavGroup, NavItem, NavCollapsible, NavLink }

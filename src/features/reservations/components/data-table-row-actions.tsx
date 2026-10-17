@@ -65,7 +65,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             setCurrentRow(reservation)
             setOpen('cancel')
           }}
-          className='text-red-500!'
+          className='text-status-danger!'
         >
           Cancel
           <DropdownMenuShortcut>

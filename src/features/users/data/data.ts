@@ -1,13 +1,14 @@
+import { STATUS_TONE } from '@/lib/status-tone'
 import { Shield, UserCheck, Users, CreditCard } from '@/components/icons'
 import { type UserStatus } from './schema'
 
 export const callTypes = new Map<UserStatus, string>([
-  ['active', 'bg-teal-100/30 text-teal-900 dark:text-teal-200 border-teal-200'],
-  ['inactive', 'bg-neutral-300/40 border-neutral-300'],
-  ['invited', 'bg-sky-200/40 text-sky-900 dark:text-sky-100 border-sky-300'],
+  ['active', STATUS_TONE.success],
+  ['inactive', STATUS_TONE.neutral],
+  ['invited', STATUS_TONE.info],
   [
     'suspended',
-    'bg-destructive/10 dark:bg-destructive/50 text-destructive dark:text-primary border-destructive/10',
+    STATUS_TONE.danger,
   ],
 ])
 

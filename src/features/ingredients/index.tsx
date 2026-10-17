@@ -1,6 +1,5 @@
 import { getRouteApi } from '@tanstack/react-router'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Beaker, LayoutDashboard, Store } from '@/components/icons'
 import { AppHeader } from '@/components/layout/app-header'
 import { Main } from '@/components/layout/main'
 import { PageHeader } from '@/components/layout/page-header'
@@ -33,24 +32,20 @@ export function Ingredients() {
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <PageHeader
           title='Ingredients'
-          description='Monitor stock health across all outlets and manage the master ingredient catalogue.'
+          description='Stock levels across outlets and the master ingredient list'
         />
 
-        <Tabs defaultValue='dashboard' className='flex flex-1 flex-col gap-4'>
-          <div className='flex items-center justify-between gap-4'>
-            <TabsList className='h-9'>
-              <TabsTrigger value='dashboard' className='gap-1.5 text-sm'>
-                <LayoutDashboard className='h-3.5 w-3.5' />
-                Dashboard
-              </TabsTrigger>
-              <TabsTrigger value='master' className='gap-1.5 text-sm'>
-                <Beaker className='h-3.5 w-3.5' />
-                Master Ingredients
-              </TabsTrigger>
-              <TabsTrigger value='outlet-stock' className='gap-1.5 text-sm'>
-                <Store className='h-3.5 w-3.5' />
-                Outlet Stock
-              </TabsTrigger>
+        <Tabs
+          // A name filter (e.g. from global search) opens the master list.
+          key={search.name ? 'filtered' : 'default'}
+          defaultValue={search.name ? 'master' : 'dashboard'}
+          className='flex flex-1 flex-col gap-4'
+        >
+          <div className='border-divider flex items-center justify-between gap-4 border-b'>
+            <TabsList variant='line' aria-label='Ingredient views'>
+              <TabsTrigger value='dashboard'>Overview</TabsTrigger>
+              <TabsTrigger value='master'>Master list</TabsTrigger>
+              <TabsTrigger value='outlet-stock'>Outlet stock</TabsTrigger>
             </TabsList>
 
             {/* Add button only shown on master tab */}

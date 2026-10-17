@@ -72,7 +72,7 @@ export const modifierGroupsColumns: ColumnDef<ModifierGroup>[] = [
     cell: ({ row }) => {
       const required = row.original.isRequired
       return (
-        <Badge variant='outline' className={required ? 'border-amber-300 text-amber-700' : ''}>
+        <Badge variant='outline' className={required ? 'border-status-warning/30 text-status-warning' : ''}>
           {required ? 'Yes' : 'No'}
         </Badge>
       )
@@ -85,7 +85,7 @@ export const modifierGroupsColumns: ColumnDef<ModifierGroup>[] = [
       <DataTableColumnHeader column={column} title='Selection' />
     ),
     cell: ({ row }) => (
-      <div className='text-sm'>
+      <div>
         {row.original.minSelection} – {row.original.maxSelection}
       </div>
     ),

@@ -1,13 +1,66 @@
 import { formatMoney } from '@/lib/format'
+import { formatCount } from '@/lib/metrics'
 import { useCopy } from '@/hooks/use-copy'
-interface StockMovement { id: string; movementType: string; quantity: string; totalCost: string; ingredient: { name: string } }
-export function StockMovementsStats({ movements }: { movements: StockMovement[] }) {
+import { Metric, MetricGroup } from '@/components/data-display/metric'
+
+interface StockMovement {
+  id: string
+  movementType: string
+  quantity: string
+  totalCost: string
+  ingredient: { name: string }
+}
+
+export function StockMovementsStats({
+  movements,
+  isLoading,
+  className,
+}: {
+  movements: StockMovement[]
+  isLoading?: boolean
+  className?: string
+}) {
   const copy = useCopy()
   const stats = [
-    [copy('Catatan stok', 'Stock entries'), movements.length.toLocaleString()],
-    [copy('Total biaya tercatat', 'Total recorded cost'), formatMoney(movements.reduce((sum, item) => sum + Math.abs(Number(item.totalCost)), 0))],
-    [copy('Pemakaian untuk penjualan', 'Sales usage entries'), movements.filter((item) => item.movementType === 'SALE').length.toLocaleString()],
-    [copy('Jenis bahan', 'Ingredients'), new Set(movements.map((item) => item.ingredient.name)).size.toLocaleString()],
+    {
+      label: copy('Catatan stok', 'Stock entries'),
+      value: formatCount(movements.length),
+    },
+    {
+      label: copy('Total biaya tercatat', 'Total recorded cost'),
+      definition: copy(
+        'Jumlah nilai absolut biaya dari semua catatan.',
+        'Sum of the absolute cost of every entry.'
+      ),
+      value: formatMoney(
+        movements.reduce(
+          (sum, item) => sum + Math.abs(Number(item.totalCost)),
+          0
+        )
+      ),
+    },
+    {
+      label: copy('Pemakaian untuk penjualan', 'Sales usage entries'),
+      value: formatCount(
+        movements.filter((item) => item.movementType === 'SALE').length
+      ),
+    },
+    {
+      label: copy('Jenis bahan', 'Ingredients'),
+      value: formatCount(
+        new Set(movements.map((item) => item.ingredient.name)).size
+      ),
+    },
   ]
-  return <section className='metric-grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4'>{stats.map(([label, value]) => <div key={label} className='space-y-3'><p className='text-muted-foreground text-xs font-semibold'>{label}</p><p className='text-[26px] font-bold tracking-tight tabular-nums'>{value}</p><p className='text-muted-foreground text-xs'>{copy('Dari catatan stok yang tersedia', 'From available stock entries')}</p></div>)}</section>
+
+  return (
+    <MetricGroup
+      aria-label={copy('Ringkasan stok', 'Stock summary')}
+      className={className}
+    >
+      {stats.map((stat) => (
+        <Metric key={stat.label} {...stat} isLoading={isLoading} />
+      ))}
+    </MetricGroup>
+  )
 }

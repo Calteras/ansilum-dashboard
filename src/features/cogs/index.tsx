@@ -16,23 +16,24 @@ export function Cogs() {
 
       <Main className='w-full flex-1 overscroll-none p-3 sm:p-4 md:p-6'>
         <PageHeader
-          eyebrow='COST CONTROL / COGS'
           title={t('cogs.page.title')}
           description={t('cogs.page.subtitle')}
         />
 
-        <Tabs defaultValue='period' className='space-y-6'>
-          <TabsList className='bg-card h-auto w-full justify-start gap-1 rounded-xl border p-1 sm:w-fit'>
-            <TabsTrigger className='rounded-lg px-4 py-2.5' value='period'>
+        <Tabs defaultValue='period' className='gap-4'>
+          <div className='border-divider border-b'>
+          <TabsList variant='line'>
+            <TabsTrigger value='period'>
               {t('cogs.tabs.period')}
             </TabsTrigger>
-            <TabsTrigger className='rounded-lg px-4 py-2.5' value='product'>
+            <TabsTrigger value='product'>
               {t('cogs.tabs.product')}
             </TabsTrigger>
-            <TabsTrigger className='rounded-lg px-4 py-2.5' value='overhead'>
+            <TabsTrigger value='overhead'>
               {t('cogs.tabs.overhead')}
             </TabsTrigger>
           </TabsList>
+          </div>
 
           <TabsContent value='period' className='mt-0'>
             <PeriodCogsReport />

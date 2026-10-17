@@ -1,8 +1,9 @@
+import { STATUS_TONE } from '@/lib/status-tone'
 import type { ProductStatus, ProductType } from '../api/products.types'
 
 export const productStatusStyles = new Map<ProductStatus, string>([
-  ['active', 'bg-teal-100/30 text-teal-900 dark:text-teal-200 border-teal-200'],
-  ['inactive', 'bg-neutral-300/40 border-neutral-300'],
+  ['active', STATUS_TONE.success],
+  ['inactive', STATUS_TONE.neutral],
 ])
 
 export const productStatuses = [

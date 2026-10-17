@@ -10,6 +10,7 @@ import { AppSidebar } from '@/components/layout/app-sidebar'
 import { SubscriptionGuard } from '@/components/layout/subscription-guard'
 import { SkipToMain } from '@/components/skip-to-main'
 import { useSessionRestore } from '@/features/auth/hooks/use-session-restore'
+import { CommandMenu } from '@/features/search/command-menu'
 
 type AuthenticatedLayoutProps = {
   children?: React.ReactNode
@@ -39,6 +40,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
       <LayoutProvider>
         <SidebarProvider defaultOpen={defaultOpen}>
           <SkipToMain />
+          <CommandMenu />
           <AppSidebar />
           <SidebarInset
             className={cn(

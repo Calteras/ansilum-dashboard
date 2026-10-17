@@ -353,7 +353,7 @@ function Notice({
 }) {
   return (
     <section role='alert' className='space-y-4'>
-      <h1 className='text-2xl font-bold tracking-tight'>{title}</h1>
+      <h1 className='text-xl font-semibold tracking-[-0.02em]'>{title}</h1>
       <p className='text-muted-foreground'>{body}</p>
       {action}
     </section>

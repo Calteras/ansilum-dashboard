@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import {
-  Bike,
   ClipboardList,
   Plug,
   Activity,
@@ -11,6 +10,7 @@ import { tenantGet } from '@/lib/tenant-api-client'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AppHeader } from '@/components/layout/app-header'
 import { Main } from '@/components/layout/main'
+import { PageHeader } from '@/components/layout/page-header'
 import type { Outlet } from '@/features/outlets/api/outlets.types'
 import { ChannelSales } from './components/channel-sales'
 import { Connections } from './components/connections'
@@ -43,20 +43,11 @@ function DeliveryWorkspace() {
     <>
       <AppHeader />
       <Main className='flex flex-1 flex-col gap-6'>
-        <div className='flex flex-wrap items-end justify-between gap-4'>
-          <div>
-            <div className='text-muted-foreground mb-2 flex items-center gap-2 text-xs font-medium tracking-wider uppercase'>
-              <Bike className='size-4' aria-hidden='true' />
-              GoFood & GrabFood
-            </div>
-            <h1 className='text-3xl font-bold tracking-tight'>
-              {t('nav.foodDelivery')}
-            </h1>
-            <p className='text-muted-foreground'>
-              From incoming order to pickup, all in one place.
-            </p>
-          </div>
-          {admin && (
+        <PageHeader
+          title={t('nav.foodDelivery')}
+          description='GoFood and GrabFood orders, from incoming to picked up'
+          actions={
+            admin && (
             <div className='w-full sm:w-64'>
               <Choice
                 label='Outlet'
@@ -73,8 +64,9 @@ function DeliveryWorkspace() {
                 ))}
               </Choice>
             </div>
-          )}
-        </div>
+            )
+          }
+        />
         {!admin ? (
           <Notice>
             Delivery access requires an active owner or admin membership in this
@@ -92,29 +84,31 @@ function DeliveryWorkspace() {
                 </Notice>
               )}
             <Tabs defaultValue='orders'>
-              <TabsList className='mb-4 grid h-auto w-full grid-cols-2 gap-1 p-1 sm:flex sm:w-auto sm:justify-start'>
-                <TabsTrigger className='gap-2 px-3 py-2' value='orders'>
+              <div className='border-divider mb-4 border-b'>
+              <TabsList variant='line'>
+                <TabsTrigger value='orders'>
                   <ClipboardList className='size-4' aria-hidden='true' />
                   Orders
                 </TabsTrigger>
                 <TabsTrigger value='connections'>
-                  <Plug className='mr-2 size-4' aria-hidden='true' />
+                  <Plug className='size-4' aria-hidden='true' />
                   Integrations
                 </TabsTrigger>
                 <TabsTrigger value='recovery'>
-                  <Activity className='mr-2 size-4' aria-hidden='true' />
+                  <Activity className='size-4' aria-hidden='true' />
                   Recovery
                 </TabsTrigger>
                 {owner && (
                   <TabsTrigger value='reports'>
                     <ChartNoAxesCombined
-                      className='mr-2 size-4'
+                      className='size-4'
                       aria-hidden='true'
                     />
                     Channel sales
                   </TabsTrigger>
                 )}
               </TabsList>
+              </div>
               <TabsContent value='orders'>
                 <Orders key={outletId} outletId={outletId} />
               </TabsContent>

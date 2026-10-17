@@ -6,10 +6,30 @@ import {
   savePendingVerification,
   clearPendingVerification,
 } from '../verification/pending-email'
-import { AuthRequestError, loginApi, logoutApi } from './auth.api'
-import { deleteProfileImageApi, uploadProfileImageApi } from './profile.api'
+import {
+  AuthRequestError,
+  loginApi,
+  logoutApi,
+  updateProfileApi,
+} from './auth.api'
 import type { LoginCredentials } from './auth.types'
+import { deleteProfileImageApi, uploadProfileImageApi } from './profile.api'
 import { listTenantsApi, setActiveTenantApi } from './tenant.api'
+
+export function useUpdateProfileMutation() {
+  const setUser = useAuthStore((state) => state.setUser)
+
+  return useMutation({
+    mutationFn: updateProfileApi,
+    onSuccess: (user) => {
+      setUser(user)
+      toast.success('Profile updated')
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to update profile', { description: error.message })
+    },
+  })
+}
 
 /**
  * Login mutation - handles email/password authentication

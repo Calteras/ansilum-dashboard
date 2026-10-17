@@ -2,6 +2,11 @@ import * as React from 'react'
 import * as TabsPrimitive from '@radix-ui/react-tabs'
 import { cn } from '@/lib/utils'
 
+/** `default` is a segmented control for switching views; `line` is underline navigation for page sections. */
+type TabsVariant = 'default' | 'line'
+
+const TabsVariantContext = React.createContext<TabsVariant>('default')
+
 function Tabs({
   className,
   ...props
@@ -17,17 +22,25 @@ function Tabs({
 
 function TabsList({
   className,
+  variant = 'default',
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.List>) {
+}: React.ComponentProps<typeof TabsPrimitive.List> & {
+  variant?: TabsVariant
+}) {
   return (
-    <TabsPrimitive.List
-      data-slot='tabs-list'
-      className={cn(
-        'bg-card text-muted-foreground inline-flex w-fit items-center gap-1 rounded-lg border p-1',
-        className
-      )}
-      {...props}
-    />
+    <TabsVariantContext.Provider value={variant}>
+      <TabsPrimitive.List
+        data-slot='tabs-list'
+        data-variant={variant}
+        className={cn(
+          variant === 'line'
+            ? 'text-fg-muted inline-flex h-10 w-fit items-stretch gap-5'
+            : 'border-divider bg-surface-subtle text-fg-muted inline-flex h-9 w-fit items-stretch gap-0.5 rounded-md border p-0.5',
+          className
+        )}
+        {...props}
+      />
+    </TabsVariantContext.Provider>
   )
 }
 
@@ -35,11 +48,15 @@ function TabsTrigger({
   className,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
+  const variant = React.useContext(TabsVariantContext)
+
   return (
     <TabsPrimitive.Trigger
       data-slot='tabs-trigger'
       className={cn(
-        "data-[state=active]:bg-primary data-[state=active]:text-primary-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring  text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-4 py-2 text-sm font-semibold whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        variant === 'line'
+          ? "hover:text-foreground data-[state=active]:text-foreground data-[state=active]:after:bg-brand focus-visible:outline-ring relative inline-flex items-center gap-1.5 text-[13px] font-medium whitespace-nowrap transition-colors after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+          : "hover:text-foreground data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:ring-divider-strong focus-visible:outline-ring inline-flex flex-1 items-center justify-center gap-1.5 rounded-[5px] px-3 text-[13px] font-medium whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:ring-1 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}

@@ -26,6 +26,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AppHeader } from '@/components/layout/app-header'
 import { Main } from '@/components/layout/main'
+import { DataPanel } from '@/components/data-display/data-panel'
+import { Metric, MetricGroup } from '@/components/data-display/metric'
+import { PageHeader } from '@/components/layout/page-header'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useDashboardOutletsQuery } from '@/features/dashboard/api/dashboard.queries'
 import {
@@ -85,9 +89,9 @@ function layoutToNodes(layout: TableLayoutResponse): Node<TableData>[] {
 
 function StatusBadge({ status }: { status: TableStatus }) {
   const styles: Record<TableStatus, string> = {
-    AVAILABLE: 'border-emerald-500/30 bg-leaf/10 text-leaf ',
-    OCCUPIED: 'border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300',
-    RESERVED: 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300',
+    AVAILABLE: 'border-status-success/30 bg-leaf/10 text-leaf ',
+    OCCUPIED: 'border-status-danger/30 bg-status-danger/10 text-status-danger',
+    RESERVED: 'border-status-warning/30 bg-status-warning/10 text-status-warning',
     CLEANING: 'border-slate-500/30 bg-slate-500/10 text-slate-700 dark:text-slate-300',
   }
   return <Badge variant='outline' className={styles[status]}>{statusLabels[status]}</Badge>
@@ -121,7 +125,7 @@ function MonitoringTableCard({
       <CardContent className='p-0'>
         <div className='flex items-start justify-between border-b p-4'>
           <div>
-            <p className='font-display text-2xl font-semibold tracking-tight'>{table.name}</p>
+            <p className='text-base font-semibold'>{table.name}</p>
             <p className='text-muted-foreground mt-1 flex items-center gap-1 text-xs'>
               <Users className='size-3.5' /> {table.capacity} seats · {table.section.name}
             </p>
@@ -274,25 +278,23 @@ export function TableManagement(): React.JSX.Element {
     <Main fixed>
       <AppHeader />
       <section className='flex min-h-full flex-col gap-6'>
-        <div className='flex flex-wrap items-end justify-between gap-3'>
-          <div>
-            <p className='text-primary mb-1 text-xs font-semibold uppercase tracking-[0.22em]'>Floor operations</p>
-            <h2 className='font-display text-3xl font-semibold tracking-tight'>Tables</h2>
-            <p className='text-muted-foreground mt-1'>Shape the room, then keep an eye on every seat in service.</p>
-          </div>
-          <Select value={outletId} onValueChange={setSelectedOutletId}>
-            <SelectTrigger className='w-[220px]'><SelectValue placeholder='Select outlet' /></SelectTrigger>
-            <SelectContent>{outlets.map((outlet) => <SelectItem key={outlet.id} value={outlet.id}>{outlet.name}</SelectItem>)}</SelectContent>
-          </Select>
-        </div>
-        <div className='flex items-center justify-between border-b'>
-          <div className='flex gap-1'>
-            {(['manage', 'monitor'] as const).map((item) => (
-              <button key={item} onClick={() => setView(item)} className={`border-b-2 px-4 py-3 text-sm font-medium capitalize ${view === item ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'}`}>
-                {item === 'manage' ? 'Table management' : 'Live monitoring'}
-              </button>
-            ))}
-          </div>
+        <PageHeader
+          title='Tables'
+          description='Floor layout and live table status by outlet'
+          actions={
+            <Select value={outletId} onValueChange={setSelectedOutletId}>
+              <SelectTrigger size='sm' aria-label='Outlet' className='h-8 w-56 text-[13px]'><SelectValue placeholder='Select outlet' /></SelectTrigger>
+              <SelectContent>{outlets.map((outlet) => <SelectItem key={outlet.id} value={outlet.id}>{outlet.name}</SelectItem>)}</SelectContent>
+            </Select>
+          }
+        />
+        <div className='border-divider flex items-center justify-between border-b'>
+          <Tabs value={view} onValueChange={(value) => setView(value as typeof view)}>
+            <TabsList variant='line' aria-label='Table views'>
+              <TabsTrigger value='manage'>Table management</TabsTrigger>
+              <TabsTrigger value='monitor'>Live monitoring</TabsTrigger>
+            </TabsList>
+          </Tabs>
           {view === 'monitor' && <Button variant='ghost' size='sm' onClick={() => monitoringQuery.refetch()} disabled={monitoringQuery.isFetching}><RefreshCw className={monitoringQuery.isFetching ? 'size-4 animate-spin' : 'size-4'} /> Refresh</Button>}
         </div>
 
@@ -300,11 +302,13 @@ export function TableManagement(): React.JSX.Element {
           <Card><CardContent className='text-muted-foreground flex items-center gap-2 p-8 text-sm'><AlertCircle className='size-4' /> Add an outlet to configure tables.</CardContent></Card>
         ) : view === 'monitor' ? (
           <div className='space-y-6'>
-            {monitoringQuery.data && <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-5'>
-              {([['tables', 'Tables'], ['AVAILABLE', 'Available'], ['OCCUPIED', 'Occupied'], ['RESERVED', 'Reserved'], ['CLEANING', 'Cleaning']] as const).map(([key, label]) => (
-                <Card key={key}><CardContent className='p-4'><p className='text-muted-foreground text-xs uppercase tracking-wider'>{label}</p><p className='font-display mt-1 text-2xl font-semibold'>{key === 'tables' ? monitoringQuery.data.totals.tables : monitoringQuery.data.totals.byStatus[key]}</p></CardContent></Card>
-              ))}
-            </div>}
+            {monitoringQuery.data && <DataPanel aria-label='Table status summary' className='overflow-hidden'>
+              <MetricGroup className='grid-cols-2 sm:grid-cols-3 lg:grid-cols-5'>
+                {([['tables', 'Tables'], ['AVAILABLE', 'Available'], ['OCCUPIED', 'Occupied'], ['RESERVED', 'Reserved'], ['CLEANING', 'Cleaning']] as const).map(([key, label]) => (
+                  <Metric key={key} label={label} value={key === 'tables' ? monitoringQuery.data.totals.tables : monitoringQuery.data.totals.byStatus[key]} />
+                ))}
+              </MetricGroup>
+            </DataPanel>}
             <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
               {(monitoringQuery.data?.tables ?? []).map((table) => <MonitoringTableCard key={table.id} table={table} outletId={outletId} onRefresh={() => monitoringQuery.refetch()} />)}
             </div>
@@ -312,13 +316,18 @@ export function TableManagement(): React.JSX.Element {
         ) : (
           <>
             <div className='flex flex-wrap items-center justify-between gap-3'>
-              <div className='flex gap-2'>
+              <dl className='flex flex-wrap gap-x-6 gap-y-1 text-[13px]'>
                 {[
-                  ['total', stats.total, 'Total'],
+                  ['total', stats.total, 'Tables'],
                   ['available', stats.available, 'Available'],
                   ['unavailable', stats.unavailable, 'In service'],
-                ].map(([key, value, label]) => <Card key={key}><CardContent className='flex items-center gap-3 p-3'><span className='font-display text-xl font-semibold'>{value}</span><span className='text-muted-foreground text-xs'>{label}</span></CardContent></Card>)}
-              </div>
+                ].map(([key, value, label]) => (
+                  <div key={key} className='flex items-baseline gap-1.5'>
+                    <dd className='font-semibold tabular-nums'>{value}</dd>
+                    <dt className='text-fg-muted'>{label}</dt>
+                  </div>
+                ))}
+              </dl>
               <div className='flex gap-2'>
                 <Button variant='outline' onClick={() => { setIsEditMode((current) => !current); setSelectedNode(null) }}>{isEditMode ? <Check /> : <Edit2 />} {isEditMode ? 'Editing' : 'Edit layout'}</Button>
                 {isEditMode && (
@@ -339,7 +348,7 @@ export function TableManagement(): React.JSX.Element {
               <CardHeader className='border-b py-3'><CardTitle className='text-sm font-medium'>{layoutQuery.isLoading ? 'Loading layout…' : `${stats.total} tables in ${selectedSection === 'All' ? 'all areas' : selectedSection}`}</CardTitle></CardHeader>
               <CardContent className='relative h-[560px] p-0'>
                 <ReactFlow nodes={displayNodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onNodeClick={(_, node) => isEditMode && setSelectedNode(node as Node<TableData>)} nodeTypes={nodeTypes} nodesDraggable={isEditMode} nodesConnectable={false} elementsSelectable={isEditMode} fitView>
-                  <Background variant={BackgroundVariant.Dots} gap={24} size={1} color='var(--border)' /><Controls showInteractive={false} /><MiniMap nodeColor={(node) => node.data.status === 'available' ? 'var(--success)' : 'var(--destructive)'} /><Panel position='bottom-left' className='bg-card/80 rounded-lg px-3 py-1 text-xs shadow-none backdrop-blur-sm'>{isEditMode ? 'Drag tables or select one to edit' : 'Switch to edit layout to make changes'}</Panel>
+                  <Background variant={BackgroundVariant.Dots} gap={24} size={1} color='var(--border)' /><Controls showInteractive={false} /><MiniMap nodeColor={(node) => node.data.status === 'available' ? 'var(--success)' : 'var(--destructive)'} /><Panel position='bottom-left' className='bg-popover rounded-lg px-3 py-1 text-xs shadow-overlay'>{isEditMode ? 'Drag tables or select one to edit' : 'Switch to edit layout to make changes'}</Panel>
                 </ReactFlow>
               </CardContent>
             </Card>

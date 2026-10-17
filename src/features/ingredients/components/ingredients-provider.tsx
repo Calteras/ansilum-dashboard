@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import useDialogState from '@/hooks/use-dialog-state'
+import { usePendingAction } from '@/features/search/pending-action'
 import type { Ingredient } from '../api/ingredients.types'
 
 type IngredientsDialogType = 'add' | 'edit' | 'delete' | 'stock-movement'
@@ -20,6 +21,8 @@ export function IngredientsProvider({
   children: React.ReactNode
 }) {
   const [open, setOpen] = useDialogState<IngredientsDialogType>(null)
+  // "Add …" chosen in global search opens the create dialog on arrival.
+  usePendingAction('ingredients.create', () => setOpen('add'))
   const [currentRow, setCurrentRow] = useState<Ingredient | null>(null)
 
   return (

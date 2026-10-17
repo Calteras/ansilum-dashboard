@@ -15,7 +15,7 @@ export function Tasks() {
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <PageHeader
           title='Tasks'
-          description="Here's a list of your tasks for this month!"
+          description='Tasks due this month'
           actions={<TasksPrimaryButtons />}
         />
         <TasksTable data={tasks} />

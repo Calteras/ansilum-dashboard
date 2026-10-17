@@ -64,8 +64,8 @@ const TYPE_CONFIG: Record<
   { dot: string; text: string; labelKey: string }
 > = {
   SALE: {
-    dot: 'bg-rose-500',
-    text: 'text-rose-600 dark:text-rose-400',
+    dot: 'bg-status-danger',
+    text: 'text-status-danger',
     labelKey: 'dashboard.movementTypes.SALE',
   },
   PURCHASE: {
@@ -74,13 +74,13 @@ const TYPE_CONFIG: Record<
     labelKey: 'dashboard.movementTypes.PURCHASE',
   },
   ADJUSTMENT: {
-    dot: 'bg-amber-500',
-    text: 'text-amber-600 dark:text-amber-400',
+    dot: 'bg-status-warning',
+    text: 'text-status-warning',
     labelKey: 'dashboard.movementTypes.ADJUSTMENT',
   },
   WASTE: {
-    dot: 'bg-orange-500',
-    text: 'text-orange-600 dark:text-orange-400',
+    dot: 'bg-status-warning',
+    text: 'text-status-warning',
     labelKey: 'dashboard.movementTypes.WASTE',
   },
 }
@@ -134,14 +134,14 @@ export function StockMovementsTable({
   }
 
   return (
-    <div className='bg-card overflow-hidden rounded-xl border'>
+    <div className='border-divider bg-card overflow-hidden rounded-lg border'>
       {/* Toolbar */}
-      <div className='flex flex-col gap-3 border-b px-4 py-3.5 sm:flex-row sm:items-center sm:gap-4 sm:px-6'>
+      <div className='border-divider flex flex-col gap-3 border-b px-4 py-3 sm:flex-row sm:items-center sm:gap-4 sm:px-5'>
         <div className='flex flex-1 items-center gap-3'>
-          <p className='text-foreground text-xs font-semibold tracking-wide uppercase'>
+          <h2 className='text-sm leading-5 font-semibold tracking-[-0.01em]'>
             {t('dashboard.stockTable.title')}
-          </p>
-          <span className='bg-primary/10 text-primary rounded px-1.5 py-0.5 font-sans text-xs tabular-nums'>
+          </h2>
+          <span className='text-fg-muted text-[13px] tabular-nums'>
             {filteredMovements.length}
           </span>
         </div>
@@ -152,7 +152,7 @@ export function StockMovementsTable({
               placeholder={t('dashboard.stockTable.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className='h-8 w-full text-xs sm:w-[220px]'
+              className='border-divider-strong h-8 w-full text-[13px] sm:w-56'
             />
           </div>
         </div>
@@ -161,33 +161,33 @@ export function StockMovementsTable({
       {/* Table */}
       <div className='overflow-x-auto'>
         <Table>
-          <TableHeader>
-            <TableRow className='border-b hover:bg-transparent'>
-              <TableHead className='text-muted-foreground w-[40px] px-4 py-2.5 text-xs font-semibold tracking-wide uppercase sm:px-6'>
+          <TableHeader className='bg-transparent'>
+            <TableRow className='border-divider bg-surface-subtle border-b hover:bg-transparent'>
+              <TableHead className='text-muted-foreground w-[40px] px-4 py-2.5 text-xs font-medium sm:px-6'>
                 {t('dashboard.stockTable.colNo')}
               </TableHead>
-              <TableHead className='text-muted-foreground min-w-[140px] px-2 py-2.5 text-xs font-semibold tracking-wide uppercase'>
+              <TableHead className='text-muted-foreground min-w-[140px] px-2 py-2.5 text-xs font-medium'>
                 {t('dashboard.stockTable.colDate')}
               </TableHead>
-              <TableHead className='text-muted-foreground min-w-[140px] px-2 py-2.5 text-xs font-semibold tracking-wide uppercase'>
+              <TableHead className='text-muted-foreground min-w-[140px] px-2 py-2.5 text-xs font-medium'>
                 {t('dashboard.stockTable.colIngredient')}
               </TableHead>
-              <TableHead className='text-muted-foreground min-w-[80px] px-2 py-2.5 text-xs font-semibold tracking-wide uppercase'>
+              <TableHead className='text-muted-foreground min-w-[80px] px-2 py-2.5 text-xs font-medium'>
                 {t('dashboard.stockTable.colType')}
               </TableHead>
-              <TableHead className='text-muted-foreground min-w-[90px] px-2 py-2.5 text-right text-xs font-semibold tracking-wide uppercase'>
+              <TableHead className='text-muted-foreground min-w-[90px] px-2 py-2.5 text-right text-xs font-medium'>
                 {t('dashboard.stockTable.colQty')}
               </TableHead>
-              <TableHead className='text-muted-foreground hidden min-w-[90px] px-2 py-2.5 text-right text-xs font-semibold tracking-wide uppercase md:table-cell'>
+              <TableHead className='text-muted-foreground hidden min-w-[90px] px-2 py-2.5 text-right text-xs font-medium md:table-cell'>
                 {t('dashboard.stockTable.colCostPerUnit')}
               </TableHead>
-              <TableHead className='text-muted-foreground min-w-[110px] px-2 py-2.5 text-right text-xs font-semibold tracking-wide uppercase'>
+              <TableHead className='text-muted-foreground min-w-[110px] px-2 py-2.5 text-right text-xs font-medium'>
                 {t('dashboard.stockTable.colTotalCost')}
               </TableHead>
-              <TableHead className='text-muted-foreground hidden min-w-[120px] px-2 py-2.5 text-xs font-semibold tracking-wide uppercase lg:table-cell'>
+              <TableHead className='text-muted-foreground hidden min-w-[120px] px-2 py-2.5 text-xs font-medium lg:table-cell'>
                 {t('dashboard.stockTable.colEmployee')}
               </TableHead>
-              <TableHead className='text-muted-foreground hidden min-w-[200px] px-4 py-2.5 text-xs font-semibold tracking-wide uppercase sm:px-6 xl:table-cell'>
+              <TableHead className='text-muted-foreground hidden min-w-[200px] px-4 py-2.5 text-xs font-medium sm:px-6 xl:table-cell'>
                 {t('dashboard.stockTable.colNotes')}
               </TableHead>
             </TableRow>
@@ -224,15 +224,15 @@ export function StockMovementsTable({
                 return (
                   <TableRow
                     key={movement.id}
-                    className='group hover:bg-muted/20 border-b last:border-0'
+                    className='group hover:bg-surface-hover border-divider border-b last:border-0'
                   >
-                    <TableCell className='text-muted-foreground px-4 py-3 font-sans text-xs tabular-nums sm:px-6'>
+                    <TableCell className='text-muted-foreground px-4 py-2 font-sans text-xs tabular-nums sm:px-6'>
                       {(currentPage - 1) * pageSize + index + 1}
                     </TableCell>
-                    <TableCell className='text-muted-foreground px-2 py-3 font-sans text-xs tabular-nums'>
+                    <TableCell className='text-muted-foreground px-2 py-2 font-sans text-xs tabular-nums'>
                       {formatDate(movement.movementDate)}
                     </TableCell>
-                    <TableCell className='px-2 py-3'>
+                    <TableCell className='px-2 py-2'>
                       <div className='min-w-0'>
                         <span className='block truncate text-xs font-medium'>
                           {movement.ingredient.name}
@@ -242,7 +242,7 @@ export function StockMovementsTable({
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className='px-2 py-3'>
+                    <TableCell className='px-2 py-2'>
                       <div className='flex items-center gap-1.5'>
                         <span
                           className={`inline-block h-1.5 w-1.5 rounded-full ${typeDot}`}
@@ -252,27 +252,27 @@ export function StockMovementsTable({
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className='px-2 py-3 text-right font-sans text-xs tabular-nums'>
+                    <TableCell className='px-2 py-2 text-right font-sans text-xs tabular-nums'>
                       <span
                         className={
                           qty < 0
-                            ? 'text-rose-600 dark:text-rose-400'
+                            ? 'text-status-danger'
                             : 'text-leaf'
                         }
                       >
                         {qty.toLocaleString()} {movement.unit}
                       </span>
                     </TableCell>
-                    <TableCell className='text-muted-foreground hidden px-2 py-3 text-right font-sans text-xs tabular-nums md:table-cell'>
+                    <TableCell className='text-muted-foreground hidden px-2 py-2 text-right font-sans text-xs tabular-nums md:table-cell'>
                       Rp{Number(movement.costPerUnit).toLocaleString()}
                     </TableCell>
-                    <TableCell className='px-2 py-3 text-right font-sans text-xs font-medium tabular-nums'>
+                    <TableCell className='px-2 py-2 text-right font-sans text-xs font-medium tabular-nums'>
                       Rp{Number(movement.totalCost).toLocaleString()}
                     </TableCell>
-                    <TableCell className='text-muted-foreground hidden px-2 py-3 text-xs lg:table-cell'>
+                    <TableCell className='text-muted-foreground hidden px-2 py-2 text-xs lg:table-cell'>
                       {movement.employee.name}
                     </TableCell>
-                    <TableCell className='text-muted-foreground hidden max-w-[250px] truncate px-4 py-3 text-xs sm:px-6 xl:table-cell'>
+                    <TableCell className='text-muted-foreground hidden max-w-[250px] truncate px-4 py-2 text-xs sm:px-6 xl:table-cell'>
                       {movement.notes}
                     </TableCell>
                   </TableRow>
@@ -285,7 +285,7 @@ export function StockMovementsTable({
 
       {/* Pagination */}
       {filteredMovements.length > 0 && (
-        <div className='flex flex-col items-center justify-between gap-3 border-t px-4 py-3 sm:flex-row sm:px-6'>
+        <div className='border-divider flex flex-col items-center justify-between gap-3 border-t px-4 py-3 sm:flex-row sm:px-5'>
           <div className='text-muted-foreground flex items-center gap-2 font-sans text-xs tabular-nums'>
             <span className='hidden sm:inline'>
               {t('dashboard.stockTable.rows')}

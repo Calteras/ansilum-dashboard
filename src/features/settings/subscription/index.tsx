@@ -72,9 +72,9 @@ export function SettingsSubscription() {
         {renewal?.mode === 'manual' && renewal.canRenewNow && (
           <div
             role='status'
-            className='flex gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-4 text-sm'
+            className='flex gap-3 rounded-lg border border-status-warning/30 bg-status-warning/10 p-4 text-sm'
           >
-            <AlertTriangle className='mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400' />
+            <AlertTriangle className='mt-0.5 size-4 shrink-0 text-status-warning' />
             <p>
               {copy(
                 'Paket Anda segera berakhir dan tidak diperpanjang otomatis. Perpanjang sekarang, atau simpan kartu untuk perpanjangan otomatis.',
@@ -86,7 +86,7 @@ export function SettingsSubscription() {
 
         {billing.isPending ? (
           <div className='flex gap-4' aria-label={copy('Memuat', 'Loading')}>
-            <Skeleton className='size-14 rounded-xl' />
+            <Skeleton className='size-14 rounded-lg' />
             <div className='flex-1 space-y-2'>
               <Skeleton className='h-5 w-40' />
               <Skeleton className='h-4 w-64' />

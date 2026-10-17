@@ -1,3 +1,4 @@
+import { STATUS_TONE } from '@/lib/status-tone'
 import {
   Shield,
   UserCheck,
@@ -10,8 +11,8 @@ import {
 import type { EmployeeStatus, EmployeeRole } from './schema'
 
 export const employeeStatusStyles = new Map<EmployeeStatus, string>([
-  ['active', 'bg-teal-100/30 text-teal-900 dark:text-teal-200 border-teal-200'],
-  ['inactive', 'bg-neutral-300/40 border-neutral-300'],
+  ['active', STATUS_TONE.success],
+  ['inactive', STATUS_TONE.neutral],
 ])
 
 export const employeeRoles = [

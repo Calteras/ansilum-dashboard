@@ -59,10 +59,10 @@ export function EmployeesDeleteDialog({
         <div className='space-y-4'>
           <p className='mb-2'>
             Are you sure you want to delete{' '}
-            <span className='font-bold'>{currentRow.name}</span>?
+            <span className='font-semibold'>{currentRow.name}</span>?
             <br />
             This action will permanently remove the employee with the role of{' '}
-            <span className='font-bold'>{currentRow.role}</span> from the
+            <span className='font-semibold'>{currentRow.role}</span> from the
             system. This cannot be undone.
           </p>
 

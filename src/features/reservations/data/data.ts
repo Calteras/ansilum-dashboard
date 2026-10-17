@@ -1,21 +1,22 @@
+import { STATUS_TONE } from '@/lib/status-tone'
 import type { ReservationStatus } from '../api/reservations.types'
 
 export const reservationStatusStyles = new Map<ReservationStatus, string>([
   [
     'RESERVED',
-    'bg-blue-100/30 text-blue-900 dark:text-blue-200 border-blue-200',
+    STATUS_TONE.info,
   ],
   [
     'OPEN',
-    'bg-teal-100/30 text-teal-900 dark:text-teal-200 border-teal-200',
+    STATUS_TONE.success,
   ],
   [
     'CLOSED',
-    'bg-neutral-300/40 border-neutral-300',
+    STATUS_TONE.neutral,
   ],
   [
     'VOIDED',
-    'bg-red-100/30 text-red-900 dark:text-red-200 border-red-200',
+    STATUS_TONE.danger,
   ],
 ])
 

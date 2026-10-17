@@ -1,68 +1,53 @@
 import {
-  LayoutDashboard,
-  Users,
-  MessagesSquare,
-  AudioWaveform,
-  Command,
-  GalleryVerticalEnd,
-  BetweenVerticalEnd,
-  Store,
-  UtensilsCrossed,
-  Tags,
-  Package,
-  Layers,
   ArrowRightLeft,
-  Receipt,
   BarChart3,
-  CalendarCheck,
-  TrendingDown,
+  BetweenVerticalEnd,
   Bike,
+  CalendarCheck,
+  HelpCircle,
+  Layers,
+  LayoutDashboard,
+  MessagesSquare,
+  Package,
+  Receipt,
+  Settings,
+  ShoppingBag,
+  Store,
+  Tags,
+  TrendingDown,
+  Users,
+  UtensilsCrossed,
+  Warehouse,
 } from '@/components/icons'
 import { type SidebarData } from '../types'
 
+/**
+ * Single source for navigation: the sidebar renders it and the global search
+ * indexes it. Titles are i18n keys; keywords cover synonyms in both languages.
+ */
 export const sidebarData: SidebarData = {
-  user: {
-    name: 'satnaing',
-    email: 'satnaingdev@gmail.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
-  teams: [
-    {
-      name: 'POS Terra',
-      logo: Command,
-      plan: 'Vite + ShadcnUI',
-    },
-    {
-      name: 'Acme Inc',
-      logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
-    },
-    {
-      name: 'Acme Corp.',
-      logo: AudioWaveform,
-      plan: 'Startup',
-    },
-  ],
   navGroups: [
     {
-      title: 'nav.groups.general',
       items: [
         {
           title: 'nav.dashboard',
           url: '/',
           icon: LayoutDashboard,
-        },
-        {
-          title: 'nav.chats',
-          url: '/chats',
-          icon: MessagesSquare,
-          requiredTier: 'STANDARD',
+          keywords: ['home', 'overview', 'sales', 'ringkasan', 'beranda'],
         },
         {
           title: 'nav.analytics',
           url: '/analytics',
           icon: BarChart3,
           requiredTier: 'FULL',
+          keywords: ['profit', 'margin', 'busy hours', 'top products', 'laba'],
+        },
+        {
+          title: 'nav.chats',
+          url: '/chats',
+          icon: MessagesSquare,
+          requiredTier: 'STANDARD',
+          keywords: ['ai', 'assistant', 'chat', 'ask', 'tanya'],
         },
       ],
     },
@@ -70,88 +55,166 @@ export const sidebarData: SidebarData = {
       title: 'nav.groups.operations',
       items: [
         {
-          title: 'nav.foodDelivery',
-          url: '/food-delivery',
-          icon: Bike,
+          title: 'nav.orders',
+          icon: ShoppingBag,
+          items: [
+            {
+              title: 'nav.transactions',
+              url: '/transactions',
+              icon: Receipt,
+              requiredTier: 'STANDARD',
+              keywords: [
+                'orders',
+                'receipts',
+                'payments',
+                'sales',
+                'transaksi',
+                'penjualan',
+                'struk',
+              ],
+            },
+            {
+              title: 'nav.foodDelivery',
+              url: '/food-delivery',
+              icon: Bike,
+              keywords: [
+                'gofood',
+                'grabfood',
+                'delivery',
+                'online orders',
+                'pesanan online',
+              ],
+            },
+            {
+              title: 'nav.reservations',
+              url: '/reservations',
+              icon: CalendarCheck,
+              requiredTier: 'STANDARD',
+              keywords: ['booking', 'pre-order', 'reservasi', 'pesan meja'],
+            },
+          ],
         },
         {
           title: 'nav.tables',
           url: '/tables',
           icon: BetweenVerticalEnd,
           requiredTier: 'STANDARD',
-        },
-        {
-          title: 'nav.employees',
-          url: '/employees',
-          icon: Users,
+          keywords: ['floor', 'layout', 'seats', 'meja', 'denah'],
         },
         {
           title: 'nav.outlets',
           url: '/outlets',
           icon: Store,
+          keywords: ['store', 'branch', 'location', 'cabang', 'gerai', 'toko'],
         },
         {
-          title: 'nav.reservations',
-          url: '/reservations',
-          icon: CalendarCheck,
-          requiredTier: 'STANDARD',
-        },
-      ],
-    },
-    {
-      title: 'nav.groups.menu',
-      items: [
-        {
-          title: 'nav.categories',
-          url: '/categories',
-          icon: Tags,
-        },
-        {
-          title: 'nav.modifierGroups',
-          url: '/modifier-groups',
-          icon: Layers,
-          requiredTier: 'STANDARD',
+          title: 'nav.employees',
+          url: '/employees',
+          icon: Users,
+          keywords: [
+            'staff',
+            'cashier',
+            'barista',
+            'team',
+            'roles',
+            'karyawan',
+            'kasir',
+          ],
         },
       ],
     },
     {
-      title: 'nav.groups.kitchen',
+      title: 'nav.groups.catalog',
       items: [
         {
-          title: 'nav.rawIngredients',
-          url: '/ingredients',
-          icon: UtensilsCrossed,
-          requiredTier: 'STANDARD',
-        },
-        {
-          title: 'nav.products',
-          url: '/products',
+          title: 'nav.menu',
           icon: Package,
+          items: [
+            {
+              title: 'nav.products',
+              url: '/products',
+              icon: Package,
+              keywords: ['menu items', 'sku', 'price', 'produk', 'harga'],
+            },
+            {
+              title: 'nav.categories',
+              url: '/categories',
+              icon: Tags,
+              keywords: ['groups', 'kategori'],
+            },
+            {
+              title: 'nav.modifierGroups',
+              url: '/modifier-groups',
+              icon: Layers,
+              requiredTier: 'STANDARD',
+              keywords: [
+                'options',
+                'add-ons',
+                'toppings',
+                'size',
+                'sugar',
+                'pilihan',
+                'tambahan',
+              ],
+            },
+          ],
+        },
+        {
+          title: 'nav.inventory',
+          icon: Warehouse,
+          items: [
+            {
+              title: 'nav.rawIngredients',
+              url: '/ingredients',
+              icon: UtensilsCrossed,
+              requiredTier: 'STANDARD',
+              keywords: ['stock', 'raw materials', 'bahan', 'stok'],
+            },
+            {
+              title: 'nav.stockMovements',
+              url: '/stock-movements',
+              icon: ArrowRightLeft,
+              requiredTier: 'STANDARD',
+              keywords: [
+                'purchase',
+                'waste',
+                'adjustment',
+                'usage',
+                'pembelian',
+                'stok',
+              ],
+            },
+            {
+              title: 'nav.cogs',
+              url: '/cogs',
+              icon: TrendingDown,
+              requiredTier: 'STANDARD',
+              keywords: [
+                'cogs',
+                'cost of goods sold',
+                'margin',
+                'overhead',
+                'hpp',
+                'biaya',
+              ],
+            },
+          ],
         },
       ],
     },
+  ],
+  footer: [
     {
-      title: 'nav.groups.reports',
-      items: [
-        {
-          title: 'nav.stockMovements',
-          url: '/stock-movements',
-          icon: ArrowRightLeft,
-          requiredTier: 'STANDARD',
-        },
-        {
-          title: 'nav.transactions',
-          url: '/transactions',
-          icon: Receipt,
-          requiredTier: 'STANDARD',
-        },
-        {
-          title: 'nav.cogs',
-          url: '/cogs',
-          icon: TrendingDown,
-          requiredTier: 'STANDARD',
-        },
-      ],
+      title: 'nav.settings',
+      url: '/settings',
+      icon: Settings,
+      keywords: ['preferences', 'account', 'pengaturan'],
+    },
+    {
+      title: 'nav.helpCenter',
+      url: '/help-center',
+      icon: HelpCircle,
+      keywords: ['support', 'docs', 'bantuan'],
     },
   ],
 }

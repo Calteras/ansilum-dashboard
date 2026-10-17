@@ -49,7 +49,7 @@ export const ingredientsColumns: ColumnDef<Ingredient>[] = [
       <DataTableColumnHeader column={column} title='Code' />
     ),
     cell: ({ row }) => (
-      <div className='font-sans tabular-nums text-sm'>{row.getValue('code')}</div>
+      <div className='font-sans tabular-nums'>{row.getValue('code')}</div>
     ),
     meta: {
       className: cn(
@@ -83,7 +83,7 @@ export const ingredientsColumns: ColumnDef<Ingredient>[] = [
       <DataTableColumnHeader column={column} title='Cost/Unit' />
     ),
     cell: ({ row }) => (
-      <div className='font-sans tabular-nums text-sm'>
+      <div className='font-sans tabular-nums'>
         {formatRupiah(row.getValue('costPerUnit'))}
       </div>
     ),
@@ -99,7 +99,7 @@ export const ingredientsColumns: ColumnDef<Ingredient>[] = [
       const isLow = current <= minimum
       return (
         <div
-          className={cn('font-sans tabular-nums text-sm', isLow && 'font-bold text-red-500')}
+          className={cn('font-sans tabular-nums', isLow && 'font-semibold text-status-danger')}
         >
           {formatNumber(current)} {row.original.unit}
         </div>
@@ -112,7 +112,7 @@ export const ingredientsColumns: ColumnDef<Ingredient>[] = [
       <DataTableColumnHeader column={column} title='Min Stock' />
     ),
     cell: ({ row }) => (
-      <div className='font-sans tabular-nums text-sm'>
+      <div className='font-sans tabular-nums'>
         {formatNumber(row.getValue('minimumStock'))} {row.original.unit}
       </div>
     ),

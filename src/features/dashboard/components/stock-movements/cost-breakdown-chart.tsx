@@ -1,6 +1,10 @@
-'use client'
-
 import { useTranslation } from 'react-i18next'
+import { formatMoney } from '@/lib/format'
+import { formatPercent } from '@/lib/metrics'
+import { cn } from '@/lib/utils'
+import { useCopy } from '@/hooks/use-copy'
+import { SectionHeader } from '@/components/data-display/data-panel'
+import { EmptyState } from '@/components/data-display/data-states'
 
 interface StockMovement {
   id: string
@@ -17,108 +21,94 @@ interface StockMovement {
 
 interface CostBreakdownChartProps {
   movements: StockMovement[]
+  className?: string
 }
 
-const COLORS = [
-  'var(--chart-1)',
-  'var(--chart-2)',
-  'var(--chart-3)',
-  'var(--chart-4)',
-  'var(--chart-5)',
-]
-
-function formatCompact(value: number): string {
-  if (value >= 1_000_000_000)
-    return `${(value / 1_000_000_000).toFixed(1).replace(/\.0$/, '')}M`
-  if (value >= 1_000_000)
-    return `${(value / 1_000_000).toFixed(1).replace(/\.0$/, '')} Jt`
-  if (value >= 1_000) return `${(value / 1_000).toFixed(0)}K`
-  return value.toLocaleString()
-}
-
-export function CostBreakdownChart({ movements }: CostBreakdownChartProps) {
+/** Top ingredients by recorded cost. One series, so one color. */
+export function CostBreakdownChart({
+  movements,
+  className,
+}: CostBreakdownChartProps) {
   const { t } = useTranslation()
+  const copy = useCopy()
 
-  // Group by ingredient and sum costs
-  const ingredientCosts = movements.reduce(
-    (acc, m) => {
-      const name = m.ingredient.name
-      if (!acc[name]) acc[name] = 0
-      acc[name] += Math.abs(Number(m.totalCost))
-      return acc
-    },
-    {} as Record<string, number>
-  )
-
-  const data = Object.entries(ingredientCosts)
-    .map(([name, value], index) => ({
-      name,
-      value,
-      color: COLORS[index % COLORS.length],
-    }))
+  const costs = new Map<string, number>()
+  for (const m of movements) {
+    costs.set(
+      m.ingredient.name,
+      (costs.get(m.ingredient.name) ?? 0) + Math.abs(Number(m.totalCost))
+    )
+  }
+  const totalCost = [...costs.values()].reduce((sum, value) => sum + value, 0)
+  const data = [...costs.entries()]
+    .map(([name, value]) => ({ name, value }))
     .sort((a, b) => b.value - a.value)
     .slice(0, 8)
 
-  const totalCost = data.reduce((acc, item) => acc + item.value, 0)
-
   return (
-    <div className='flex w-full flex-col gap-5 overflow-hidden rounded-xl border bg-card p-4 sm:p-6 xl:w-[410px]'>
-      {/* Header */}
-      <div className='flex items-center justify-between'>
-        <p className='text-xs font-semibold tracking-wide text-foreground uppercase'>
-          {t('dashboard.costBreakdown.title')}
-        </p>
-        <span className='font-sans tabular-nums text-xs text-muted-foreground'>
-          Rp{formatCompact(totalCost)}
-        </span>
-      </div>
+    <section
+      aria-labelledby='cost-breakdown-title'
+      className={cn('flex min-w-0 flex-col gap-3 p-4 sm:p-5', className)}
+    >
+      <SectionHeader
+        id='cost-breakdown-title'
+        title={t('dashboard.costBreakdown.title')}
+        description={`${copy('8 bahan teratas dari', 'Top 8 ingredients of')} ${formatMoney(totalCost)}`}
+      />
 
       {data.length === 0 ? (
-        <div className='flex h-48 items-center justify-center'>
-          <p className='font-sans tabular-nums text-xs text-muted-foreground'>
-            {t('dashboard.costBreakdown.noData')}
-          </p>
-        </div>
+        <EmptyState
+          title={t('dashboard.costBreakdown.noData')}
+          className='py-8'
+        />
       ) : (
-        <div className='space-y-3'>
-          {data.map((item) => {
-            const pct =
-              totalCost > 0 ? (item.value / totalCost) * 100 : 0
-
-            return (
-              <div key={item.name} className='space-y-1.5'>
-                <div className='flex items-center justify-between'>
-                  <span className='truncate text-xs font-medium'>
+        <table className='w-full text-[13px] tabular-nums'>
+          <thead className='sr-only'>
+            <tr>
+              <th scope='col'>{copy('Bahan', 'Ingredient')}</th>
+              <th scope='col'>{copy('Biaya', 'Cost')}</th>
+              <th scope='col'>{copy('Porsi', 'Share')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item) => {
+              const share = totalCost > 0 ? item.value / totalCost : 0
+              return (
+                <tr
+                  key={item.name}
+                  className='border-divider border-b last:border-0'
+                >
+                  <th
+                    scope='row'
+                    className='w-full max-w-0 truncate py-2 pr-3 text-left font-medium'
+                  >
                     {item.name}
-                  </span>
-                  <div className='flex items-center gap-2'>
-                    <span className='font-sans tabular-nums text-xs text-muted-foreground'>
-                      {pct.toFixed(1)}%
-                    </span>
-                    <span className='font-sans tabular-nums text-xs tabular-nums'>
-                      Rp{formatCompact(item.value)}
-                    </span>
-                  </div>
-                </div>
-                {/* Horizontal bar */}
-                <div className='h-1.5 w-full overflow-hidden rounded-full bg-muted/60'>
-                  <div
-                    className='h-full rounded-full transition-colors duration-500'
-                    style={{
-                      width: `${pct}%`,
-                      backgroundColor: item.color,
-                    }}
-                  />
-                </div>
-              </div>
-            )
-          })}
-        </div>
+                  </th>
+                  <td className='py-2 pr-3 text-right whitespace-nowrap'>
+                    {formatMoney(item.value)}
+                  </td>
+                  <td className='py-2'>
+                    <div className='flex items-center justify-end gap-2'>
+                      <span
+                        aria-hidden
+                        className='bg-surface-hover h-1 w-12 overflow-hidden rounded-full'
+                      >
+                        <span
+                          className='bg-series-neutral block h-full rounded-full'
+                          style={{ width: `${Math.max(share * 100, 2)}%` }}
+                        />
+                      </span>
+                      <span className='text-fg-secondary w-12 text-right'>
+                        {formatPercent(share)}
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       )}
-
-      <p className='font-sans tabular-nums text-xs tracking-[0.12em] text-muted-foreground uppercase'>
-        {t('dashboard.costBreakdown.footer')}
-      </p>
-    </div>
+    </section>
   )
 }

@@ -22,9 +22,7 @@ export const modifierGroupKeys = {
   detail: (id: string) => [...modifierGroupKeys.details(), id] as const,
 }
 
-export function useModifierGroupsQuery(
-  params: ModifierGroupListParams = {}
-) {
+export function useModifierGroupsQuery(params: ModifierGroupListParams = {}) {
   return useQuery({
     queryKey: modifierGroupKeys.list(params),
     queryFn: () => listModifierGroupsApi(params),
@@ -77,6 +75,7 @@ export function useUpdateModifierGroupMutation() {
       queryClient.invalidateQueries({
         queryKey: modifierGroupKeys.detail(group.id),
       })
+      queryClient.invalidateQueries({ queryKey: ['products'] })
       toast.success('Modifier group updated', {
         description: `${group.name} has been updated successfully.`,
       })

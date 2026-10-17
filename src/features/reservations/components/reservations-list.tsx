@@ -101,34 +101,34 @@ export function ReservationsList({ reservations, isLoading }: Props) {
             </h4>
             <div className='grid grid-cols-2 gap-2'>
               <div className='bg-muted  rounded-lg p-3 text-center'>
-                <div className='text-xl font-bold text-muted-foreground '>
+                <div className='text-xl font-semibold text-muted-foreground '>
                   {filtered.filter((r) => r.status === 'RESERVED').length}
                 </div>
-                <div className='text-xs text-muted-foreground uppercase'>
+                <div className='text-xs text-fg-muted'>
                   Reserved
                 </div>
               </div>
-              <div className='bg-teal-50 dark:bg-teal-950/30 rounded-lg p-3 text-center'>
-                <div className='text-xl font-bold text-teal-600 dark:text-teal-400'>
+              <div className='bg-status-success/10 rounded-lg p-3 text-center'>
+                <div className='text-xl font-semibold text-status-success'>
                   {filtered.filter((r) => r.status === 'OPEN').length}
                 </div>
-                <div className='text-xs text-muted-foreground uppercase'>
+                <div className='text-xs text-fg-muted'>
                   Open
                 </div>
               </div>
               <div className='bg-neutral-50 dark:bg-neutral-900/30 rounded-lg p-3 text-center'>
-                <div className='text-xl font-bold'>
+                <div className='text-xl font-semibold'>
                   {filtered.filter((r) => r.status === 'CLOSED').length}
                 </div>
-                <div className='text-xs text-muted-foreground uppercase'>
+                <div className='text-xs text-fg-muted'>
                   Closed
                 </div>
               </div>
-              <div className='bg-red-50 dark:bg-red-950/30 rounded-lg p-3 text-center'>
-                <div className='text-xl font-bold text-red-600 dark:text-red-400'>
+              <div className='bg-status-danger/10 rounded-lg p-3 text-center'>
+                <div className='text-xl font-semibold text-status-danger'>
                   {filtered.filter((r) => r.status === 'VOIDED').length}
                 </div>
-                <div className='text-xs text-muted-foreground uppercase'>
+                <div className='text-xs text-fg-muted'>
                   Voided
                 </div>
               </div>
@@ -295,7 +295,7 @@ export function ReservationsList({ reservations, isLoading }: Props) {
                               setCurrentRow(reservation)
                               setOpen('cancel')
                             }}
-                            className='text-red-500!'
+                            className='text-status-danger!'
                           >
                             <XCircle size={14} className='mr-2' />
                             Cancel

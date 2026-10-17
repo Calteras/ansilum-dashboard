@@ -40,7 +40,7 @@ export function DataTablePagination<TData>({
       style={{ overflowClipMargin: 1 }}
     >
       <div className='flex w-full items-center justify-between'>
-        <div className='flex w-[100px] items-center justify-center text-sm font-medium @2xl/content:hidden'>
+        <div className='text-fg-secondary flex w-[100px] items-center justify-center text-[13px] @2xl/content:hidden'>
           {copy('Halaman', 'Page')} {currentPage} {copy('dari', 'of')} {totalPages}
         </div>
         <div className='flex items-center gap-2 @max-2xl/content:flex-row-reverse'>
@@ -61,12 +61,12 @@ export function DataTablePagination<TData>({
               ))}
             </SelectContent>
           </Select>
-          <p className='hidden text-sm font-medium sm:block'>{copy('Baris per halaman', 'Rows per page')}</p>
+          <p className='text-fg-secondary hidden text-[13px] sm:block'>{copy('Baris per halaman', 'Rows per page')}</p>
         </div>
       </div>
 
       <div className='flex items-center sm:space-x-6 lg:space-x-8'>
-        <div className='flex w-[100px] items-center justify-center text-sm font-medium @max-3xl/content:hidden'>
+        <div className='text-fg-secondary flex w-[100px] items-center justify-center text-[13px] @max-3xl/content:hidden'>
           {copy('Halaman', 'Page')} {currentPage} {copy('dari', 'of')} {totalPages}
         </div>
         <div className='flex items-center gap-1'>

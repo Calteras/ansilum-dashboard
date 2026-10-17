@@ -205,7 +205,7 @@ export function ProductsRecipeDialog({
           <div className='rounded-md border p-3 text-center'>
             <div className='text-muted-foreground text-xs'>{t('products.recipeDialog.profitMargin')}</div>
             <div
-              className={`mt-1 font-sans tabular-nums text-sm font-semibold ${profitMargin < 0 ? 'text-red-500' : 'text-leaf'}`}
+              className={`mt-1 font-sans tabular-nums text-sm font-semibold ${profitMargin < 0 ? 'text-status-danger' : 'text-leaf'}`}
             >
               {formatRupiah(profitMargin)}
             </div>
@@ -335,7 +335,7 @@ export function ProductsRecipeDialog({
                       type='button'
                       variant='ghost'
                       size='icon'
-                      className='mt-1 shrink-0 text-red-500'
+                      className='mt-1 shrink-0 text-status-danger'
                       onClick={() => removeRow(index)}
                     >
                       <Trash2 size={16} />

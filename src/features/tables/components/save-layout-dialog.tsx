@@ -111,7 +111,7 @@ function CopyButton({ text }: { text: string }) {
 function ShapeBadge({ shape }: { shape: TableLayoutRow['shape'] }) {
   const label = shape === 'CIRCLE' ? 'Circle' : shape === 'SQUARE' ? 'Square' : 'Rect'
   return (
-    <span className='bg-muted text-muted-foreground rounded px-1.5 py-0.5 font-sans tabular-nums text-xs uppercase tracking-wide'>
+    <span className='bg-muted text-fg-muted rounded px-1.5 py-0.5 font-sans tabular-nums text-xs'>
       {label}
     </span>
   )
@@ -121,7 +121,7 @@ function StructureView({ payload }: { payload: LayoutPayload }) {
   return (
     <div className='space-y-4'>
       {payload.sections.map((section) => (
-        <div key={section.name} className='border-border rounded-xl border'>
+        <div key={section.name} className='border-border rounded-lg border'>
           {/* Section header */}
           <div className='bg-muted/40 flex items-center gap-2 rounded-t-xl border-b px-4 py-2.5'>
             <LayoutGrid className='text-primary h-3.5 w-3.5' />
@@ -170,7 +170,7 @@ function JsonView({ payload }: { payload: LayoutPayload }) {
       <div className='absolute top-3 right-3 z-10'>
         <CopyButton text={json} />
       </div>
-      <pre className='bg-muted/40 border-border overflow-x-auto rounded-xl border p-4 font-sans tabular-nums text-xs leading-relaxed'>
+      <pre className='bg-muted/40 border-border overflow-x-auto rounded-lg border p-4 font-sans tabular-nums text-xs leading-relaxed'>
         {json}
       </pre>
     </div>

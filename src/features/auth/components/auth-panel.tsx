@@ -20,7 +20,7 @@ export function AuthPanel({
       <div className='space-y-3'>
         <h1
           role={titleRole}
-          className='text-[32px] font-bold tracking-[-0.03em]'
+          className='text-2xl font-semibold tracking-[-0.02em]'
         >
           {title}
         </h1>

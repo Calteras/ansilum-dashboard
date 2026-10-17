@@ -24,7 +24,7 @@ export function PlanStep({
   return (
     <section className='space-y-6' aria-labelledby='plan-heading'>
       <div className='space-y-1.5'>
-        <h1 id='plan-heading' className='text-2xl font-bold tracking-tight'>
+        <h1 id='plan-heading' className='text-xl font-semibold tracking-[-0.02em]'>
           {copy('Pilih paket', 'Choose your plan')}
         </h1>
         <p className='text-muted-foreground'>

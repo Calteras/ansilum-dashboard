@@ -45,7 +45,7 @@ export function MethodStep({
   return (
     <section className='space-y-6' aria-labelledby='method-heading'>
       <div className='space-y-1.5'>
-        <h1 id='method-heading' className='text-2xl font-bold tracking-tight'>
+        <h1 id='method-heading' className='text-xl font-semibold tracking-[-0.02em]'>
           {copy('Bagaimana Anda ingin membayar?', 'How would you like to pay?')}
         </h1>
         <p className='text-muted-foreground'>
@@ -61,7 +61,7 @@ export function MethodStep({
         disabled={isSubmitting}
         value={method}
         onValueChange={(value) => setMethod(value as PaymentType)}
-        className='bg-card gap-0 divide-y overflow-hidden rounded-xl border'
+        className='bg-card gap-0 divide-y overflow-hidden rounded-lg border'
       >
         {PAYMENT_METHOD_GROUPS.map((group) => {
           const open = openGroup === group.id

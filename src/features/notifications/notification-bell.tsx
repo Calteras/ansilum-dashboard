@@ -50,7 +50,7 @@ export function NotificationBell() {
         <Button
           variant='ghost'
           size='icon'
-          className='relative rounded-full'
+          className='relative'
           aria-label={
             unread
               ? copy(
@@ -60,7 +60,7 @@ export function NotificationBell() {
               : copy('Notifikasi', 'Notifications')
           }
         >
-          <Bell className='size-[1.2rem]' />
+          <Bell className='size-[18px]' />
           {unread > 0 && (
             <span className='bg-destructive text-destructive-foreground absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] leading-none font-semibold tabular-nums'>
               {unread > 9 ? '9+' : unread}

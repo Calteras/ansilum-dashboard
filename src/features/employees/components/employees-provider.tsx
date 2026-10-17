@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import useDialogState from '@/hooks/use-dialog-state'
+import { usePendingAction } from '@/features/search/pending-action'
 import type { Employee } from '../data/schema'
 
 type EmployeesDialogType = 'add' | 'edit' | 'delete'
@@ -15,6 +16,8 @@ const EmployeesContext = React.createContext<EmployeesContextType | null>(null)
 
 export function EmployeesProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useDialogState<EmployeesDialogType>(null)
+  // "Add …" chosen in global search opens the create dialog on arrival.
+  usePendingAction('employees.create', () => setOpen('add'))
   const [currentRow, setCurrentRow] = useState<Employee | null>(null)
 
   return (

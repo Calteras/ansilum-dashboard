@@ -1,79 +1,94 @@
-import { Link } from '@tanstack/react-router'
-import { Settings, HelpCircle } from '@/components/icons'
-import { useCopy } from '@/hooks/use-copy'
-import { useTranslation } from 'react-i18next'
+import { useLocation } from '@tanstack/react-router'
 import { useLayout } from '@/context/layout-provider'
-import { useAuth } from '@/features/auth/hooks/use-auth'
+import { useCopy } from '@/hooks/use-copy'
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarRail,
   SidebarMenu,
-  SidebarMenuItem,
   SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+  useSidebar,
 } from '@/components/ui/sidebar'
+import { ChevronsLeft, ChevronsRight } from '@/components/icons'
 import { BrandCard } from './brand-card'
-import { sidebarData } from './data/sidebar-data'
-import { NavGroup } from './nav-group'
-import { NavUser } from './nav-user'
+import { useNavigation } from './data/use-navigation'
+import { NavGroup, NavLinkItem } from './nav-group'
 import { TenantSwitcher } from './tenant-switcher'
-import type { NavGroup as NavGroupType } from './types'
 
-function useSidebarData(): NavGroupType[] {
-  const { t } = useTranslation()
-  return sidebarData.navGroups.map((group) => ({
-    ...group,
-    title: t(group.title as any) as string,
-    items: group.items.map((item) => ({
-      ...item,
-      title: t(item.title as any) as string,
-    })),
-  }))
-}
+const isMac =
+  typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
 
+/**
+ * Console sidebar: logo row aligned with the app header, business switcher,
+ * sectioned navigation with expandable groups, and a collapse control that
+ * reduces it to an icon rail (also ⌘/Ctrl+B).
+ */
 export function AppSidebar() {
-  const copy = useCopy()
   const { collapsible, variant } = useLayout()
-  const { user } = useAuth()
-  const navGroups = useSidebarData()
-
-  // Build user data from auth store
-  const userData = {
-    name: user?.name ?? 'User',
-    email: user?.email ?? '',
-    avatar: user?.image ?? undefined,
-  }
+  // Collapsing always leaves the icon rail; a fully hidden sidebar would have
+  // no way back on desktop now that the header toggle is mobile-only.
+  const mode = collapsible === 'none' ? 'none' : 'icon'
+  const { groups, footer } = useNavigation()
+  const pathname = useLocation({ select: (location) => location.pathname })
 
   return (
-    <Sidebar
-      collapsible={collapsible}
-      variant={variant}
-      className='border-r'
-    >
-      <SidebarHeader className="border-b px-4 py-3">
+    <Sidebar collapsible={mode} variant={variant} className='border-divider'>
+      <SidebarHeader className='border-divider h-(--app-header-height) shrink-0 justify-center border-b px-3 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-2'>
         <BrandCard />
       </SidebarHeader>
-      <SidebarContent className='flex flex-col gap-6 px-4 py-4'>
-        <div className="space-y-5">
-          <TenantSwitcher />
-          {navGroups.map((props) => (
-            <NavGroup key={props.title} {...props} />
-          ))}
-        </div>
-        <div className='mt-auto'>
-          <SidebarMenu>
-            {[{ to: '/settings', icon: Settings, label: copy('Pengaturan', 'Settings') }, { to: '/help-center', icon: HelpCircle, label: copy('Bantuan', 'Help') }].map(({ to, icon: Icon, label }) => (
-              <SidebarMenuItem key={to}><SidebarMenuButton asChild tooltip={label}><Link to={to}><Icon /><span>{label}</span></Link></SidebarMenuButton></SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </div>
+
+      <div className='px-2 pt-2'>
+        <TenantSwitcher />
+      </div>
+
+      <SidebarContent className='gap-4 px-2 py-3'>
+        {groups.map((group, index) => (
+          <NavGroup key={group.title ?? index} group={group} />
+        ))}
       </SidebarContent>
-      <SidebarFooter className='border-t p-2'>
-        <NavUser user={userData} />
+
+      <SidebarFooter className='border-divider gap-px border-t p-2'>
+        <SidebarMenu className='gap-px'>
+          {footer.map((item) => (
+            <NavLinkItem key={item.url} item={item} pathname={pathname} />
+          ))}
+          {mode === 'icon' && <CollapseControl />}
+        </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
+  )
+}
+
+function CollapseControl() {
+  const copy = useCopy()
+  const { state, isMobile, toggleSidebar } = useSidebar()
+  if (isMobile) return null
+
+  const collapsed = state === 'collapsed'
+  const label = collapsed
+    ? copy('Lebarkan menu', 'Expand sidebar')
+    : copy('Ciutkan menu', 'Collapse sidebar')
+  const shortcut = isMac ? '⌘B' : 'Ctrl+B'
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        onClick={toggleSidebar}
+        tooltip={`${label} (${shortcut})`}
+        aria-label={label}
+        aria-expanded={!collapsed}
+        className='text-fg-secondary'
+      >
+        {collapsed ? <ChevronsRight /> : <ChevronsLeft />}
+        <span>{label}</span>
+        <kbd className='text-fg-muted ms-auto rounded border px-1 text-[10px] leading-4'>
+          {shortcut}
+        </kbd>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   )
 }

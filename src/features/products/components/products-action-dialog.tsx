@@ -781,7 +781,7 @@ export function ProductsActionDialog({
                     type='button'
                     variant='ghost'
                     size='icon'
-                    className='mt-1 shrink-0 text-red-500'
+                    className='mt-1 shrink-0 text-status-danger'
                     onClick={() => remove(index)}
                   >
                     <Trash2 size={16} />

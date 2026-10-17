@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import useDialogState from '@/hooks/use-dialog-state'
+import { usePendingAction } from '@/features/search/pending-action'
 import type { Product } from '../api/products.types'
 
 type ProductsDialogType = 'add' | 'edit' | 'delete' | 'deactivate' | 'recipe' | 'outlets'
@@ -15,6 +16,8 @@ const ProductsContext = React.createContext<ProductsContextType | null>(null)
 
 export function ProductsProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useDialogState<ProductsDialogType>(null)
+  // "Add …" chosen in global search opens the create dialog on arrival.
+  usePendingAction('products.create', () => setOpen('add'))
   const [currentRow, setCurrentRow] = useState<Product | null>(null)
 
   return (

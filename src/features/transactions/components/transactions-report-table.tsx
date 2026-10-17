@@ -1,6 +1,5 @@
 import * as React from 'react'
 import {
-  ClipboardList,
   Search,
   ChevronLeft,
   ChevronRight,
@@ -12,6 +11,7 @@ import {
   Eye,
   RefreshCw,
 } from '@/components/icons'
+import { STATUS_TONE } from '@/lib/status-tone'
 import { cn } from '@/lib/utils'
 import { format, parseISO } from 'date-fns'
 import { Badge } from '@/components/ui/badge'
@@ -50,20 +50,17 @@ interface TransactionsReportTableProps {
   isLoading?: boolean
   onRefresh?: () => void
   isFetching?: boolean
+  /** Prefilled search, e.g. from the global search. */
+  initialSearch?: string
 }
 
 const PAGE_SIZE_OPTIONS = [10, 20, 30, 50]
 
-function getStatusBadge(status: string) {
-  const styles: Record<string, string> = {
-    OPEN: 'bg-muted text-muted-foreground  ',
-    PENDING:
-      'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-    CLOSED:
-      'bg-leaf-soft text-leaf  ',
-    VOIDED: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  }
-  return styles[status] || 'bg-muted text-muted-foreground'
+const STATUS: Record<string, { label: string; tone: string }> = {
+  OPEN: { label: 'Open', tone: STATUS_TONE.info },
+  PENDING: { label: 'Pending', tone: STATUS_TONE.warning },
+  CLOSED: { label: 'Closed', tone: STATUS_TONE.success },
+  VOIDED: { label: 'Voided', tone: STATUS_TONE.danger },
 }
 
 function formatPaymentMethod(method: string) {
@@ -98,7 +95,7 @@ function SortableHeader({
   return (
     <TableHead className={className}>
       <button
-        className='text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs font-medium sm:text-sm'
+        className='text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs font-medium'
         onClick={() => onSort(column)}
       >
         {label}
@@ -142,8 +139,9 @@ export function TransactionsReportTable({
   isLoading,
   onRefresh,
   isFetching,
+  initialSearch = '',
 }: TransactionsReportTableProps) {
-  const [searchQuery, setSearchQuery] = React.useState('')
+  const [searchQuery, setSearchQuery] = React.useState(initialSearch)
   const [currentPage, setCurrentPage] = React.useState(1)
   const [pageSize, setPageSize] = React.useState(10)
   const [sortColumn, setSortColumn] = React.useState<SortColumn | null>(null)
@@ -202,22 +200,15 @@ export function TransactionsReportTable({
   }
 
   return (
-    <div className='bg-card rounded-xl border'>
-      <div className='flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:gap-4 sm:px-6 sm:py-3.5'>
-        <div className='flex flex-1 items-center gap-2 sm:gap-2.5'>
-          <Button
-            variant='outline'
-            size='icon'
-            className='size-7 shrink-0 sm:size-8'
-          >
-            <ClipboardList className='text-muted-foreground size-4 sm:size-[18px]' />
-          </Button>
-          <span className='text-sm font-medium sm:text-base'>
+    <div className='bg-card rounded-lg border'>
+      <div className='border-divider flex flex-col gap-3 border-b px-4 py-3 sm:flex-row sm:items-center sm:gap-4 sm:px-5'>
+        <div className='flex flex-1 items-center gap-3'>
+          <h2 className='text-sm leading-5 font-semibold tracking-[-0.01em]'>
             Transactions
-          </span>
-          <Badge variant='secondary' className='ml-1 text-xs sm:text-xs'>
+          </h2>
+          <span className='text-fg-muted text-[13px] tabular-nums'>
             {filteredTransactions.length}
-          </Badge>
+          </span>
         </div>
 
         <div className='flex flex-wrap items-center gap-2'>
@@ -227,15 +218,16 @@ export function TransactionsReportTable({
               placeholder='Search...'
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className='h-8 w-full pl-9 text-sm sm:h-9 sm:w-[200px] sm:pl-10'
+              className='h-8 w-full pl-9 text-[13px] sm:w-56'
             />
           </div>
           {onRefresh && (
             <Button
               variant='outline'
               size='icon'
-              className='size-8 sm:size-9'
+              className='size-8'
               onClick={onRefresh}
+              aria-label='Refresh'
               disabled={isFetching}
               title='Refresh'
             >
@@ -245,11 +237,11 @@ export function TransactionsReportTable({
         </div>
       </div>
 
-      <div className='overflow-x-auto px-3 pb-3 sm:px-6 sm:pb-4'>
+      <div className='overflow-x-auto'>
         <Table>
           <TableHeader>
             <TableRow className='bg-muted/50 hover:bg-muted/50'>
-              <TableHead className='text-muted-foreground w-[40px] text-xs font-medium sm:text-sm'>
+              <TableHead className='text-muted-foreground w-[40px] text-xs font-medium'>
                 #
               </TableHead>
               <SortableHeader
@@ -292,13 +284,13 @@ export function TransactionsReportTable({
                 onSort={handleSort}
                 className='min-w-[60px]'
               />
-              <TableHead className='text-muted-foreground min-w-[100px] text-right text-xs font-medium sm:text-sm'>
+              <TableHead className='text-muted-foreground min-w-[100px] text-right text-xs font-medium'>
                 Subtotal
               </TableHead>
-              <TableHead className='text-muted-foreground min-w-[90px] text-right text-xs font-medium sm:text-sm'>
+              <TableHead className='text-muted-foreground min-w-[90px] text-right text-xs font-medium'>
                 Discount
               </TableHead>
-              <TableHead className='text-muted-foreground min-w-[90px] text-right text-xs font-medium sm:text-sm'>
+              <TableHead className='text-muted-foreground min-w-[90px] text-right text-xs font-medium'>
                 Tax
               </TableHead>
               <SortableHeader
@@ -325,10 +317,10 @@ export function TransactionsReportTable({
                 onSort={handleSort}
                 className='hidden min-w-[100px] lg:table-cell'
               />
-              <TableHead className='text-muted-foreground hidden min-w-[70px] text-xs font-medium sm:text-sm lg:table-cell'>
+              <TableHead className='text-muted-foreground hidden min-w-[70px] text-xs font-medium lg:table-cell'>
                 Table No
               </TableHead>
-              <TableHead className='text-muted-foreground w-[50px] text-xs font-medium sm:text-sm'>
+              <TableHead className='text-muted-foreground w-[50px] text-xs font-medium'>
                 <span className='sr-only'>Actions</span>
               </TableHead>
             </TableRow>
@@ -364,42 +356,42 @@ export function TransactionsReportTable({
 
                 return (
                   <TableRow key={tx.id}>
-                    <TableCell className='text-xs font-medium sm:text-sm'>
+                    <TableCell className='text-xs font-medium'>
                       {(currentPage - 1) * pageSize + index + 1}
                     </TableCell>
                     <TableCell>
-                      <span className='text-xs font-medium sm:text-sm'>
+                      <span className='text-xs font-medium'>
                         {tx.transactionNo}
                       </span>
                     </TableCell>
-                    <TableCell className='text-muted-foreground text-xs sm:text-sm'>
+                    <TableCell className='text-muted-foreground text-xs'>
                       {format(parseISO(tx.transactionDate), 'dd MMM yyyy HH:mm')}
                     </TableCell>
                     <TableCell>
-                      <span className='block truncate text-xs font-medium sm:text-sm'>
+                      <span className='block truncate text-xs font-medium'>
                         {tx.customerName || '-'}
                       </span>
                     </TableCell>
                     <TableCell>
                       <Badge
-                        className={`text-xs font-medium sm:text-xs ${getStatusBadge(tx.status)}`}
+                        className={STATUS[tx.status]?.tone ?? STATUS_TONE.neutral}
                       >
-                        {tx.status}
+                        {STATUS[tx.status]?.label ?? tx.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className='text-center text-xs tabular-nums sm:text-sm'>
+                    <TableCell className='text-center text-xs tabular-nums'>
                       {totalItems}
                     </TableCell>
-                    <TableCell className='text-right text-xs tabular-nums sm:text-sm'>
+                    <TableCell className='text-right text-xs tabular-nums'>
                       Rp{Number(tx.subtotal).toLocaleString()}
                     </TableCell>
-                    <TableCell className='text-right text-xs tabular-nums sm:text-sm'>
+                    <TableCell className='text-right text-xs tabular-nums'>
                       Rp{Number(tx.discountAmount).toLocaleString()}
                     </TableCell>
-                    <TableCell className='text-right text-xs tabular-nums sm:text-sm'>
+                    <TableCell className='text-right text-xs tabular-nums'>
                       Rp{Number(tx.taxAmount).toLocaleString()}
                     </TableCell>
-                    <TableCell className='text-right text-xs font-medium tabular-nums sm:text-sm'>
+                    <TableCell className='text-right text-xs font-medium tabular-nums'>
                       Rp{Number(tx.grandTotal).toLocaleString()}
                     </TableCell>
                     <TableCell className='hidden md:table-cell'>
@@ -408,17 +400,17 @@ export function TransactionsReportTable({
                           <Badge
                             key={m}
                             variant='outline'
-                            className='text-xs sm:text-xs'
+                            className='text-xs'
                           >
                             {formatPaymentMethod(m)}
                           </Badge>
                         ))}
                       </div>
                     </TableCell>
-                    <TableCell className='text-muted-foreground hidden text-xs sm:text-sm lg:table-cell'>
+                    <TableCell className='text-muted-foreground hidden text-xs lg:table-cell'>
                       {tx.cashier.name}
                     </TableCell>
-                    <TableCell className='text-muted-foreground hidden text-xs sm:text-sm lg:table-cell'>
+                    <TableCell className='text-muted-foreground hidden text-xs lg:table-cell'>
                       {tx.tableNumber || '-'}
                     </TableCell>
                     <TableCell>
@@ -440,7 +432,7 @@ export function TransactionsReportTable({
 
       {filteredTransactions.length > 0 && (
         <div className='flex flex-col items-center justify-between gap-3 border-t px-3 py-3 sm:flex-row sm:px-6'>
-          <div className='text-muted-foreground flex items-center gap-2 text-xs sm:text-sm'>
+          <div className='text-muted-foreground flex items-center gap-2 text-xs'>
             <span className='hidden sm:inline'>Rows per page:</span>
             <Select
               value={pageSize.toString()}

@@ -125,13 +125,13 @@ export function Orders({ outletId }: { outletId: string }) {
             type='button'
             aria-pressed={state === filter}
             onClick={() => setState(filter)}
-            className={`bg-card hover:bg-muted/50 rounded-xl border p-4 text-left transition-colors focus-visible:ring-2 ${state === filter ? 'border-primary' : ''}`}
+            className={`bg-card hover:bg-surface-hover focus-visible:outline-ring rounded-lg border p-4 text-left transition-colors focus-visible:outline-2 ${state === filter ? 'bg-surface-selected border-divider-strong' : ''}`}
           >
             <div className='text-muted-foreground flex items-center justify-between gap-2'>
-              <span className='text-xs font-medium sm:text-sm'>{label}</span>
+              <span className='text-[13px] font-medium'>{label}</span>
               <Icon className='size-4 shrink-0' aria-hidden='true' />
             </div>
-            <p className='mt-3 text-3xl font-semibold tabular-nums'>
+            <p className='mt-2 text-2xl leading-8 font-semibold'>
               {query.isPending || query.error ? '—' : count}
             </p>
           </button>

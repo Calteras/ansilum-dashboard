@@ -1,5 +1,6 @@
 import { tenantGet, tenantApiPaths } from '@/lib/tenant-api-client'
 import type {
+  Transaction,
   OutletsResponse,
   TransactionSummaryResponse,
   TransactionsListResponse,
@@ -45,6 +46,29 @@ export async function listTransactionsApi(
   return tenantGet<TransactionsListResponse>(
     `${tenantApiPaths.transactions.list}?${searchParams}`
   )
+}
+
+/**
+ * Walks every page of the transactions list. `maxRows` caps the walk; the list is
+ * newest-first, so a capped result is missing the oldest rows, never the latest.
+ */
+export async function listAllTransactionsApi(
+  params: Omit<TransactionListParams, 'offset' | 'limit'>,
+  { pageSize = 500, maxRows = Number.POSITIVE_INFINITY } = {}
+): Promise<{ data: Transaction[]; total: number }> {
+  const data: Transaction[] = []
+  let total = Number.POSITIVE_INFINITY
+  while (data.length < total && data.length < maxRows) {
+    const page = await listTransactionsApi({
+      ...params,
+      offset: data.length,
+      limit: Math.min(pageSize, maxRows - data.length),
+    })
+    data.push(...page.data)
+    total = page.meta?.total ?? data.length
+    if (page.data.length === 0) break
+  }
+  return { data, total: Number.isFinite(total) ? total : data.length }
 }
 
 export async function listStockMovementsApi(): Promise<StockMovementsResponse> {

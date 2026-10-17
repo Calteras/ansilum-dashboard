@@ -50,7 +50,7 @@ export function useProductsColumns(): ColumnDef<Product>[] {
         <DataTableColumnHeader column={column} title={t('products.columns.sku')} />
       ),
       cell: ({ row }) => (
-        <div className='font-sans tabular-nums text-sm'>{row.getValue('sku')}</div>
+        <div className='font-sans tabular-nums'>{row.getValue('sku')}</div>
       ),
       meta: {
         className: cn(
@@ -107,7 +107,7 @@ export function useProductsColumns(): ColumnDef<Product>[] {
         <DataTableColumnHeader column={column} title={t('products.columns.basePrice')} />
       ),
       cell: ({ row }) => (
-        <div className='font-sans tabular-nums text-sm'>
+        <div className='font-sans tabular-nums'>
           {formatRupiah(row.getValue('basePrice'))}
         </div>
       ),

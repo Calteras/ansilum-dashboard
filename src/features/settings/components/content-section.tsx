@@ -10,8 +10,10 @@ export function ContentSection({ title, desc, children }: ContentSectionProps) {
   return (
     <div className='flex flex-1 flex-col'>
       <div className='flex-none'>
-        <h3 className='text-lg font-medium'>{title}</h3>
-        <p className='text-muted-foreground text-sm'>{desc}</p>
+        <h2 className='text-sm leading-5 font-semibold tracking-[-0.01em]'>
+          {title}
+        </h2>
+        <p className='text-fg-muted text-[13px] leading-5'>{desc}</p>
       </div>
       <Separator className='my-4 flex-none' />
       <div className='faded-bottom h-full w-full overflow-y-auto scroll-smooth pe-4 pb-12'>

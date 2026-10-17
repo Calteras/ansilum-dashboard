@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { CommandMenu } from '@/components/command-menu'
 
 type SearchContextType = {
   open: boolean
@@ -12,6 +11,15 @@ type SearchProviderProps = {
   children: React.ReactNode
 }
 
+function isTypingTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false
+  return (
+    target.isContentEditable ||
+    ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)
+  )
+}
+
+/** Global search state. ⌘/Ctrl+K toggles it anywhere; "/" opens it outside text fields. */
 export function SearchProvider({ children }: SearchProviderProps) {
   const [open, setOpen] = useState(false)
 
@@ -20,18 +28,22 @@ export function SearchProvider({ children }: SearchProviderProps) {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
         setOpen((open) => !open)
+      } else if (
+        e.key === '/' &&
+        !e.metaKey &&
+        !e.ctrlKey &&
+        !e.altKey &&
+        !isTypingTarget(e.target)
+      ) {
+        e.preventDefault()
+        setOpen(true)
       }
     }
     document.addEventListener('keydown', down)
     return () => document.removeEventListener('keydown', down)
   }, [])
 
-  return (
-    <SearchContext value={{ open, setOpen }}>
-      {children}
-      <CommandMenu />
-    </SearchContext>
-  )
+  return <SearchContext value={{ open, setOpen }}>{children}</SearchContext>
 }
 
 // eslint-disable-next-line react-refresh/only-export-components

@@ -94,7 +94,7 @@ function AddOverheadForm({
         onSubmit={form.handleSubmit(onSubmit)}
         className='space-y-3 rounded-lg border bg-muted/30 p-4'
       >
-        <p className='text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+        <p className='text-xs font-medium text-fg-muted'>
           {t('cogs.overhead.addTitle')}
         </p>
 
@@ -227,9 +227,9 @@ export function OverheadManager() {
 
       {/* Table */}
       {selectedProductId && (
-        <div className='overflow-hidden rounded-xl border bg-card'>
+        <div className='overflow-hidden rounded-lg border bg-card'>
           <div className='border-b px-4 py-3 sm:px-5'>
-            <p className='text-xs font-semibold tracking-wide text-foreground uppercase'>
+            <p className='text-xs font-medium text-foreground'>
               {t('cogs.overhead.title')}
               <span className='ml-2 rounded bg-primary/10 px-1.5 py-0.5 font-sans tabular-nums text-xs text-primary'>
                 {overheads.length}
@@ -250,7 +250,7 @@ export function OverheadManager() {
                   ].map((h, i) => (
                     <TableHead
                       key={i}
-                      className='px-4 py-2.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase'
+                      className='px-4 py-2.5 text-xs font-medium text-fg-muted'
                     >
                       {h}
                     </TableHead>
@@ -274,7 +274,7 @@ export function OverheadManager() {
                   overheads.map((oh) => {
                     const costPerUnit = Number(oh.ratePerHour) * Number(oh.hoursRequired)
                     return (
-                      <TableRow key={oh.id} className='group border-b last:border-0 hover:bg-muted/20'>
+                      <TableRow key={oh.id} className='group border-b last:border-0 hover:bg-surface-hover'>
                         <TableCell className='px-4 py-3 text-sm font-medium'>{oh.name}</TableCell>
                         <TableCell className='px-4 py-3'>
                           <span className='rounded bg-muted px-1.5 py-0.5 font-sans tabular-nums text-xs text-muted-foreground'>

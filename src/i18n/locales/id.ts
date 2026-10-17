@@ -53,18 +53,18 @@ const id = {
     entries: 'data',
   },
   nav: {
-    foodDelivery: 'Pesanan Delivery',
+    foodDelivery: 'Pesanan delivery',
     dashboard: 'Ringkasan',
     analytics: 'Analitik',
     products: 'Produk',
     categories: 'Kategori',
     ingredients: 'Bahan',
-    rawIngredients: 'Bahan Baku',
+    rawIngredients: 'Bahan baku',
     recipes: 'Resep',
     modifierGroups: 'Pilihan tambahan',
     pricing: 'Harga',
     transactions: 'Penjualan',
-    stockMovements: 'Pergerakan Stok',
+    stockMovements: 'Pergerakan stok',
     reservations: 'Reservasi',
     tables: 'Meja',
     outlets: 'Gerai',
@@ -75,12 +75,17 @@ const id = {
     tasks: 'Tugas',
     chats: 'Tanya Ansilum',
     cogs: 'HPP',
+    orders: 'Pesanan',
+    menu: 'Menu',
+    inventory: 'Inventaris',
+    helpCenter: 'Bantuan',
     groups: {
       general: 'Usaha Anda',
       operations: 'Kegiatan usaha',
       menu: 'Menu',
       kitchen: 'Produk & bahan',
       reports: 'Laporan',
+      catalog: 'Katalog',
     },
   },
   auth: {
@@ -127,7 +132,7 @@ const id = {
   products: {
     page: {
       title: 'Produk',
-      subtitle: 'Kelola produk dan menu Anda di sini.',
+      subtitle: 'Item menu beserta harga dan kategorinya',
     },
     actions: {
       addProduct: 'Tambah Produk',

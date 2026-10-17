@@ -40,9 +40,9 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
   ]
 
   return (
-    <div className='border-border bg-card/95 absolute top-20 right-4 z-50 w-80 rounded-xl border p-4 shadow-none backdrop-blur-sm'>
+    <div className='bg-popover text-popover-foreground absolute top-20 right-4 z-50 w-80 rounded-lg border p-4 shadow-overlay'>
       <div className='mb-4 flex items-center justify-between'>
-        <h3 className='text-foreground text-lg font-bold'>Table Properties</h3>
+        <h3 className='text-sm font-semibold'>Table properties</h3>
         <button
           onClick={onClose}
           className='hover:bg-muted rounded-lg p-1 transition-colors'

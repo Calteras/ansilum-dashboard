@@ -9,10 +9,10 @@ export function AppHeader() {
   return (
     <Header
       fixed
-      className='border-border/70 bg-background/85 border-b backdrop-blur-xl'
+      className='bg-background border-b'
     >
       <Search />
-      <div className='ms-auto flex shrink-0 items-center gap-1 sm:gap-2'>
+      <div className='ms-auto flex shrink-0 items-center gap-1'>
         <NotificationBell />
         <LanguageSwitch />
         <ThemeSwitch />

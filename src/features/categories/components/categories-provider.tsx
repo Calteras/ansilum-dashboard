@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import useDialogState from '@/hooks/use-dialog-state'
+import { usePendingAction } from '@/features/search/pending-action'
 import type { Category } from '../api/categories.types'
 
 type CategoriesDialogType = 'add' | 'edit' | 'delete'
@@ -19,6 +20,8 @@ export function CategoriesProvider({
   children: React.ReactNode
 }) {
   const [open, setOpen] = useDialogState<CategoriesDialogType>(null)
+  // "Add …" chosen in global search opens the create dialog on arrival.
+  usePendingAction('categories.create', () => setOpen('add'))
   const [currentRow, setCurrentRow] = useState<Category | null>(null)
 
   return (

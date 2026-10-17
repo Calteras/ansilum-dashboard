@@ -25,8 +25,8 @@ export function ModifierGroups() {
       <AppHeader />
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <PageHeader
-          title='Modifier Groups'
-          description='Manage your modifier groups and modifiers here.'
+          title='Modifier groups'
+          description='Option sets attached to products, such as size or sugar level'
           actions={<ModifierGroupsPrimaryButtons />}
         />
         <ModifierGroupsTable

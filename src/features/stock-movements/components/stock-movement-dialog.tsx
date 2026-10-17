@@ -77,7 +77,7 @@ const MOVEMENT_TYPES: {
     description: 'Stock received from supplier. Updates WAC.',
     colorClass: 'text-leaf ',
     accentClass:
-      'border-emerald-300 bg-leaf-soft dark:border-emerald-700 ',
+      'border-status-success/30 bg-leaf-soft ',
   },
   {
     value: 'ADJUSTMENT_IN',
@@ -91,17 +91,17 @@ const MOVEMENT_TYPES: {
     value: 'ADJUSTMENT_OUT',
     label: 'Adjust Out',
     description: 'Manual negative correction.',
-    colorClass: 'text-amber-600 dark:text-amber-400',
+    colorClass: 'text-status-warning',
     accentClass:
-      'border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950/30',
+      'border-status-warning/30 bg-status-warning/10',
   },
   {
     value: 'WASTE',
     label: 'Waste',
     description: 'Spoilage or loss.',
-    colorClass: 'text-rose-600 dark:text-rose-400',
+    colorClass: 'text-status-danger',
     accentClass:
-      'border-rose-300 bg-rose-50 dark:border-rose-700 dark:bg-rose-950/30',
+      'border-status-danger/30 bg-status-danger/10',
   },
 ]
 

@@ -42,7 +42,7 @@ export function Reservations() {
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <PageHeader
           title='Reservations'
-          description='Manage and create reservations.'
+          description='Table bookings and pre-orders by outlet'
           actions={
             outlets.length > 0 ? (
               <Select
@@ -65,10 +65,12 @@ export function Reservations() {
         />
 
         <Tabs defaultValue='make' className='flex-1'>
-          <TabsList>
-            <TabsTrigger value='make'>Make a Reservation</TabsTrigger>
-            <TabsTrigger value='list'>Reservation List</TabsTrigger>
-          </TabsList>
+          <div className='border-divider border-b'>
+            <TabsList variant='line'>
+              <TabsTrigger value='make'>New reservation</TabsTrigger>
+              <TabsTrigger value='list'>Reservations</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value='make' className='mt-4'>
             <ReservationsMakeForm outletId={selectedOutletId} />

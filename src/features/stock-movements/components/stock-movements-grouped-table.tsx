@@ -73,13 +73,13 @@ function formatDate(dateStr: string) {
 
 function getMovementTypeBadge(type: string) {
   const styles: Record<string, string> = {
-    SALE: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+    SALE: 'bg-status-danger/10 text-status-danger',
     PURCHASE:
       'bg-leaf-soft text-leaf  ',
     ADJUSTMENT:
-      'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+      'bg-status-warning/10 text-status-warning',
     WASTE:
-      'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+      'bg-status-warning/10 text-status-warning',
   }
   return styles[type] || 'bg-muted text-muted-foreground'
 }
@@ -366,7 +366,7 @@ export function StockMovementsGroupedTable({
     collapsedGroups.size === groups.length && groups.length > 0
 
   return (
-    <div className='bg-card rounded-xl border'>
+    <div className='bg-card rounded-lg border'>
       {/* Toolbar */}
       <div className='flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:gap-4 sm:px-6 sm:py-3.5'>
         <div className='flex flex-1 items-center gap-2 sm:gap-2.5'>
@@ -562,7 +562,7 @@ export function StockMovementsGroupedTable({
                 return (
                   <TableRow
                     key={movement.id}
-                    className='hover:bg-muted/20 border-0'
+                    className='hover:bg-surface-hover border-0'
                   >
                     {/* Tree connector */}
                     <TableCell className='text-muted-foreground w-[40px] pr-0 text-right font-sans tabular-nums text-xs select-none'>
@@ -594,7 +594,7 @@ export function StockMovementsGroupedTable({
                       <span
                         className={
                           Number(movement.quantity) < 0
-                            ? 'text-red-600'
+                            ? 'text-status-danger'
                             : 'text-leaf'
                         }
                       >

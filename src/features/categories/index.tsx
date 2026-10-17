@@ -26,7 +26,7 @@ export function Categories() {
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <PageHeader
           title='Categories'
-          description='Manage your product categories here.'
+          description='Groups that organise products on the menu and in reports'
           actions={<CategoriesPrimaryButtons />}
         />
         <CategoriesTable

@@ -16,13 +16,13 @@ export const TableNode: React.FC<NodeProps<TableData>> = ({
   const containerClass = cn(
     'relative flex h-full w-full flex-col items-center justify-center border-2 transition-colors',
     // Shape
-    data.shape === 'circle' ? 'rounded-full' : 'rounded-xl',
+    data.shape === 'circle' ? 'rounded-full' : 'rounded-lg',
     // Status base (not selected)
     !selected && !isOccupied && !isReserved && !isCleaning
       ? 'border-input bg-card hover:border-primary/50 hover:bg-muted/50'
       : '',
     isOccupied ? 'border-destructive/30 bg-destructive/5 opacity-70' : '',
-    isReserved ? 'border-warning/30 bg-warning/5 opacity-70' : '',
+    isReserved ? 'border-status-warning/30 bg-status-warning/5 opacity-70' : '',
     isCleaning ? 'border-muted bg-muted/10 opacity-60' : '',
     // Selected overrides base (not on disabled states)
     selected && !isOccupied && !isReserved && !isCleaning
@@ -37,7 +37,7 @@ export const TableNode: React.FC<NodeProps<TableData>> = ({
       : isOccupied
         ? 'bg-destructive/25'
         : isReserved
-          ? 'bg-warning/30'
+          ? 'bg-status-warning/30'
           : isCleaning
             ? 'bg-muted/40'
             : 'bg-muted-foreground/20'

@@ -1,5 +1,4 @@
 import { useId, type ReactNode } from 'react'
-import { Inbox } from '@/components/icons'
 import { cn } from '@/lib/utils'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
@@ -13,6 +12,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { DataPanel } from '@/components/data-display/data-panel'
+import { EmptyState as SharedEmptyState } from '@/components/data-display/data-states'
 import { providers } from '../delivery.providers'
 import type { Provider } from '../delivery.types'
 
@@ -143,9 +144,9 @@ export function Status({ value }: { value: string }) {
       className={cn(
         'text-xs font-medium',
         warning &&
-          'border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200',
+          'border-status-warning/30 bg-status-warning/10 text-status-warning',
         success &&
-          'border-emerald-200 bg-leaf-soft text-leaf dark:border-emerald-800  '
+          'border-status-success/30 bg-leaf-soft text-leaf  '
       )}
       variant={
         value === 'UNKNOWN' || value === 'FAILED' || value.endsWith('REVIEW')
@@ -206,16 +207,14 @@ export function EmptyState({
   children?: ReactNode
 }) {
   return (
-    <div className='flex min-h-56 flex-col items-center justify-center rounded-xl border border-dashed px-6 py-10 text-center'>
-      <div className='bg-muted mb-4 rounded-full p-3'>
-        <Inbox className='text-muted-foreground size-6' aria-hidden='true' />
-      </div>
-      <h3 className='font-semibold'>{title}</h3>
-      <p className='text-muted-foreground mt-2 max-w-md text-sm'>
-        {description}
-      </p>
-      {children && <div className='mt-5'>{children}</div>}
-    </div>
+    <DataPanel>
+      <SharedEmptyState
+        title={title}
+        description={description}
+        action={children}
+        className='min-h-56'
+      />
+    </DataPanel>
   )
 }
 

@@ -4,7 +4,6 @@ import { useEffect } from 'react'
 import { z } from 'zod'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Trash2 } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -23,29 +22,40 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
-import type { ModifierGroup } from '../api/modifier-groups.types'
+import { Textarea } from '@/components/ui/textarea'
+import { Plus, Trash2 } from '@/components/icons'
 import {
   useCreateModifierGroupMutation,
   useUpdateModifierGroupMutation,
 } from '../api/modifier-groups.queries'
+import type { ModifierGroup } from '../api/modifier-groups.types'
 
 const modifierSchema = z.object({
-  name: z.string().min(1, 'Modifier name is required.'),
+  id: z.string().uuid().optional(),
+  name: z.string().trim().min(1, 'Modifier name is required.').max(50),
   priceAdjustment: z.coerce.number().min(0, 'Price must be 0 or greater.'),
   sortOrder: z.coerce.number().int().min(0),
 })
 
-const formSchema = z.object({
-  name: z.string().min(1, 'Name is required.'),
-  description: z.string().optional(),
-  isRequired: z.boolean(),
-  minSelection: z.coerce.number().int().min(0),
-  maxSelection: z.coerce.number().int().min(0),
-  isActive: z.boolean(),
-  modifiers: z.array(modifierSchema),
-})
+const formSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(2, 'Name must be at least 2 characters.')
+      .max(50),
+    description: z.string().optional(),
+    isRequired: z.boolean(),
+    minSelection: z.coerce.number().int().min(0),
+    maxSelection: z.coerce.number().int().min(1),
+    isActive: z.boolean(),
+    modifiers: z.array(modifierSchema),
+  })
+  .refine((values) => values.minSelection <= values.maxSelection, {
+    message: 'Maximum selections must be at least the minimum.',
+    path: ['maxSelection'],
+  })
 
 type ModifierGroupForm = z.infer<typeof formSchema>
 
@@ -78,6 +88,7 @@ export function ModifierGroupsActionDialog({
           isActive: currentRow.isActive,
           modifiers:
             currentRow.modifiers?.map((m) => ({
+              id: m.id,
               name: m.name,
               priceAdjustment: Number(m.priceAdjustment),
               sortOrder: m.sortOrder,
@@ -112,6 +123,7 @@ export function ModifierGroupsActionDialog({
               isActive: currentRow.isActive,
               modifiers:
                 currentRow.modifiers?.map((m) => ({
+                  id: m.id,
                   name: m.name,
                   priceAdjustment: Number(m.priceAdjustment),
                   sortOrder: m.sortOrder,
@@ -137,13 +149,12 @@ export function ModifierGroupsActionDialog({
           id: currentRow.id,
           data: {
             name: values.name,
-            description: values.description || undefined,
+            description: values.description,
             isRequired: values.isRequired,
             minSelection: values.minSelection,
             maxSelection: values.maxSelection,
             isActive: values.isActive,
-            modifiers:
-              values.modifiers.length > 0 ? values.modifiers : undefined,
+            modifiers: values.modifiers,
           },
         })
       } else {
@@ -153,8 +164,7 @@ export function ModifierGroupsActionDialog({
           isRequired: values.isRequired,
           minSelection: values.minSelection,
           maxSelection: values.maxSelection,
-          modifiers:
-            values.modifiers.length > 0 ? values.modifiers : undefined,
+          modifiers: values.modifiers.length > 0 ? values.modifiers : undefined,
         })
       }
       form.reset()
@@ -372,6 +382,7 @@ export function ModifierGroupsActionDialog({
                     type='button'
                     variant='ghost'
                     size='icon'
+                    aria-label={`Remove modifier ${index + 1}`}
                     className='mt-1 shrink-0 text-red-500'
                     onClick={() => remove(index)}
                   >
@@ -383,11 +394,7 @@ export function ModifierGroupsActionDialog({
           </form>
         </Form>
         <DialogFooter>
-          <Button
-            type='submit'
-            form='modifier-group-form'
-            disabled={isLoading}
-          >
+          <Button type='submit' form='modifier-group-form' disabled={isLoading}>
             {isLoading ? 'Saving...' : 'Save changes'}
           </Button>
         </DialogFooter>

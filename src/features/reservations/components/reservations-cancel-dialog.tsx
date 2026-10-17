@@ -51,8 +51,8 @@ export function ReservationsCancelDialog({
         <div className='space-y-4'>
           <p>
             Are you sure you want to cancel reservation{' '}
-            <span className='font-bold'>{currentRow.transactionNo}</span> for{' '}
-            <span className='font-bold'>{currentRow.customerName}</span>?
+            <span className='font-semibold'>{currentRow.transactionNo}</span> for{' '}
+            <span className='font-semibold'>{currentRow.customerName}</span>?
           </p>
           <Alert variant='destructive'>
             <AlertTitle>Warning!</AlertTitle>

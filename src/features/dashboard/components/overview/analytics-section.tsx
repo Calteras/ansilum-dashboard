@@ -1,102 +1,112 @@
-/** Live analytics for Full; a clear upgrade panel for other plans. */
+/** Live analytics for Full; a quiet upgrade notice for other plans. */
 import { format } from 'date-fns'
 import { Link } from '@tanstack/react-router'
-import { Lock } from '@/components/icons'
-import type { DateRange } from 'react-day-picker'
 import { useTranslation } from 'react-i18next'
+import type { DateSpan } from '@/lib/date-range'
+import { useCopy } from '@/hooks/use-copy'
 import { Button } from '@/components/ui/button'
+import { DataPanel, SectionHeader } from '@/components/data-display/data-panel'
+import { Lock } from '@/components/icons'
 import { useAnalyticsSummaryQuery } from '@/features/analytics/api/analytics.queries'
-import type {
-  AnalyticsSummaryKpis,
-  AnalyticsTopProduct,
-  AnalyticsPeakHour,
-} from '@/features/analytics/api/analytics.types'
 import { AnalyticsKpiStrip } from '@/features/analytics/components/analytics-kpi-strip'
 import { AnalyticsPeakHours } from '@/features/analytics/components/analytics-peak-hours'
 import { AnalyticsTopProducts } from '@/features/analytics/components/analytics-top-products'
 import { useCurrentSubscriptionQuery } from '@/features/settings/subscription/subscription.queries'
 
-// ─── Shared content layout ────────────────────────────────────────────────────
-
-interface ContentProps {
-  kpis: AnalyticsSummaryKpis | null
-  products: AnalyticsTopProduct[]
-  peakHours: AnalyticsPeakHour[]
-  isLoading: boolean
-}
-
-function AnalyticsContent({
-  kpis,
-  products,
-  peakHours,
-  isLoading,
-}: ContentProps) {
-  return (
-    <div className='flex flex-col gap-4 sm:gap-6'>
-      <AnalyticsKpiStrip kpis={kpis} isLoading={isLoading} />
-
-      <div className='flex flex-col gap-4 sm:gap-6 xl:flex-row'>
-        <AnalyticsTopProducts products={products} isLoading={isLoading} />
-        <AnalyticsPeakHours peakHours={peakHours} isLoading={isLoading} />
-      </div>
-
-    </div>
-  )
-}
-
-// ─── Main export ──────────────────────────────────────────────────────────────
-
 interface AnalyticsDashboardSectionProps {
-  dateRange: DateRange
+  span: DateSpan
   outletId: string
 }
 
 export function AnalyticsDashboardSection({
-  dateRange,
+  span,
   outletId,
 }: AnalyticsDashboardSectionProps) {
   const { t } = useTranslation()
+  const copy = useCopy()
   const { data: subData } = useCurrentSubscriptionQuery()
-  const tier = subData?.data?.tier ?? 'BASIC'
-  const isFullTier = tier === 'FULL'
-
-  const analyticsParams = {
-    startDate: dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : '',
-    endDate: dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : '',
-    outletId: outletId || undefined,
-  }
+  const isFullTier = (subData?.data?.tier ?? 'BASIC') === 'FULL'
 
   const { data: analyticsData, isLoading } = useAnalyticsSummaryQuery({
-    ...analyticsParams,
-    // Only fetch when FULL tier and dates are present
-    startDate: isFullTier ? analyticsParams.startDate : '',
-    endDate: isFullTier ? analyticsParams.endDate : '',
+    // Only fetch on the Full plan
+    startDate: isFullTier ? format(span.from, 'yyyy-MM-dd') : '',
+    endDate: isFullTier ? format(span.to, 'yyyy-MM-dd') : '',
+    outletId: outletId || undefined,
   })
-
   const summary = analyticsData?.data ?? null
 
-  // ── FULL tier: live data ──────────────────────────────────────────────────
-  if (isFullTier) {
+  const header = (
+    <SectionHeader
+      id='profit-customers-title'
+      title={copy('Laba & pelanggan', 'Profit & customers')}
+      description={copy(
+        'HPP, produk, dan aktivitas pelanggan pada periode yang dipilih',
+        'Cost of goods, products and customer activity for the selected period'
+      )}
+    />
+  )
+
+  if (!isFullTier) {
     return (
-      <AnalyticsContent
-        kpis={summary?.kpis ?? null}
-        products={summary?.topProducts ?? []}
-        peakHours={summary?.peakHours ?? []}
-        isLoading={isLoading}
-      />
+      <section
+        aria-labelledby='profit-customers-title'
+        className='flex flex-col gap-3'
+      >
+        {header}
+        <DataPanel className='bg-surface-subtle flex flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-5'>
+          <div className='flex min-w-0 items-start gap-3'>
+            <Lock
+              className='text-fg-muted mt-0.5 size-4 shrink-0'
+              aria-hidden
+            />
+            <p className='text-fg-secondary text-[13px] leading-5'>
+              {t('dashboard.analytics.lockDesc')}{' '}
+              <span className='text-foreground font-medium'>
+                {t('dashboard.analytics.lockPlan')}
+              </span>{' '}
+              {t('dashboard.analytics.lockDescFull')}
+            </p>
+          </div>
+          <Button
+            asChild
+            variant='outline'
+            size='sm'
+            className='h-8 px-3 text-[13px]'
+          >
+            <Link to='/settings/subscription'>
+              {t('dashboard.analytics.upgradeNow')}
+            </Link>
+          </Button>
+        </DataPanel>
+      </section>
     )
   }
 
   return (
-    <div className='flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-muted/40 p-6'>
-      <div className='flex items-start gap-3'>
-        <Lock className='text-muted-foreground mt-1 size-5 shrink-0' />
-        <div className='space-y-1'>
-          <h3 className='text-base font-bold'>{t('dashboard.analytics.lockTitle')}</h3>
-          <p className='text-muted-foreground max-w-xl text-sm'>{t('dashboard.analytics.lockDesc')} {t('dashboard.analytics.lockPlan')} {t('dashboard.analytics.lockDescFull')}</p>
+    <section
+      aria-labelledby='profit-customers-title'
+      className='flex flex-col gap-3'
+    >
+      {header}
+      <DataPanel className='overflow-hidden'>
+        <AnalyticsKpiStrip
+          kpis={summary?.kpis ?? null}
+          isLoading={isLoading}
+          showRevenue={false}
+          className='border-divider border-b'
+        />
+        <div className='grid xl:grid-cols-2'>
+          <AnalyticsTopProducts
+            products={summary?.topProducts ?? []}
+            isLoading={isLoading}
+          />
+          <AnalyticsPeakHours
+            peakHours={summary?.peakHours ?? []}
+            isLoading={isLoading}
+            className='border-divider border-t xl:border-t-0 xl:border-l'
+          />
         </div>
-      </div>
-      <Button asChild variant='outline'><Link to='/settings/subscription'>{t('dashboard.analytics.upgradeNow')}</Link></Button>
-    </div>
+      </DataPanel>
+    </section>
   )
 }

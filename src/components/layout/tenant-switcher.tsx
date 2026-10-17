@@ -4,11 +4,11 @@ import { useCopy } from '@/hooks/use-copy'
 import * as React from 'react'
 import { Link } from '@tanstack/react-router'
 import {
-  ChevronsUpDown,
-  Plus,
-  Building2,
-  Loader2,
   ArrowUpCircle,
+  Check,
+  ChevronsUpDown,
+  Loader2,
+  Plus,
 } from '@/components/icons'
 import {
   DropdownMenu,
@@ -31,6 +31,12 @@ import {
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { useCurrentSubscriptionQuery } from '@/features/settings/subscription/subscription.queries'
 import { TenantCreateDialog } from '@/features/tenants/components/tenant-create-dialog'
+
+function initials(name?: string) {
+  if (!name) return '?'
+  const parts = name.trim().split(/\s+/)
+  return (parts[0][0] + (parts[1]?.[0] ?? '')).toUpperCase()
+}
 
 export function TenantSwitcher() {
   const copy = useCopy()
@@ -57,14 +63,11 @@ export function TenantSwitcher() {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton size='lg' disabled>
-            <div className='bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg'>
-              <Loader2 className='size-4 animate-spin' />
+          <SidebarMenuButton disabled className='h-9 group-data-[collapsible=icon]:p-1!'>
+            <div className='bg-surface-selected flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-md'>
+              <Loader2 className='size-3.5 animate-spin' />
             </div>
-            <div className='grid flex-1 text-start text-sm leading-tight'>
-              <span className='truncate font-semibold'>{copy('Memuat…', 'Loading...')}</span>
-              <span className='truncate text-xs'>{copy('Menyiapkan usaha Anda', 'Fetching tenants')}</span>
-            </div>
+            <span className='truncate text-[13px] font-medium'>{copy('Memuat…', 'Loading…')}</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
@@ -77,16 +80,16 @@ export function TenantSwitcher() {
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton
-            size='lg'
             onClick={() => setCreateDialogOpen(true)}
+            tooltip={copy('Tambah usaha', 'Create a business')}
+            className='h-9 group-data-[collapsible=icon]:p-1!'
           >
-            <div className='bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg'>
-              <Plus className='size-4' />
+            <div className='bg-surface-selected flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-md'>
+              <Plus className='size-3.5' />
             </div>
-            <div className='grid flex-1 text-start text-sm leading-tight'>
-              <span className='truncate font-semibold'>{copy('Tambahkan usaha Anda', 'No Tenant')}</span>
-              <span className='truncate text-xs'>{copy('Mulai dari sini', 'Click to create one')}</span>
-            </div>
+            <span className='truncate text-[13px] font-medium'>
+              {copy('Tambah usaha', 'Create a business')}
+            </span>
           </SidebarMenuButton>
         </SidebarMenuItem>
         <TenantCreateDialog
@@ -104,28 +107,24 @@ export function TenantSwitcher() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton
-                size='lg'
-                className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
+                tooltip={activeTenant?.name ?? copy('Pilih usaha', 'Select business')}
+                aria-label={copy('Ganti usaha', 'Switch business')}
+                className='data-[state=open]:bg-surface-selected h-9 group-data-[collapsible=icon]:p-1!'
                 disabled={isLoading}
               >
-                <div className='bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg'>
+                <div className='bg-surface-selected text-foreground flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-md text-[11px] font-semibold'>
                   {isLoading ? (
-                    <Loader2 className='size-4 animate-spin' />
+                    <Loader2 className='size-3.5 animate-spin' />
                   ) : activeTenant?.logo ? (
                     <img src={activeTenant.logo} alt='' className='size-full object-cover' />
                   ) : (
-                    <Building2 className='size-4' />
+                    initials(activeTenant?.name)
                   )}
                 </div>
-                <div className='grid flex-1 text-start text-sm leading-tight'>
-                  <span className='truncate font-semibold'>
-                    {activeTenant?.name ?? copy('Pilih usaha', 'Select business')}
-                  </span>
-                  <span className='truncate text-xs'>
-                    {activeTenant?.slug ?? copy('Belum ada usaha dipilih', 'No business selected')}
-                  </span>
-                </div>
-                <ChevronsUpDown className='ms-auto' />
+                <span className='truncate text-[13px] font-semibold'>
+                  {activeTenant?.name ?? copy('Pilih usaha', 'Select business')}
+                </span>
+                <ChevronsUpDown className='text-fg-muted ms-auto size-3.5!' />
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -134,8 +133,8 @@ export function TenantSwitcher() {
               side={isMobile ? 'bottom' : 'right'}
               sideOffset={4}
             >
-              <DropdownMenuLabel className='text-muted-foreground text-xs'>
-                {copy('Usaha Anda', 'Tenants')}
+              <DropdownMenuLabel>
+                {copy('Usaha Anda', 'Businesses')}
               </DropdownMenuLabel>
               {tenants.map((membership) => (
                 <DropdownMenuItem
@@ -144,11 +143,11 @@ export function TenantSwitcher() {
                   className='gap-2 p-2'
                   disabled={isLoading}
                 >
-                  <div className='flex size-6 items-center justify-center overflow-hidden rounded-sm border'>
+                  <div className='bg-surface-selected flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-md text-[11px] font-semibold'>
                     {membership.tenant.logo ? (
                       <img src={membership.tenant.logo} alt='' className='size-full object-cover' />
                     ) : (
-                      <Building2 className='size-4 shrink-0' />
+                      initials(membership.tenant.name)
                     )}
                   </div>
                   <div className='flex flex-1 flex-col'>
@@ -158,7 +157,7 @@ export function TenantSwitcher() {
                     </span>
                   </div>
                   {membership.tenant.id === activeTenant?.id && (
-                    <span className='text-primary text-xs'>{copy('Aktif', 'Active')}</span>
+                    <Check className='size-4' aria-label={copy('Aktif', 'Active')} />
                   )}
                 </DropdownMenuItem>
               ))}
@@ -173,7 +172,7 @@ export function TenantSwitcher() {
                       <span className='text-muted-foreground text-xs'>
                         {copy('Batas usaha tercapai', 'Business limit reached')} ({tenantCount}/{limit})
                       </span>
-                      <span className='font-medium'>{copy('Lihat paket', 'Upgrade Plan')}</span>
+                      <span className='font-medium'>{copy('Lihat paket', 'Upgrade plan')}</span>
                     </div>
                   </Link>
                 </DropdownMenuItem>
@@ -186,7 +185,7 @@ export function TenantSwitcher() {
                     <Plus className='size-4' />
                   </div>
                   <div className='text-muted-foreground font-medium'>
-                    {copy('Tambah usaha', 'Create Tenant')}
+                    {copy('Tambah usaha', 'Create a business')}
                   </div>
                 </DropdownMenuItem>
               )}

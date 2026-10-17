@@ -191,7 +191,7 @@ export function Onboarding() {
           </div>
 
           <div className='mb-6'>
-            <p className='text-sidebar-foreground/60 font-sans text-xs tracking-widest uppercase tabular-nums'>
+            <p className='text-sidebar-foreground/60 font-sans text-xs tabular-nums'>
               <UiText id='Siapkan usaha Anda' en='Workspace setup' />
             </p>
             <p className='text-sidebar-foreground/75 mt-2 text-sm leading-relaxed'>
@@ -280,11 +280,11 @@ export function Onboarding() {
           </div>
 
           <div className='animate-in fade-in-50 fill-mode-both space-y-3 duration-500'>
-            <p className='text-primary font-sans text-xs tracking-widest uppercase tabular-nums'>
+            <p className='text-fg-muted font-sans text-xs tabular-nums'>
               <UiText id='Langkah' en='Step' />
               {currentIndex + 1} of {STEPS.length}
             </p>
-            <h1 className='text-foreground text-[32px] font-bold tracking-[-0.03em]'>
+            <h1 className='text-foreground text-2xl font-semibold tracking-[-0.02em]'>
               {getStepTitle()}
             </h1>
             <p className='text-muted-foreground max-w-lg leading-relaxed'>

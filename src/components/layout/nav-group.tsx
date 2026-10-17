@@ -1,13 +1,18 @@
-import { type ReactNode } from 'react'
+import { useState } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
-import { ChevronRight, Lock } from '@/components/icons'
-import { useCurrentSubscriptionQuery } from '@/features/settings/subscription/subscription.queries'
-import { hasRouteAccess } from '@/lib/subscription-access'
+import { cn } from '@/lib/utils'
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -19,176 +24,200 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from '@/components/ui/sidebar'
-import { Badge } from '../ui/badge'
+import { ChevronRight, Lock } from '@/components/icons'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
-import {
-  type NavCollapsible,
-  type NavItem,
-  type NavLink,
-  type NavGroup as NavGroupProps,
-} from './types'
+  isPathActive,
+  type ResolvedNavGroup,
+  type ResolvedNavItem,
+  type ResolvedNavLink,
+} from './data/use-navigation'
 
-export function NavGroup({ title, items }: NavGroupProps) {
-  const { state, isMobile } = useSidebar()
-  const href = useLocation({ select: (location) => location.href })
+export function NavGroup({ group }: { group: ResolvedNavGroup }) {
+  const pathname = useLocation({ select: (location) => location.pathname })
+
   return (
     <SidebarGroup className='p-0'>
-      <SidebarGroupLabel className='text-muted-foreground px-3 text-xs font-semibold'>
-        {title}
-      </SidebarGroupLabel>
-      <SidebarMenu>
-        {items.map((item) => {
-          const key = `${item.title}-${item.url}`
-
-          if (!item.items)
-            return <SidebarMenuLink key={key} item={item} href={href} />
-
-          if (state === 'collapsed' && !isMobile)
-            return (
-              <SidebarMenuCollapsedDropdown key={key} item={item} href={href} />
-            )
-
-          return <SidebarMenuCollapsible key={key} item={item} href={href} />
-        })}
+      {group.title && (
+        <SidebarGroupLabel className='text-fg-muted h-7 px-2 text-xs font-medium'>
+          {group.title}
+        </SidebarGroupLabel>
+      )}
+      <SidebarMenu className='gap-px'>
+        {group.items.map((item) =>
+          item.items ? (
+            <NavCollapsibleItem
+              key={item.title}
+              item={item}
+              pathname={pathname}
+            />
+          ) : (
+            <NavLinkItem key={item.url} item={item} pathname={pathname} />
+          )
+        )}
       </SidebarMenu>
     </SidebarGroup>
   )
 }
 
-function NavBadge({ children }: { children: ReactNode }) {
-  return <Badge className='rounded-md px-1 py-0 text-xs'>{children}</Badge>
+function LockMark() {
+  return (
+    <Lock
+      className='text-fg-muted ms-auto size-3.5'
+      aria-label='Requires a plan upgrade'
+    />
+  )
 }
 
-function SidebarMenuLink({ item, href }: { item: NavLink; href: string }) {
+export function NavLinkItem({
+  item,
+  pathname,
+}: {
+  item: ResolvedNavLink
+  pathname: string
+}) {
   const { setOpenMobile } = useSidebar()
-  const { data } = useCurrentSubscriptionQuery()
-  const currentTier = data?.data?.tier ?? 'BASIC'
-  const isLocked =
-    !!item.requiredTier && !hasRouteAccess(currentTier, item.url as string)
+  const active = isPathActive(pathname, item.url)
 
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton
-        asChild
-        isActive={checkIsActive(href, item)}
-        tooltip={item.title}
-        className={`h-11 ${isLocked ? 'opacity-60' : ''}`}
-      >
-        <Link aria-current={checkIsActive(href, item) ? 'page' : undefined} to={item.url} onClick={() => setOpenMobile(false)}>
-          {item.icon && <item.icon className='size-4 sm:size-5' />}
-          <span className='text-sm'>{item.title}</span>
-          {isLocked && (
-            <Lock className='ml-auto size-3.5 text-muted-foreground' />
-          )}
-          {item.badge && !isLocked && <NavBadge>{item.badge}</NavBadge>}
+      <SidebarMenuButton asChild isActive={active} tooltip={item.title}>
+        <Link
+          to={item.url}
+          aria-current={active ? 'page' : undefined}
+          onClick={() => setOpenMobile(false)}
+          className={cn(item.locked && 'opacity-70')}
+        >
+          {item.icon && <item.icon />}
+          <span>{item.title}</span>
+          {item.locked && <LockMark />}
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
   )
 }
 
-function SidebarMenuCollapsible({
+const OPEN_STATE_KEY = 'ansilum.sidebar.open-groups'
+
+function readOpenState(): Record<string, boolean> {
+  try {
+    return JSON.parse(localStorage.getItem(OPEN_STATE_KEY) ?? '{}')
+  } catch {
+    return {}
+  }
+}
+
+function writeOpenState(id: string, open: boolean) {
+  try {
+    localStorage.setItem(
+      OPEN_STATE_KEY,
+      JSON.stringify({ ...readOpenState(), [id]: open })
+    )
+  } catch {
+    // Storage unavailable (private mode): the group simply won't remember.
+  }
+}
+
+function NavCollapsibleItem({
   item,
-  href,
+  pathname,
 }: {
-  item: NavCollapsible
-  href: string
+  item: Extract<ResolvedNavItem, { items: ResolvedNavLink[] }>
+  pathname: string
 }) {
-  const { setOpenMobile } = useSidebar()
+  const { state, isMobile, setOpenMobile } = useSidebar()
+  const id = item.items[0]?.url ?? item.title
+  const childActive = item.items.some((sub) => isPathActive(pathname, sub.url))
+  const [remembered, setRemembered] = useState(
+    () => readOpenState()[id] ?? false
+  )
+  // A group holding the current page stays open unless closed on that page.
+  const [closedOn, setClosedOn] = useState<string | null>(null)
+  const open = childActive ? closedOn !== pathname : remembered
+
+  const handleOpenChange = (next: boolean) => {
+    if (childActive) setClosedOn(next ? null : pathname)
+    setRemembered(next)
+    writeOpenState(id, next)
+  }
+
+  if (state === 'collapsed' && !isMobile) {
+    return (
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton tooltip={item.title} isActive={childActive}>
+              {item.icon && <item.icon />}
+              <span>{item.title}</span>
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            side='right'
+            align='start'
+            sideOffset={8}
+            className='min-w-48'
+          >
+            <DropdownMenuLabel>{item.title}</DropdownMenuLabel>
+            {item.items.map((sub) => (
+              <DropdownMenuItem key={sub.url} asChild>
+                <Link
+                  to={sub.url}
+                  aria-current={
+                    isPathActive(pathname, sub.url) ? 'page' : undefined
+                  }
+                  className={cn(
+                    isPathActive(pathname, sub.url) &&
+                      'bg-surface-selected font-medium'
+                  )}
+                >
+                  <span>{sub.title}</span>
+                  {sub.locked && <LockMark />}
+                </Link>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    )
+  }
+
   return (
-    <Collapsible asChild defaultOpen={true} className='group/collapsible'>
+    <Collapsible
+      asChild
+      open={open}
+      onOpenChange={handleOpenChange}
+      className='group/collapsible'
+    >
       <SidebarMenuItem>
         <CollapsibleTrigger asChild>
-          <SidebarMenuButton tooltip={item.title} className='h-11'>
+          <SidebarMenuButton tooltip={item.title}>
             {item.icon && <item.icon />}
             <span>{item.title}</span>
-            {item.badge && <NavBadge>{item.badge}</NavBadge>}
-            <ChevronRight className='ms-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 rtl:rotate-180' />
+            <ChevronRight className='text-fg-muted ms-auto size-3.5! transition-transform duration-150 group-data-[state=open]/collapsible:rotate-90 rtl:rotate-180' />
           </SidebarMenuButton>
         </CollapsibleTrigger>
         <CollapsibleContent className='CollapsibleContent'>
-          <SidebarMenuSub>
-            {item.items.map((subItem) => (
-              <SidebarMenuSubItem key={subItem.title}>
-                <SidebarMenuSubButton
-                  asChild
-                  isActive={checkIsActive(href, subItem)}
-                >
-                  <Link to={subItem.url} onClick={() => setOpenMobile(false)}>
-                    {subItem.icon && <subItem.icon />}
-                    <span>{subItem.title}</span>
-                    {subItem.badge && <NavBadge>{subItem.badge}</NavBadge>}
-                  </Link>
-                </SidebarMenuSubButton>
-              </SidebarMenuSubItem>
-            ))}
+          <SidebarMenuSub className='me-0 gap-px py-1 pe-0'>
+            {item.items.map((sub) => {
+              const active = isPathActive(pathname, sub.url)
+              return (
+                <SidebarMenuSubItem key={sub.url}>
+                  <SidebarMenuSubButton asChild isActive={active}>
+                    <Link
+                      to={sub.url}
+                      aria-current={active ? 'page' : undefined}
+                      onClick={() => setOpenMobile(false)}
+                      className={cn(sub.locked && 'opacity-70')}
+                    >
+                      <span>{sub.title}</span>
+                      {sub.locked && <LockMark />}
+                    </Link>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              )
+            })}
           </SidebarMenuSub>
         </CollapsibleContent>
       </SidebarMenuItem>
     </Collapsible>
-  )
-}
-
-function SidebarMenuCollapsedDropdown({
-  item,
-  href,
-}: {
-  item: NavCollapsible
-  href: string
-}) {
-  return (
-    <SidebarMenuItem>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <SidebarMenuButton
-            tooltip={item.title}
-            isActive={checkIsActive(href, item)}
-          >
-            {item.icon && <item.icon />}
-            <span>{item.title}</span>
-            {item.badge && <NavBadge>{item.badge}</NavBadge>}
-            <ChevronRight className='ms-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-          </SidebarMenuButton>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side='right' align='start' sideOffset={4}>
-          <DropdownMenuLabel>
-            {item.title} {item.badge ? `(${item.badge})` : ''}
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {item.items.map((sub) => (
-            <DropdownMenuItem key={`${sub.title}-${sub.url}`} asChild>
-              <Link
-                to={sub.url}
-                className={`${checkIsActive(href, sub) ? 'bg-secondary' : ''}`}
-              >
-                {sub.icon && <sub.icon />}
-                <span className='max-w-52 text-wrap'>{sub.title}</span>
-                {sub.badge && (
-                  <span className='ms-auto text-xs'>{sub.badge}</span>
-                )}
-              </Link>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </SidebarMenuItem>
-  )
-}
-
-function checkIsActive(href: string, item: NavItem, mainNav = false) {
-  return (
-    href === item.url || // /endpint?search=param
-    href.split('?')[0] === item.url || // endpoint
-    !!item?.items?.filter((i) => i.url === href).length || // if child nav is active
-    (mainNav &&
-      href.split('/')[1] !== '' &&
-      href.split('/')[1] === item?.url?.split('/')[1])
   )
 }
