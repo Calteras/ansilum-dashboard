@@ -1,0 +1,256 @@
+/*
+ * Online store motifs and motion. Imported by the storefront pages only.
+ *
+ * Motion answers something: the first paint of a page, what the customer just
+ * did, or a change of the order's state. Every animation lives inside
+ * prefers-reduced-motion: no-preference, so reduced motion gets the end state.
+ */
+
+.sf {
+  --sf-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --sf-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sf-accent-soft: color-mix(
+    in srgb,
+    var(--store-accent) 12%,
+    var(--background)
+  );
+  --sf-accent-line: color-mix(
+    in srgb,
+    var(--store-accent) 45%,
+    var(--background)
+  );
+}
+
+/* A shopfront awning: stripes in the merchant's colour with a scalloped edge. */
+.sf-awning {
+  height: 26px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--store-accent) 0 20px,
+    color-mix(in srgb, var(--store-accent) 22%, var(--background)) 20px 40px
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) top / 100% 16px no-repeat,
+    radial-gradient(circle 10px at 50% 0, #000 97%, transparent 100%) 0 16px /
+      20px 10px repeat-x;
+  mask:
+    linear-gradient(#000 0 0) top / 100% 16px no-repeat,
+    radial-gradient(circle 10px at 50% 0, #000 97%, transparent 100%) 0 16px /
+      20px 10px repeat-x;
+}
+
+.sf-awning-thin {
+  height: 14px;
+  -webkit-mask:
+    linear-gradient(#000 0 0) top / 100% 6px no-repeat,
+    radial-gradient(circle 8px at 50% 0, #000 97%, transparent 100%) 0 6px /
+      20px 8px repeat-x;
+  mask:
+    linear-gradient(#000 0 0) top / 100% 6px no-repeat,
+    radial-gradient(circle 8px at 50% 0, #000 97%, transparent 100%) 0 6px /
+      20px 8px repeat-x;
+}
+
+/* The order ticket: a perforated tear line with notches cut out of both edges. */
+.sf-ticket {
+  position: relative;
+}
+.sf-tear {
+  position: relative;
+  border-top: 2px dashed var(--border);
+  margin: 0 18px;
+}
+.sf-tear::before,
+.sf-tear::after {
+  content: '';
+  position: absolute;
+  top: -15px;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background: var(--background);
+  border: 1px solid var(--border);
+}
+.sf-tear::before {
+  left: -34px;
+  clip-path: inset(0 0 0 50%);
+}
+.sf-tear::after {
+  right: -34px;
+  clip-path: inset(0 50% 0 0);
+}
+
+/* The paid stamp, drawn as a rubber stamp would be. */
+.sf-stamp {
+  transform: rotate(-12deg);
+  border: 3px solid currentColor;
+  border-radius: 10px;
+  box-shadow:
+    inset 0 0 0 2px var(--background),
+    inset 0 0 0 4px currentColor;
+}
+
+/* Options: the whole row is the control; the native input stays for a11y. */
+.sf-option:has(input:focus-visible) {
+  outline: 3px solid
+    color-mix(in srgb, var(--store-accent-text) 45%, transparent);
+  outline-offset: 2px;
+}
+.sf-option:has(input:checked) {
+  border-color: var(--store-accent-text);
+  background: var(--sf-accent-soft);
+}
+.sf-option:has(input:checked) .sf-indicator {
+  border-color: var(--store-accent);
+  background: var(--store-accent);
+  color: var(--store-on-accent);
+}
+.sf-indicator svg {
+  opacity: 0;
+  transform: scale(0.4);
+}
+.sf-option:has(input:checked) .sf-indicator svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sf-rise {
+    animation: sf-rise 520ms var(--sf-ease) both;
+  }
+  .sf-fade {
+    animation: sf-fade 360ms var(--sf-ease) both;
+  }
+  .sf-pop {
+    animation: sf-pop 420ms var(--sf-spring) both;
+  }
+  .sf-bump {
+    animation: sf-bump 420ms var(--sf-spring);
+  }
+  .sf-shake {
+    animation: sf-shake 420ms var(--sf-ease);
+  }
+  .sf-slide-up {
+    animation: sf-slide-up 460ms var(--sf-spring) both;
+  }
+  .sf-toast {
+    animation: sf-toast 1800ms var(--sf-ease) both;
+  }
+  .sf-stamp-in {
+    animation: sf-stamp 620ms var(--sf-spring) both;
+  }
+  .sf-live::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 9999px;
+    border: 2px solid currentColor;
+    animation: sf-ping 1.8s var(--sf-ease) infinite;
+  }
+  .sf-indicator svg,
+  .sf-indicator {
+    transition:
+      transform 220ms var(--sf-spring),
+      opacity 160ms var(--sf-ease),
+      background-color 160ms var(--sf-ease),
+      border-color 160ms var(--sf-ease);
+  }
+  .sf-option {
+    transition:
+      background-color 160ms var(--sf-ease),
+      border-color 160ms var(--sf-ease);
+  }
+  .sf-tab-indicator {
+    transition:
+      transform 320ms var(--sf-ease),
+      width 320ms var(--sf-ease);
+  }
+  .sf-header {
+    transition: box-shadow 200ms var(--sf-ease);
+  }
+  .sf-press {
+    transition: transform 140ms var(--sf-ease);
+  }
+  .sf-press:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  .sf-progress {
+    transition: width 600ms var(--sf-ease);
+  }
+}
+
+@keyframes sf-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+@keyframes sf-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes sf-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+}
+@keyframes sf-bump {
+  30% {
+    transform: scale(1.08);
+  }
+}
+@keyframes sf-shake {
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+@keyframes sf-slide-up {
+  from {
+    transform: translateY(140%);
+  }
+}
+@keyframes sf-toast {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  14%,
+  80% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+@keyframes sf-stamp {
+  from {
+    opacity: 0;
+    transform: scale(1.9) rotate(-20deg);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(0.94) rotate(-12deg);
+  }
+  to {
+    transform: scale(1) rotate(-12deg);
+  }
+}
+@keyframes sf-ping {
+  from {
+    opacity: 0.5;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}

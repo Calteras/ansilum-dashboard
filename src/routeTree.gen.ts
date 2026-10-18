@@ -14,6 +14,7 @@ import { Route as ClerkRouteRouteImport } from './routes/clerk/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as PricingIndexRouteImport } from './routes/pricing/index'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as OCodeRouteImport } from './routes/o/$code'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors404RouteImport } from './routes/(errors)/404'
@@ -28,6 +29,7 @@ import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-p
 import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_authenticated/route'
 import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
+import { Route as StoreSlugIndexRouteImport } from './routes/store/$slug/index'
 import { Route as AuthenticatedTransactionsIndexRouteImport } from './routes/_authenticated/transactions/index'
 import { Route as AuthenticatedTablesIndexRouteImport } from './routes/_authenticated/tables/index'
 import { Route as AuthenticatedStockMovementsIndexRouteImport } from './routes/_authenticated/stock-movements/index'
@@ -46,11 +48,13 @@ import { Route as AuthenticatedCogsIndexRouteImport } from './routes/_authentica
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedCategoriesIndexRouteImport } from './routes/_authenticated/categories/index'
 import { Route as AuthenticatedAnalyticsIndexRouteImport } from './routes/_authenticated/analytics/index'
+import { Route as StoreSlugOutletIdRouteImport } from './routes/store/$slug/$outletId'
 import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/clerk/_authenticated/user-management'
 import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-up'
 import { Route as ClerkauthSignInRouteImport } from './routes/clerk/(auth)/sign-in'
 import { Route as AuthenticatedSettingsSubscriptionRouteImport } from './routes/_authenticated/settings/subscription'
 import { Route as AuthenticatedSettingsReceiptRouteImport } from './routes/_authenticated/settings/receipt'
+import { Route as AuthenticatedSettingsOnlineStoreRouteImport } from './routes/_authenticated/settings/online-store'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsBusinessRouteImport } from './routes/_authenticated/settings/business'
@@ -83,6 +87,11 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const OCodeRoute = OCodeRouteImport.update({
+  id: '/o/$code',
+  path: '/o/$code',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const errors503Route = errors503RouteImport.update({
   id: '/(errors)/503',
@@ -153,6 +162,11 @@ const AuthenticatedSettingsRouteRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const StoreSlugIndexRoute = StoreSlugIndexRouteImport.update({
+  id: '/store/$slug/',
+  path: '/store/$slug/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedTransactionsIndexRoute =
   AuthenticatedTransactionsIndexRouteImport.update({
     id: '/transactions/',
@@ -258,6 +272,11 @@ const AuthenticatedAnalyticsIndexRoute =
     path: '/analytics/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const StoreSlugOutletIdRoute = StoreSlugOutletIdRouteImport.update({
+  id: '/store/$slug/$outletId',
+  path: '/store/$slug/$outletId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ClerkAuthenticatedUserManagementRoute =
   ClerkAuthenticatedUserManagementRouteImport.update({
     id: '/user-management',
@@ -284,6 +303,12 @@ const AuthenticatedSettingsReceiptRoute =
   AuthenticatedSettingsReceiptRouteImport.update({
     id: '/receipt',
     path: '/receipt',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
+const AuthenticatedSettingsOnlineStoreRoute =
+  AuthenticatedSettingsOnlineStoreRouteImport.update({
+    id: '/online-store',
+    path: '/online-store',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
 const AuthenticatedSettingsNotificationsRoute =
@@ -348,6 +373,7 @@ export interface FileRoutesByFullPath {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
+  '/o/$code': typeof OCodeRoute
   '/': typeof AuthenticatedIndexRoute
   '/pricing': typeof PricingIndexRoute
   '/auth/check-email': typeof authAuthCheckEmailRoute
@@ -358,11 +384,13 @@ export interface FileRoutesByFullPath {
   '/settings/business': typeof AuthenticatedSettingsBusinessRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/settings/online-store': typeof AuthenticatedSettingsOnlineStoreRoute
   '/settings/receipt': typeof AuthenticatedSettingsReceiptRoute
   '/settings/subscription': typeof AuthenticatedSettingsSubscriptionRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
+  '/store/$slug/$outletId': typeof StoreSlugOutletIdRoute
   '/analytics': typeof AuthenticatedAnalyticsIndexRoute
   '/categories': typeof AuthenticatedCategoriesIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
@@ -381,6 +409,7 @@ export interface FileRoutesByFullPath {
   '/stock-movements': typeof AuthenticatedStockMovementsIndexRoute
   '/tables': typeof AuthenticatedTablesIndexRoute
   '/transactions': typeof AuthenticatedTransactionsIndexRoute
+  '/store/$slug': typeof StoreSlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
@@ -396,6 +425,7 @@ export interface FileRoutesByTo {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
+  '/o/$code': typeof OCodeRoute
   '/': typeof AuthenticatedIndexRoute
   '/pricing': typeof PricingIndexRoute
   '/auth/check-email': typeof authAuthCheckEmailRoute
@@ -406,11 +436,13 @@ export interface FileRoutesByTo {
   '/settings/business': typeof AuthenticatedSettingsBusinessRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/settings/online-store': typeof AuthenticatedSettingsOnlineStoreRoute
   '/settings/receipt': typeof AuthenticatedSettingsReceiptRoute
   '/settings/subscription': typeof AuthenticatedSettingsSubscriptionRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
+  '/store/$slug/$outletId': typeof StoreSlugOutletIdRoute
   '/analytics': typeof AuthenticatedAnalyticsIndexRoute
   '/categories': typeof AuthenticatedCategoriesIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
@@ -429,6 +461,7 @@ export interface FileRoutesByTo {
   '/stock-movements': typeof AuthenticatedStockMovementsIndexRoute
   '/tables': typeof AuthenticatedTablesIndexRoute
   '/transactions': typeof AuthenticatedTransactionsIndexRoute
+  '/store/$slug': typeof StoreSlugIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -449,6 +482,7 @@ export interface FileRoutesById {
   '/(errors)/404': typeof errors404Route
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
+  '/o/$code': typeof OCodeRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/pricing/': typeof PricingIndexRoute
   '/(auth)/auth/check-email': typeof authAuthCheckEmailRoute
@@ -459,11 +493,13 @@ export interface FileRoutesById {
   '/_authenticated/settings/business': typeof AuthenticatedSettingsBusinessRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/_authenticated/settings/online-store': typeof AuthenticatedSettingsOnlineStoreRoute
   '/_authenticated/settings/receipt': typeof AuthenticatedSettingsReceiptRoute
   '/_authenticated/settings/subscription': typeof AuthenticatedSettingsSubscriptionRoute
   '/clerk/(auth)/sign-in': typeof ClerkauthSignInRoute
   '/clerk/(auth)/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/_authenticated/user-management': typeof ClerkAuthenticatedUserManagementRoute
+  '/store/$slug/$outletId': typeof StoreSlugOutletIdRoute
   '/_authenticated/analytics/': typeof AuthenticatedAnalyticsIndexRoute
   '/_authenticated/categories/': typeof AuthenticatedCategoriesIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
@@ -482,6 +518,7 @@ export interface FileRoutesById {
   '/_authenticated/stock-movements/': typeof AuthenticatedStockMovementsIndexRoute
   '/_authenticated/tables/': typeof AuthenticatedTablesIndexRoute
   '/_authenticated/transactions/': typeof AuthenticatedTransactionsIndexRoute
+  '/store/$slug/': typeof StoreSlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -500,6 +537,7 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
+    | '/o/$code'
     | '/'
     | '/pricing'
     | '/auth/check-email'
@@ -510,11 +548,13 @@ export interface FileRouteTypes {
     | '/settings/business'
     | '/settings/display'
     | '/settings/notifications'
+    | '/settings/online-store'
     | '/settings/receipt'
     | '/settings/subscription'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
+    | '/store/$slug/$outletId'
     | '/analytics'
     | '/categories'
     | '/chats'
@@ -533,6 +573,7 @@ export interface FileRouteTypes {
     | '/stock-movements'
     | '/tables'
     | '/transactions'
+    | '/store/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/clerk'
@@ -548,6 +589,7 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
+    | '/o/$code'
     | '/'
     | '/pricing'
     | '/auth/check-email'
@@ -558,11 +600,13 @@ export interface FileRouteTypes {
     | '/settings/business'
     | '/settings/display'
     | '/settings/notifications'
+    | '/settings/online-store'
     | '/settings/receipt'
     | '/settings/subscription'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
+    | '/store/$slug/$outletId'
     | '/analytics'
     | '/categories'
     | '/chats'
@@ -581,6 +625,7 @@ export interface FileRouteTypes {
     | '/stock-movements'
     | '/tables'
     | '/transactions'
+    | '/store/$slug'
   id:
     | '__root__'
     | '/_authenticated'
@@ -600,6 +645,7 @@ export interface FileRouteTypes {
     | '/(errors)/404'
     | '/(errors)/500'
     | '/(errors)/503'
+    | '/o/$code'
     | '/_authenticated/'
     | '/pricing/'
     | '/(auth)/auth/check-email'
@@ -610,11 +656,13 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/business'
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
+    | '/_authenticated/settings/online-store'
     | '/_authenticated/settings/receipt'
     | '/_authenticated/settings/subscription'
     | '/clerk/(auth)/sign-in'
     | '/clerk/(auth)/sign-up'
     | '/clerk/_authenticated/user-management'
+    | '/store/$slug/$outletId'
     | '/_authenticated/analytics/'
     | '/_authenticated/categories/'
     | '/_authenticated/chats/'
@@ -633,6 +681,7 @@ export interface FileRouteTypes {
     | '/_authenticated/stock-movements/'
     | '/_authenticated/tables/'
     | '/_authenticated/transactions/'
+    | '/store/$slug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -650,9 +699,12 @@ export interface RootRouteChildren {
   errors404Route: typeof errors404Route
   errors500Route: typeof errors500Route
   errors503Route: typeof errors503Route
+  OCodeRoute: typeof OCodeRoute
   PricingIndexRoute: typeof PricingIndexRoute
   authAuthCheckEmailRoute: typeof authAuthCheckEmailRoute
   authAuthEmailVerifiedRoute: typeof authAuthEmailVerifiedRoute
+  StoreSlugOutletIdRoute: typeof StoreSlugOutletIdRoute
+  StoreSlugIndexRoute: typeof StoreSlugIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -691,6 +743,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/o/$code': {
+      id: '/o/$code'
+      path: '/o/$code'
+      fullPath: '/o/$code'
+      preLoaderRoute: typeof OCodeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/(errors)/503': {
       id: '/(errors)/503'
@@ -789,6 +848,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/store/$slug/': {
+      id: '/store/$slug/'
+      path: '/store/$slug'
+      fullPath: '/store/$slug'
+      preLoaderRoute: typeof StoreSlugIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/transactions/': {
       id: '/_authenticated/transactions/'
@@ -916,6 +982,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalyticsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/store/$slug/$outletId': {
+      id: '/store/$slug/$outletId'
+      path: '/store/$slug/$outletId'
+      fullPath: '/store/$slug/$outletId'
+      preLoaderRoute: typeof StoreSlugOutletIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/clerk/_authenticated/user-management': {
       id: '/clerk/_authenticated/user-management'
       path: '/user-management'
@@ -949,6 +1022,13 @@ declare module '@tanstack/react-router' {
       path: '/receipt'
       fullPath: '/settings/receipt'
       preLoaderRoute: typeof AuthenticatedSettingsReceiptRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
+    '/_authenticated/settings/online-store': {
+      id: '/_authenticated/settings/online-store'
+      path: '/online-store'
+      fullPath: '/settings/online-store'
+      preLoaderRoute: typeof AuthenticatedSettingsOnlineStoreRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
     '/_authenticated/settings/notifications': {
@@ -1016,6 +1096,7 @@ interface AuthenticatedSettingsRouteRouteChildren {
   AuthenticatedSettingsBusinessRoute: typeof AuthenticatedSettingsBusinessRoute
   AuthenticatedSettingsDisplayRoute: typeof AuthenticatedSettingsDisplayRoute
   AuthenticatedSettingsNotificationsRoute: typeof AuthenticatedSettingsNotificationsRoute
+  AuthenticatedSettingsOnlineStoreRoute: typeof AuthenticatedSettingsOnlineStoreRoute
   AuthenticatedSettingsReceiptRoute: typeof AuthenticatedSettingsReceiptRoute
   AuthenticatedSettingsSubscriptionRoute: typeof AuthenticatedSettingsSubscriptionRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
@@ -1029,6 +1110,8 @@ const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteCh
     AuthenticatedSettingsDisplayRoute: AuthenticatedSettingsDisplayRoute,
     AuthenticatedSettingsNotificationsRoute:
       AuthenticatedSettingsNotificationsRoute,
+    AuthenticatedSettingsOnlineStoreRoute:
+      AuthenticatedSettingsOnlineStoreRoute,
     AuthenticatedSettingsReceiptRoute: AuthenticatedSettingsReceiptRoute,
     AuthenticatedSettingsSubscriptionRoute:
       AuthenticatedSettingsSubscriptionRoute,
@@ -1147,9 +1230,12 @@ const rootRouteChildren: RootRouteChildren = {
   errors404Route: errors404Route,
   errors500Route: errors500Route,
   errors503Route: errors503Route,
+  OCodeRoute: OCodeRoute,
   PricingIndexRoute: PricingIndexRoute,
   authAuthCheckEmailRoute: authAuthCheckEmailRoute,
   authAuthEmailVerifiedRoute: authAuthEmailVerifiedRoute,
+  StoreSlugOutletIdRoute: StoreSlugOutletIdRoute,
+  StoreSlugIndexRoute: StoreSlugIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

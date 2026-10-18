@@ -73,6 +73,8 @@ export interface Product {
   productType: ProductType
   scope: ProductScope
   isActive: boolean
+  /** Shown on the public storefront (Settings → Online store). */
+  storefrontVisible?: boolean
   imageUrl?: string
   sortOrder?: number
   version?: number

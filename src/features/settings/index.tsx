@@ -10,6 +10,7 @@ import {
   CreditCard,
   Building2,
   Receipt,
+  Store,
 } from '@/components/icons'
 import { AppHeader } from '@/components/layout/app-header'
 import { Main } from '@/components/layout/main'
@@ -31,6 +32,11 @@ const sidebarNavItems = [
     title: 'Receipt',
     href: '/settings/receipt',
     icon: <Receipt size={18} />,
+  },
+  {
+    title: 'Online store',
+    href: '/settings/online-store',
+    icon: <Store size={18} />,
   },
   {
     title: 'Account',
@@ -65,6 +71,7 @@ export function Settings() {
     Profile: copy('Profil', 'Profile'),
     Business: copy('Usaha', 'Business'),
     Receipt: copy('Struk & cetak', 'Receipt & printing'),
+    'Online store': copy('Toko online', 'Online store'),
     Account: copy('Akun', 'Account'),
     Appearance: copy('Tampilan', 'Appearance'),
     Notifications: copy('Notifikasi', 'Notifications'),
