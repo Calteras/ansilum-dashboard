@@ -95,3 +95,15 @@
     transform: scale(0.8);
   }
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  .aa-panel {
+    animation: aa-panel-in 280ms var(--ease-out) both;
+  }
+}
+@keyframes aa-panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}

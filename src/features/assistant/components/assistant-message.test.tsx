@@ -4,7 +4,7 @@ import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ANSILUM_CATALOG_ID, ansilumCatalog } from '../a2ui/ansilum-catalog'
-import type { ChatTurn } from '../model/chat-reducer'
+import { newTurn, type ChatTurn } from '../model/chat-reducer'
 import { AssistantMessage } from './assistant-message'
 
 beforeEach(() => {
@@ -53,23 +53,20 @@ const metricGroup = {
   source_tool: 'get_sales_summary',
 }
 
-const turn = (overrides: Partial<ChatTurn> = {}): ChatTurn => ({
-  id: 't1',
-  question: 'Omzet?',
-  mode: 'ASK',
-  status: 'completed',
-  text: 'Penjualan **Rp581.000** dari 10 transaksi.',
-  components: [metricGroup],
-  surfaceIds: [],
-  citations: [],
-  warnings: [],
-  tools: [{ callId: 'k1', tool: 'get_sales_summary', status: 'done' }],
-  error: null,
-  unitsCharged: 1,
-  startedAt: 0,
-  thoughtMs: 3_200,
-  ...overrides,
-})
+const turn = (overrides: Partial<ChatTurn> = {}): ChatTurn =>
+  newTurn({
+    id: 't1',
+    question: 'Omzet?',
+    mode: 'ASK',
+    startedAt: 0,
+    status: 'completed',
+    text: 'Penjualan **Rp581.000** dari 10 transaksi.',
+    components: [metricGroup],
+    tools: [{ callId: 'k1', tool: 'get_sales_summary', status: 'done' }],
+    unitsCharged: 1,
+    thoughtMs: 3_200,
+    ...overrides,
+  })
 
 describe('AssistantMessage', () => {
   it('renders the data cards as A2UI surfaces', async () => {

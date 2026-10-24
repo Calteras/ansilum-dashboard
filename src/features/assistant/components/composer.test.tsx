@@ -17,10 +17,13 @@ function Harness({
   deepAnalysisAvailable?: boolean
 }) {
   const [value, setValue] = useState('')
+  const [deep, setDeep] = useState(false)
   return (
     <Composer
       value={value}
       onChange={setValue}
+      deepAnalysis={deep}
+      onDeepAnalysisChange={setDeep}
       onSubmit={onSubmit}
       onStop={onStop}
       streaming={streaming}

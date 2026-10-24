@@ -1,7 +1,6 @@
 import {
   useLayoutEffect,
   useRef,
-  useState,
   type FormEvent,
   type KeyboardEvent,
 } from 'react'
@@ -14,7 +13,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { ArrowUp, Sparkles, Square } from '@/components/icons'
+import { ArrowUp, FileText, Sparkles, Square, X } from '@/components/icons'
 import type { AssistantMode } from '../api/assistant.types'
 
 /** The backend refuses longer questions (AiQueryDto, MaxLength 8000). */
@@ -31,6 +30,14 @@ interface ComposerProps {
   streaming: boolean
   units: Record<AssistantMode, number> | null
   deepAnalysisAvailable: boolean
+  deepAnalysis: boolean
+  onDeepAnalysisChange: (on: boolean) => void
+  /** The page under the assistant panel, sent along unless removed. */
+  pageContext?: {
+    label: string
+    attached: boolean
+    onAttachedChange: (attached: boolean) => void
+  }
   autoFocus?: boolean
 }
 
@@ -42,14 +49,16 @@ export function Composer({
   streaming,
   units,
   deepAnalysisAvailable,
+  deepAnalysis,
+  onDeepAnalysisChange,
+  pageContext,
   autoFocus,
 }: ComposerProps) {
   const copy = useCopy()
   const isMobile = useIsMobile()
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const [deep, setDeep] = useState(false)
   const mode: AssistantMode =
-    deep && deepAnalysisAvailable ? 'DEEP_ANALYSIS' : 'ASK'
+    deepAnalysis && deepAnalysisAvailable ? 'DEEP_ANALYSIS' : 'ASK'
   const tooLong = value.length > MAX_QUESTION_CHARS
   const canSend = !streaming && value.trim().length > 0 && !tooLong
 
@@ -102,6 +111,30 @@ export function Composer({
         tooLong && 'border-brand/50'
       )}
     >
+      {pageContext?.attached && (
+        <div className='mb-1 flex px-1'>
+          <span className='bg-surface-subtle text-fg-muted inline-flex max-w-full items-center gap-1.5 rounded-full py-1 ps-2.5 pe-1 text-xs'>
+            <FileText className='size-3.5 shrink-0' aria-hidden />
+            <span className='truncate'>
+              <span className='sr-only'>
+                {copy('Konteks halaman: ', 'Page context: ')}
+              </span>
+              {pageContext.label}
+            </span>
+            <button
+              type='button'
+              onClick={() => pageContext.onAttachedChange(false)}
+              aria-label={copy(
+                'Jangan sertakan halaman ini',
+                'Don’t include this page'
+              )}
+              className='hover:bg-surface-hover hover:text-foreground focus-visible:ring-ring/50 grid size-5 place-items-center rounded-full outline-none focus-visible:ring-2'
+            >
+              <X className='size-3' aria-hidden />
+            </button>
+          </span>
+        </div>
+      )}
       <label htmlFor='assistant-question' className='sr-only'>
         {copy('Pertanyaan Anda', 'Your question')}
       </label>
@@ -128,7 +161,7 @@ export function Composer({
                 type='button'
                 aria-pressed={mode === 'DEEP_ANALYSIS'}
                 disabled={!deepAnalysisAvailable}
-                onClick={() => setDeep((on) => !on)}
+                onClick={() => onDeepAnalysisChange(!deepAnalysis)}
                 className={cn(
                   'inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-[13px] font-medium transition-colors outline-none',
                   'focus-visible:ring-ring/50 focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50',
@@ -144,6 +177,17 @@ export function Composer({
           </TooltipTrigger>
           <TooltipContent side='top'>{deepHint}</TooltipContent>
         </Tooltip>
+
+        {pageContext && !pageContext.attached && (
+          <button
+            type='button'
+            onClick={() => pageContext.onAttachedChange(true)}
+            className='text-fg-muted hover:bg-surface-hover hover:text-foreground focus-visible:ring-ring/50 inline-flex h-8 items-center gap-1.5 rounded-full px-2.5 text-[13px] outline-none focus-visible:ring-2'
+          >
+            <FileText className='size-4' aria-hidden />
+            {copy('Sertakan halaman', 'Include page')}
+          </button>
+        )}
 
         <div className='ms-auto flex items-center gap-3'>
           {tooLong && (

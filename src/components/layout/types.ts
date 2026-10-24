@@ -9,6 +9,8 @@ type BaseNavItem = {
   requiredTier?: SubscriptionTier
   /** Extra terms the global search matches on (synonyms, Indonesian terms). */
   keywords?: string[]
+  /** Live status shown at the end of the sidebar entry (e.g. an answer running). */
+  indicator?: React.ComponentType
 }
 
 type NavLink = BaseNavItem & {

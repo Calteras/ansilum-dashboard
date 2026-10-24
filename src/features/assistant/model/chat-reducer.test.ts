@@ -3,6 +3,8 @@ import type { AssistantEvent } from '../api/assistant.types'
 import {
   chatReducer,
   initialChatState,
+  newTurn,
+  replyTarget,
   turnPhase,
   type ChatState,
 } from './chat-reducer'
@@ -14,6 +16,7 @@ const ask = (state: ChatState = initialChatState) =>
     question: 'Omzet?',
     mode: 'ASK',
     at: 1_000,
+    parentId: null,
   })
 const apply = (state: ChatState, ...events: AssistantEvent[]) =>
   events.reduce(
@@ -210,6 +213,109 @@ describe('chatReducer', () => {
     expect(turnPhase(state.turns[0])).toBe('composing')
     state = chatReducer(state, { type: 'cancelled', id: 't1' })
     expect(turnPhase(state.turns[0])).toBeNull()
+  })
+
+  it('shows a Stop at once and lets the server confirm it', () => {
+    let state = apply(
+      ask(),
+      {
+        type: 'run.started',
+        run_id: 'r',
+        conversation_id: 'c-1',
+        user_message_id: 'u-1',
+        request_id: 'q',
+      },
+      { type: 'text.delta', text: 'Penjualan ' }
+    )
+    state = chatReducer(state, { type: 'stop', id: 't1' })
+    expect(state.turns[0]).toMatchObject({
+      status: 'cancelled',
+      stopRequested: true,
+      runId: 'r',
+      userMessageId: 'u-1',
+    })
+    // Text still in flight after the Stop is not shown.
+    state = apply(
+      state,
+      { type: 'text.delta', text: 'naik' },
+      { type: 'run.cancelled', run_id: 'r', message_id: 'm-1' },
+      { type: 'usage', units_charged: 0, remaining_units: 50 }
+    )
+    expect(state.turns[0]).toMatchObject({
+      status: 'cancelled',
+      text: 'Penjualan ',
+      messageId: 'm-1',
+      unitsCharged: 0,
+    })
+  })
+
+  it('shows an answer that finished before the Stop reached it (it is charged)', () => {
+    let state = chatReducer(ask(), { type: 'stop', id: 't1' })
+    state = apply(
+      state,
+      {
+        type: 'run.completed',
+        run_id: 'r',
+        message_id: 'm-2',
+        answer: {
+          text: 'Omzet Rp581.000.',
+          status: 'completed',
+          citations: [],
+          components: [],
+          warnings: [],
+        },
+      },
+      { type: 'usage', units_charged: 1, remaining_units: 49 }
+    )
+    expect(state.turns[0]).toMatchObject({
+      status: 'completed',
+      text: 'Omzet Rp581.000.',
+      stopRequested: false,
+      unitsCharged: 1,
+    })
+  })
+
+  it('replies to the latest answer, or its question when it has none', () => {
+    const answered = newTurn({
+      id: 'a',
+      question: 'q1',
+      mode: 'ASK',
+      startedAt: 0,
+      userMessageId: 'u-1',
+      messageId: 'm-1',
+    })
+    const refused = newTurn({
+      id: 'b',
+      question: 'q2',
+      mode: 'ASK',
+      startedAt: 0,
+    })
+    const unanswered = newTurn({
+      id: 'c',
+      question: 'q3',
+      mode: 'ASK',
+      startedAt: 0,
+      userMessageId: 'u-3',
+    })
+    expect(replyTarget([answered, refused])).toBe('m-1')
+    expect(replyTarget([answered, unanswered])).toBe('u-3')
+    expect(replyTarget([])).toBeUndefined()
+  })
+
+  it('loads a conversation from the history', () => {
+    const turn = newTurn({
+      id: 'u-1',
+      question: 'Omzet?',
+      mode: 'ASK',
+      startedAt: 0,
+    })
+    const state = chatReducer(ask(), {
+      type: 'load',
+      conversationId: 'c-9',
+      turns: [turn],
+    })
+    expect(state.conversationId).toBe('c-9')
+    expect(state.turns).toEqual([turn])
   })
 
   it('removes a turn so it can be asked again', () => {

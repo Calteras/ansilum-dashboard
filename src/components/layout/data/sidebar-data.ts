@@ -19,6 +19,7 @@ import {
   UtensilsCrossed,
   Warehouse,
 } from '@/components/icons'
+import { AssistantNavIndicator } from '@/features/assistant/shell/assistant-nav-indicator'
 import { type SidebarData } from '../types'
 
 /**
@@ -46,6 +47,7 @@ export const sidebarData: SidebarData = {
           title: 'nav.chats',
           url: '/chats',
           icon: MessagesSquare,
+          indicator: AssistantNavIndicator,
           requiredTier: 'STANDARD',
           keywords: ['ai', 'assistant', 'chat', 'ask', 'tanya'],
         },

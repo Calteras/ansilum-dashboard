@@ -89,7 +89,7 @@ export function NavLinkItem({
         >
           {item.icon && <item.icon />}
           <span>{item.title}</span>
-          {item.locked && <LockMark />}
+          {item.locked ? <LockMark /> : item.indicator && <item.indicator />}
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>

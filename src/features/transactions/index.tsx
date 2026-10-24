@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { getPresetSpan, toApiDateTime, type DateSpan } from '@/lib/date-range'
+import { useCopy } from '@/hooks/use-copy'
 import {
   Select,
   SelectContent,
@@ -15,6 +16,8 @@ import { AppHeader } from '@/components/layout/app-header'
 import { Main } from '@/components/layout/main'
 import { PageHeader } from '@/components/layout/page-header'
 import { OutletSelect } from '@/components/outlet-select'
+import { useAssistantPageContext } from '@/features/assistant/hooks/use-assistant-page-context'
+import { pageContextFor } from '@/features/assistant/model/page-context'
 import {
   useDashboardOutletsQuery,
   useTransactionSummaryQuery,
@@ -52,6 +55,17 @@ export function TransactionsReport() {
 
   const { data: outletsData } = useDashboardOutletsQuery()
   const outlets = outletsData?.data ?? []
+  const copy = useCopy()
+  useAssistantPageContext(
+    pageContextFor({
+      title: copy('Transaksi', 'Transactions'),
+      surface: 'transactions',
+      route: '/transactions',
+      span,
+      outletId: selectedOutletId || undefined,
+      outletName: outlets.find((o) => o.id === selectedOutletId)?.name,
+    })
+  )
 
   const apiParams = {
     outletId: selectedOutletId,

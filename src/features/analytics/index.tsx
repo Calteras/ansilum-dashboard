@@ -9,6 +9,8 @@ import { AppHeader } from '@/components/layout/app-header'
 import { Main } from '@/components/layout/main'
 import { PageHeader } from '@/components/layout/page-header'
 import { OutletSelect } from '@/components/outlet-select'
+import { useAssistantPageContext } from '@/features/assistant/hooks/use-assistant-page-context'
+import { pageContextFor } from '@/features/assistant/model/page-context'
 import { useDashboardOutletsQuery } from '@/features/dashboard/api/dashboard.queries'
 import { useAnalyticsSummaryQuery } from './api/analytics.queries'
 import { AnalyticsKpiStrip } from './components/analytics-kpi-strip'
@@ -24,6 +26,16 @@ export function Analytics() {
   const outlets = useMemo(() => outletsData?.data ?? [], [outletsData])
   // Default to the first outlet until the merchant picks one.
   const outletId = selectedOutletId || outlets[0]?.id || ''
+  useAssistantPageContext(
+    pageContextFor({
+      title: copy('Analitik', 'Analytics'),
+      surface: 'sales_analytics',
+      route: '/analytics',
+      span,
+      outletId: outletId || undefined,
+      outletName: outlets.find((o) => o.id === outletId)?.name,
+    })
+  )
 
   const analyticsParams = {
     startDate: format(span.from, 'yyyy-MM-dd'),

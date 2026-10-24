@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { A2uiSurface } from '@a2ui/react/v0_9'
+import { A2uiSurface, type ReactCatalogComponent } from '@a2ui/react/v0_9'
+import type { SurfaceModel } from '@a2ui/web_core/v0_9'
 import { cn } from '@/lib/utils'
 import { useCopy } from '@/hooks/use-copy'
 import {
@@ -10,7 +11,6 @@ import {
   RotateCcw,
   X,
 } from '@/components/icons'
-import type { A2uiSurfaces } from '../a2ui/use-a2ui-surfaces'
 import { useSmoothText } from '../hooks/use-smooth-text'
 import {
   turnPhase,
@@ -119,8 +119,12 @@ function LiveStatus({
     .reverse()
     .find((step) => step.status === 'running')
   const tool = running && TOOL_LABELS[running.tool]
-  const label =
-    shown === 'working'
+  const label = turn.detached
+    ? copy(
+        'Masih menjawab. Anda boleh meninggalkan halaman ini.',
+        'Still answering. You can leave this page.'
+      )
+    : shown === 'working'
       ? tool
         ? copy(tool[2], tool[3])
         : copy('Memeriksa data…', 'Checking the data…')
@@ -285,7 +289,9 @@ function Notice({ turn }: { turn: ChatTurn }) {
 
 interface AssistantMessageProps {
   turn: ChatTurn
-  getSurface: A2uiSurfaces['getSurface']
+  getSurface: (
+    surfaceId: string
+  ) => SurfaceModel<ReactCatalogComponent> | undefined
   /** Offered on the last answer when it failed, stopped or hit a limit. */
   onRetry?: () => void
 }

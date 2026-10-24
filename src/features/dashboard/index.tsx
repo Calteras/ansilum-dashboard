@@ -21,6 +21,8 @@ import {
   analyticsKeys,
   useAnalyticsSummaryQuery,
 } from '@/features/analytics/api/analytics.queries'
+import { useAssistantPageContext } from '@/features/assistant/hooks/use-assistant-page-context'
+import { pageContextFor } from '@/features/assistant/model/page-context'
 import { useCurrentSubscriptionQuery } from '@/features/settings/subscription/subscription.queries'
 import {
   dashboardKeys,
@@ -73,6 +75,16 @@ export function Dashboard() {
   // Default to the first outlet until the merchant picks one.
   const outletId = selectedOutletId || outlets[0]?.id || ''
   const outlet = outlets.find((o) => o.id === outletId)
+  useAssistantPageContext(
+    pageContextFor({
+      title: copy('Dasbor', 'Dashboard'),
+      surface: 'dashboard',
+      route: '/',
+      span,
+      outletId: outletId || undefined,
+      outletName: outlet?.name,
+    })
+  )
 
   // A baseline that would overlap the new range falls back to the previous period.
   const activeComparison = isComparisonAvailable(span, comparison)
@@ -328,9 +340,7 @@ export function Dashboard() {
     <>
       <AppHeader />
 
-      <Main
-        className='flex w-full flex-1 flex-col pt-0 pb-10'
-      >
+      <Main className='flex w-full flex-1 flex-col pt-0 pb-10'>
         <Tabs
           value={activeTab}
           onValueChange={(value) => setActiveTab(value as DashboardTab)}

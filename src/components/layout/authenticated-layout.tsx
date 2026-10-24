@@ -1,14 +1,15 @@
 import { Outlet, Navigate } from '@tanstack/react-router'
-import { Loader2 } from '@/components/icons'
 import { useAuthStore } from '@/stores/auth-store'
 import { getCookie } from '@/lib/cookies'
 import { cn } from '@/lib/utils'
 import { LayoutProvider } from '@/context/layout-provider'
 import { SearchProvider } from '@/context/search-provider'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { Loader2 } from '@/components/icons'
 import { AppSidebar } from '@/components/layout/app-sidebar'
 import { SubscriptionGuard } from '@/components/layout/subscription-guard'
 import { SkipToMain } from '@/components/skip-to-main'
+import { AssistantShell } from '@/features/assistant/shell/assistant-shell'
 import { useSessionRestore } from '@/features/auth/hooks/use-session-restore'
 import { CommandMenu } from '@/features/search/command-menu'
 
@@ -58,6 +59,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
           >
             <SubscriptionGuard>{children ?? <Outlet />}</SubscriptionGuard>
           </SidebarInset>
+          <AssistantShell />
         </SidebarProvider>
       </LayoutProvider>
     </SearchProvider>

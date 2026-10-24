@@ -125,6 +125,7 @@ export type AssistantEvent =
       message_id: string
       answer: AgentAnswer
     }
+  | { type: 'run.cancelled'; run_id: string; message_id: string }
   | {
       type: 'run.failed'
       run_id: string | null
@@ -135,8 +136,62 @@ export type AssistantEvent =
     }
   | ({ type: 'usage' } & UnitUsage)
 
+/** What the user is looking at when they ask (identifiers only; the agent resolves them). */
+export interface UiContext {
+  route?: string
+  surface?: string
+  entityType?: string
+  entityId?: string
+  activeFilters?: Record<string, string>
+}
+
 export interface AskRequest {
   message: string
   mode: AssistantMode
   conversationId?: string
+  /** The message this question replies to; null starts a new first question. */
+  parentMessageId?: string | null
+  /** The outlet the page shows; ansilum-be checks the user may access it. */
+  outletId?: string
+  uiContext?: UiContext
+}
+
+export interface ConversationSummary {
+  id: string
+  title: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ConversationPage {
+  conversations: ConversationSummary[]
+  next_cursor: string | null
+}
+
+export interface MessageView {
+  id: string
+  parent_message_id: string | null
+  role: 'user' | 'assistant'
+  status: 'completed' | 'failed' | 'cancelled'
+  content: string
+  answer: AgentAnswer | null
+  created_at: string
+  mode: AssistantMode | null
+  latency_ms: number | null
+  tools: string[]
+  billing_units: number | null
+}
+
+/** An answer still running on the server (its browser may have left). */
+export interface ActiveRun {
+  run_id: string
+  user_message_id: string
+  mode: AssistantMode | null
+  started_at: string
+}
+
+export interface ConversationView extends ConversationSummary {
+  messages: MessageView[]
+  truncated: boolean
+  active_run: ActiveRun | null
 }

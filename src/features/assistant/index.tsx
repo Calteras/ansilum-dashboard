@@ -1,70 +1,70 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { useCopy } from '@/hooks/use-copy'
 import { Button } from '@/components/ui/button'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { ArrowDown, Edit } from '@/components/icons'
+import { Clock, Edit } from '@/components/icons'
 import { AppHeader } from '@/components/layout/app-header'
 import { Main } from '@/components/layout/main'
 import { useAssistantUsageQuery } from './api/assistant.queries'
-import type { AssistantMode } from './api/assistant.types'
-import './assistant.css'
-import { AgentOrb } from './components/agent-orb'
-import { AssistantTurn } from './components/assistant-turn'
-import { Composer } from './components/composer'
+import { ChatThread } from './components/chat-thread'
+import { HistoryList } from './components/history-list'
 import { UnitsBalance } from './components/units-balance'
-import { useAssistantChat } from './hooks/use-assistant-chat'
-import { useStickToBottom } from './hooks/use-stick-to-bottom'
-import type { TurnStatus } from './model/chat-reducer'
+import { useAssistantStore } from './store/assistant-store'
 
-const SUGGESTIONS: [string, string][] = [
-  ['Berapa omzet hari ini?', 'How are sales today?'],
-  [
-    'Produk apa yang paling laku minggu ini?',
-    'What were the best-selling products this week?',
-  ],
-  [
-    'Bandingkan penjualan semua outlet bulan lalu.',
-    'Compare sales across all outlets last month.',
-  ],
-  ['Bahan apa yang stoknya menipis?', 'Which ingredients are running low?'],
-]
-
-const RETRYABLE: TurnStatus[] = ['failed', 'cancelled', 'limit_reached']
-
-/** Ask Ansilum: questions about the active business, answered from its own data. */
-export function Assistant() {
+/**
+ * Ask Ansilum: questions about the active business, answered from its own data.
+ * The conversation lives in the assistant store, not in this page: leaving the
+ * page (or opening another menu) never stops or forgets it.
+ */
+export function Assistant({ conversationId }: { conversationId?: string }) {
   const copy = useCopy()
+  const navigate = useNavigate()
   const { data: balance } = useAssistantUsageQuery()
-  const { state, isStreaming, ask, stop, retry, reset, getSurface } =
-    useAssistantChat()
-  const [draft, setDraft] = useState('')
-  const { scrollRef, contentRef, atEnd, scrollToEnd } = useStickToBottom<
-    HTMLDivElement,
-    HTMLDivElement
-  >()
-  const empty = state.turns.length === 0
-  const lastId = state.turns[state.turns.length - 1]?.id
+  const shownId = useAssistantStore((s) => s.chat.conversationId)
+  const remainingUnits = useAssistantStore((s) => s.chat.remainingUnits)
+  const hasTurns = useAssistantStore((s) => s.chat.turns.length > 0)
+  const opening = useAssistantStore((s) => s.opening)
+  const [historyOpen, setHistoryOpen] = useState(false)
 
-  const submit = (question: string, mode: AssistantMode) => {
-    setDraft('')
-    scrollToEnd('auto')
-    void ask(question, mode)
+  // The URL names the conversation: open it unless it is the one already shown.
+  useEffect(() => {
+    if (conversationId) void useAssistantStore.getState().open(conversationId)
+  }, [conversationId])
+
+  // And the shown conversation names the URL (a new chat gets its id on the first answer).
+  useEffect(() => {
+    const { chat, opening: pending } = useAssistantStore.getState()
+    if (pending) return
+    if (chat.conversationId && chat.conversationId !== conversationId)
+      void navigate({
+        to: '/chats/$conversationId',
+        params: { conversationId: chat.conversationId },
+        replace: true,
+      })
+    else if (!chat.conversationId && conversationId)
+      void navigate({ to: '/chats', replace: true })
+  }, [shownId, opening, conversationId, navigate])
+
+  const newChat = () => {
+    useAssistantStore.getState().newChat()
+    void navigate({ to: '/chats' })
   }
 
-  const composer = (
-    <Composer
-      value={draft}
-      onChange={setDraft}
-      onSubmit={submit}
-      onStop={stop}
-      streaming={isStreaming}
-      units={balance?.units_per_request ?? null}
-      deepAnalysisAvailable={balance?.deep_analysis_available ?? false}
-      autoFocus
+  const history = (
+    <HistoryList
+      activeId={shownId ?? opening?.conversationId ?? null}
+      onNavigate={() => setHistoryOpen(false)}
     />
   )
 
@@ -72,126 +72,92 @@ export function Assistant() {
     <>
       <AppHeader />
       <Main fixed className='p-0 sm:p-0'>
-        <div className='flex min-h-0 flex-1 flex-col'>
-          <header className='flex h-14 shrink-0 items-center gap-2 px-4 sm:px-6'>
-            <h1 className='text-base font-semibold'>
-              {copy('Tanya Ansilum', 'Ask Ansilum')}
-            </h1>
-            <div className='ms-auto flex items-center gap-1.5'>
-              <UnitsBalance
-                balance={balance}
-                remainingOverride={state.remainingUnits}
-              />
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant='ghost'
-                    size='icon'
-                    onClick={reset}
-                    disabled={empty}
-                    aria-label={copy('Percakapan baru', 'New conversation')}
-                    className='rounded-lg'
-                  >
-                    <Edit className='size-5' aria-hidden />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side='bottom'>
-                  {copy('Percakapan baru', 'New conversation')}
-                </TooltipContent>
-              </Tooltip>
+        <div className='flex min-h-0 flex-1'>
+          <aside
+            className='border-divider hidden w-64 shrink-0 flex-col border-e md:flex'
+            aria-label={copy('Riwayat', 'History')}
+          >
+            <div className='p-2'>
+              <Button
+                variant='ghost'
+                className='w-full justify-start gap-2'
+                onClick={newChat}
+              >
+                <Edit className='size-4' aria-hidden />
+                {copy('Percakapan baru', 'New conversation')}
+              </Button>
             </div>
-          </header>
-
-          <div ref={scrollRef} className='min-h-0 flex-1 overflow-y-auto'>
-            <div
-              ref={contentRef}
-              className='mx-auto flex min-h-full w-full max-w-3xl flex-col px-4 sm:px-6'
-            >
-              {empty ? (
-                <section
-                  aria-labelledby='assistant-greeting'
-                  className='flex flex-1 flex-col items-center justify-center gap-6 pt-6 pb-[14vh]'
-                >
-                  <AgentOrb state='breathing' />
-                  <h2
-                    id='assistant-greeting'
-                    className='text-center text-2xl font-semibold tracking-tight sm:text-[28px]'
-                  >
-                    {copy(
-                      'Ada yang bisa saya bantu hari ini?',
-                      'What can I help you with today?'
-                    )}
-                  </h2>
-                  <div className='w-full'>{composer}</div>
-                  <ul
-                    className='flex flex-wrap justify-center gap-2'
-                    aria-label={copy('Coba tanyakan', 'Try asking')}
-                  >
-                    {SUGGESTIONS.map(([id, en]) => (
-                      <li key={en}>
-                        <button
-                          type='button'
-                          onClick={() => {
-                            setDraft(copy(id, en))
-                            document
-                              .getElementById('assistant-question')
-                              ?.focus()
-                          }}
-                          className='border-divider text-fg-muted hover:bg-surface-hover hover:text-foreground focus-visible:ring-ring/50 rounded-full border px-4 py-2 text-sm transition-colors outline-none focus-visible:ring-2'
-                        >
-                          {copy(id, en)}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ) : (
-                <div className='space-y-10 pt-4 pb-10'>
-                  {state.turns.map((turn) => (
-                    <AssistantTurn
-                      key={turn.id}
-                      turn={turn}
-                      getSurface={getSurface}
-                      onRetry={
-                        turn.id === lastId && RETRYABLE.includes(turn.status)
-                          ? () => retry(turn.id)
-                          : undefined
-                      }
-                    />
-                  ))}
-                </div>
-              )}
+            <div className='min-h-0 flex-1 overflow-y-auto px-2 pb-3'>
+              {history}
             </div>
-          </div>
+          </aside>
 
-          {!empty && (
-            <div className='relative shrink-0 px-4 pb-3 sm:px-6'>
-              {!atEnd && (
-                <button
-                  type='button'
-                  onClick={() => scrollToEnd()}
-                  aria-label={copy(
-                    'Ke pesan terbaru',
-                    'Jump to the latest message'
-                  )}
-                  className='bg-card border-divider text-fg-muted hover:text-foreground aa-fade absolute -top-12 left-1/2 grid size-9 -translate-x-1/2 place-items-center rounded-full border shadow-md transition-colors'
-                >
-                  <ArrowDown className='size-4' aria-hidden />
-                </button>
-              )}
-              <div className='mx-auto w-full max-w-3xl'>
-                {composer}
-                <p className='text-fg-muted mt-2 text-center text-xs'>
-                  {copy(
-                    'Angka berasal dari data usaha Anda. Asisten hanya membaca data, tidak mengubahnya.',
-                    'Figures come from your business data. The assistant only reads data and never changes it.'
-                  )}
-                </p>
+          <div className='flex min-w-0 flex-1 flex-col'>
+            <header className='flex h-14 shrink-0 items-center gap-2 px-4 sm:px-6'>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='-ms-2 rounded-lg md:hidden'
+                onClick={() => setHistoryOpen(true)}
+                aria-label={copy('Riwayat percakapan', 'Conversation history')}
+              >
+                <Clock className='size-5' aria-hidden />
+              </Button>
+              <h1 className='text-base font-semibold'>
+                {copy('Tanya Ansilum', 'Ask Ansilum')}
+              </h1>
+              <div className='ms-auto flex items-center gap-1.5'>
+                <UnitsBalance
+                  balance={balance}
+                  remainingOverride={remainingUnits}
+                />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant='ghost'
+                      size='icon'
+                      onClick={newChat}
+                      disabled={!hasTurns && !shownId}
+                      aria-label={copy('Percakapan baru', 'New conversation')}
+                      className='rounded-lg md:hidden'
+                    >
+                      <Edit className='size-5' aria-hidden />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side='bottom'>
+                    {copy('Percakapan baru', 'New conversation')}
+                  </TooltipContent>
+                </Tooltip>
               </div>
-            </div>
-          )}
+            </header>
+            <ChatThread variant='page' />
+          </div>
         </div>
       </Main>
+
+      <Sheet open={historyOpen} onOpenChange={setHistoryOpen}>
+        <SheetContent side='left' className='w-72 p-0'>
+          <SheetHeader className='border-divider border-b'>
+            <SheetTitle>{copy('Riwayat', 'History')}</SheetTitle>
+          </SheetHeader>
+          <div className='p-2'>
+            <Button
+              variant='ghost'
+              className='w-full justify-start gap-2'
+              onClick={() => {
+                setHistoryOpen(false)
+                newChat()
+              }}
+            >
+              <Edit className='size-4' aria-hidden />
+              {copy('Percakapan baru', 'New conversation')}
+            </Button>
+          </div>
+          <div className='min-h-0 flex-1 overflow-y-auto px-2 pb-3'>
+            {history}
+          </div>
+        </SheetContent>
+      </Sheet>
     </>
   )
 }

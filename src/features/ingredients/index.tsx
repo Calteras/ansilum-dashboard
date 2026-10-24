@@ -1,8 +1,11 @@
 import { getRouteApi } from '@tanstack/react-router'
+import { useCopy } from '@/hooks/use-copy'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AppHeader } from '@/components/layout/app-header'
 import { Main } from '@/components/layout/main'
 import { PageHeader } from '@/components/layout/page-header'
+import { useAssistantPageContext } from '@/features/assistant/hooks/use-assistant-page-context'
+import { pageContextFor } from '@/features/assistant/model/page-context'
 import { useIngredientsQuery } from './api/ingredients.queries'
 import { IngredientsDashboard } from './components/ingredients-dashboard'
 import { IngredientsDialogs } from './components/ingredients-dialogs'
@@ -14,6 +17,14 @@ import { OutletInventoryTab } from './components/outlet-inventory-tab'
 const route = getRouteApi('/_authenticated/ingredients/')
 
 export function Ingredients() {
+  const copy = useCopy()
+  useAssistantPageContext(
+    pageContextFor({
+      title: copy('Bahan baku', 'Ingredients'),
+      surface: 'inventory',
+      route: '/ingredients',
+    })
+  )
   const search = route.useSearch()
   const navigate = route.useNavigate()
   const { data, isLoading, isFetching, refetch } = useIngredientsQuery({

@@ -1,7 +1,14 @@
 import { API_BASE_URL } from '@/config/api.config'
 import { notifyAuthSessionExpired } from '@/lib/auth-session'
 import { getActiveTenantId, tenantGet } from '@/lib/tenant-api-client'
-import type { AskRequest, AssistantEvent, UnitBalance } from './assistant.types'
+import type {
+  AskRequest,
+  AssistantEvent,
+  ConversationPage,
+  ConversationSummary,
+  ConversationView,
+  UnitBalance,
+} from './assistant.types'
 import { createSseParser } from './sse'
 
 /** A refused or failed request, with the backend's stable code (e.g. ai_units_exhausted). */
@@ -96,4 +103,69 @@ export async function streamAssistantAnswer(
 export async function getAssistantUsageApi(): Promise<UnitBalance> {
   const response = await tenantGet<{ data: UnitBalance }>('/ai/usage')
   return response.data
+}
+
+/** A tenant-scoped JSON call that keeps the backend's error code (e.g. run_in_progress). */
+async function assistantFetch<T>(
+  endpoint: string,
+  init: { method?: string; body?: object } = {}
+): Promise<T> {
+  const tenantId = getActiveTenantId()
+  if (!tenantId)
+    throw new AssistantError(0, 'no_tenant', 'No active business selected.')
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: init.method ?? 'GET',
+    headers: {
+      ...(init.body ? { 'Content-Type': 'application/json' } : {}),
+      'x-tenant-id': tenantId,
+    },
+    credentials: 'include',
+    body: init.body ? JSON.stringify(init.body) : undefined,
+  })
+  if (!response.ok) {
+    if (response.status === 401) notifyAuthSessionExpired()
+    throw await toAssistantError(response)
+  }
+  if (response.status === 202 || response.status === 204) return undefined as T
+  const body = (await response.json()) as { data?: T }
+  return (body.data ?? body) as T
+}
+
+export function listConversationsApi(
+  page: { limit?: number; before?: string | null } = {}
+): Promise<ConversationPage> {
+  const query = new URLSearchParams()
+  if (page.limit) query.set('limit', String(page.limit))
+  if (page.before) query.set('before', page.before)
+  const suffix = query.toString() ? `?${query.toString()}` : ''
+  return assistantFetch<ConversationPage>(`/ai/conversations${suffix}`)
+}
+
+export function getConversationApi(id: string): Promise<ConversationView> {
+  return assistantFetch<ConversationView>(
+    `/ai/conversations/${encodeURIComponent(id)}`
+  )
+}
+
+export function renameConversationApi(
+  id: string,
+  title: string
+): Promise<ConversationSummary> {
+  return assistantFetch<ConversationSummary>(
+    `/ai/conversations/${encodeURIComponent(id)}`,
+    { method: 'PATCH', body: { title } }
+  )
+}
+
+export function deleteConversationApi(id: string): Promise<void> {
+  return assistantFetch<void>(`/ai/conversations/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+  })
+}
+
+/** Stop a running answer; its stream then ends with `run.cancelled`. */
+export function cancelRunApi(runId: string): Promise<void> {
+  return assistantFetch<void>(`/ai/runs/${encodeURIComponent(runId)}/cancel`, {
+    method: 'POST',
+  })
 }

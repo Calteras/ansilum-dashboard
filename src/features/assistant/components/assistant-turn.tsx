@@ -1,4 +1,4 @@
-import type { A2uiSurfaces } from '../a2ui/use-a2ui-surfaces'
+import type { ComponentProps } from 'react'
 import type { ChatTurn } from '../model/chat-reducer'
 import { AssistantMessage } from './assistant-message'
 import { UserMessage } from './user-message'
@@ -10,7 +10,7 @@ export function AssistantTurn({
   onRetry,
 }: {
   turn: ChatTurn
-  getSurface: A2uiSurfaces['getSurface']
+  getSurface: ComponentProps<typeof AssistantMessage>['getSurface']
   onRetry?: () => void
 }) {
   return (

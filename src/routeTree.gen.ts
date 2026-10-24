@@ -61,6 +61,7 @@ import { Route as AuthenticatedSettingsBusinessRouteImport } from './routes/_aut
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as AuthenticatedChatsConversationIdRouteImport } from './routes/_authenticated/chats/$conversationId'
 import { Route as authAuthEmailVerifiedRouteImport } from './routes/(auth)/auth.email-verified'
 import { Route as authAuthCheckEmailRouteImport } from './routes/(auth)/auth.check-email'
 
@@ -347,6 +348,12 @@ const AuthenticatedErrorsErrorRoute =
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedChatsConversationIdRoute =
+  AuthenticatedChatsConversationIdRouteImport.update({
+    id: '/chats/$conversationId',
+    path: '/chats/$conversationId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const authAuthEmailVerifiedRoute = authAuthEmailVerifiedRouteImport.update({
   id: '/(auth)/auth/email-verified',
   path: '/auth/email-verified',
@@ -378,6 +385,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingIndexRoute
   '/auth/check-email': typeof authAuthCheckEmailRoute
   '/auth/email-verified': typeof authAuthEmailVerifiedRoute
+  '/chats/$conversationId': typeof AuthenticatedChatsConversationIdRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -430,6 +438,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingIndexRoute
   '/auth/check-email': typeof authAuthCheckEmailRoute
   '/auth/email-verified': typeof authAuthEmailVerifiedRoute
+  '/chats/$conversationId': typeof AuthenticatedChatsConversationIdRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -487,6 +496,7 @@ export interface FileRoutesById {
   '/pricing/': typeof PricingIndexRoute
   '/(auth)/auth/check-email': typeof authAuthCheckEmailRoute
   '/(auth)/auth/email-verified': typeof authAuthEmailVerifiedRoute
+  '/_authenticated/chats/$conversationId': typeof AuthenticatedChatsConversationIdRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -542,6 +552,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/auth/check-email'
     | '/auth/email-verified'
+    | '/chats/$conversationId'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
@@ -594,6 +605,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/auth/check-email'
     | '/auth/email-verified'
+    | '/chats/$conversationId'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
@@ -650,6 +662,7 @@ export interface FileRouteTypes {
     | '/pricing/'
     | '/(auth)/auth/check-email'
     | '/(auth)/auth/email-verified'
+    | '/_authenticated/chats/$conversationId'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
@@ -1073,6 +1086,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/chats/$conversationId': {
+      id: '/_authenticated/chats/$conversationId'
+      path: '/chats/$conversationId'
+      fullPath: '/chats/$conversationId'
+      preLoaderRoute: typeof AuthenticatedChatsConversationIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/(auth)/auth/email-verified': {
       id: '/(auth)/auth/email-verified'
       path: '/auth/email-verified'
@@ -1126,6 +1146,7 @@ const AuthenticatedSettingsRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedChatsConversationIdRoute: typeof AuthenticatedChatsConversationIdRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAnalyticsIndexRoute: typeof AuthenticatedAnalyticsIndexRoute
   AuthenticatedCategoriesIndexRoute: typeof AuthenticatedCategoriesIndexRoute
@@ -1149,6 +1170,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedChatsConversationIdRoute: AuthenticatedChatsConversationIdRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAnalyticsIndexRoute: AuthenticatedAnalyticsIndexRoute,
   AuthenticatedCategoriesIndexRoute: AuthenticatedCategoriesIndexRoute,
