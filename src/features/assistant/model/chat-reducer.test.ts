@@ -1,14 +1,29 @@
 import { describe, expect, it } from 'vitest'
 import type { AssistantEvent } from '../api/assistant.types'
-import { chatReducer, initialChatState, type ChatState } from './chat-reducer'
+import {
+  chatReducer,
+  initialChatState,
+  turnPhase,
+  type ChatState,
+} from './chat-reducer'
 
 const ask = (state: ChatState = initialChatState) =>
-  chatReducer(state, { type: 'ask', id: 't1', question: 'Omzet?', mode: 'ASK' })
+  chatReducer(state, {
+    type: 'ask',
+    id: 't1',
+    question: 'Omzet?',
+    mode: 'ASK',
+    at: 1_000,
+  })
 const apply = (state: ChatState, ...events: AssistantEvent[]) =>
   events.reduce(
-    (s, event) => chatReducer(s, { type: 'event', id: 't1', event }),
+    (s, event) => chatReducer(s, { type: 'event', id: 't1', event, at: 1_000 }),
     state
   )
+const applyAt = (state: ChatState, at: number, event: AssistantEvent) =>
+  chatReducer(state, { type: 'event', id: 't1', event, at })
+
+const surface = (surfaceId: string) => ({ surface_id: surfaceId, messages: [] })
 
 const metricGroup = {
   type: 'metric_group' as const,
@@ -136,6 +151,70 @@ describe('chatReducer', () => {
     expect(
       chatReducer(failed, { type: 'cancelled', id: 't1' }).turns[0].status
     ).toBe('failed')
+  })
+
+  it("collects A2UI surfaces once, then takes the final answer's list", () => {
+    let state = apply(
+      ask(),
+      { type: 'ui.a2ui', surface: surface('a2ui-r-1') },
+      { type: 'ui.a2ui', surface: surface('a2ui-r-1') },
+      { type: 'ui.a2ui', surface: surface('a2ui-r-2') }
+    )
+    expect(state.turns[0].surfaceIds).toEqual(['a2ui-r-1', 'a2ui-r-2'])
+    state = apply(state, {
+      type: 'run.completed',
+      run_id: 'r',
+      message_id: 'm',
+      answer: {
+        text: 'Done.',
+        status: 'completed',
+        citations: [],
+        components: [],
+        a2ui: [surface('a2ui-r-1')],
+        warnings: [],
+      },
+    })
+    expect(state.turns[0].surfaceIds).toEqual(['a2ui-r-1'])
+  })
+
+  it('times the thinking up to the first words of the answer', () => {
+    let state = applyAt(ask(), 2_500, {
+      type: 'tool.started',
+      tool: 'get_sales_summary',
+      call_id: 'k1',
+    })
+    expect(state.turns[0].thoughtMs).toBeNull()
+    state = applyAt(state, 4_200, { type: 'text.delta', text: 'Pen' })
+    state = applyAt(state, 4_900, { type: 'text.delta', text: 'jualan' })
+    expect(state.turns[0].thoughtMs).toBe(3_200)
+  })
+
+  it('follows the agent: thinking, then working on a tool, then writing', () => {
+    let state = ask()
+    expect(turnPhase(state.turns[0])).toBe('breathing')
+    state = apply(state, {
+      type: 'tool.started',
+      tool: 'get_sales_summary',
+      call_id: 'k1',
+    })
+    expect(turnPhase(state.turns[0])).toBe('working')
+    state = apply(state, {
+      type: 'tool.completed',
+      tool: 'get_sales_summary',
+      call_id: 'k1',
+      ok: true,
+      duration_ms: 4,
+    })
+    expect(turnPhase(state.turns[0])).toBe('breathing')
+    state = apply(state, { type: 'text.delta', text: 'Penjualan' })
+    expect(turnPhase(state.turns[0])).toBe('composing')
+    state = chatReducer(state, { type: 'cancelled', id: 't1' })
+    expect(turnPhase(state.turns[0])).toBeNull()
+  })
+
+  it('removes a turn so it can be asked again', () => {
+    const state = chatReducer(ask(), { type: 'remove', id: 't1' })
+    expect(state.turns).toEqual([])
   })
 
   it('starts a new conversation but keeps the last known balance', () => {

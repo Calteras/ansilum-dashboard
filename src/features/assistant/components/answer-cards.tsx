@@ -41,7 +41,7 @@ function MetricTile({ metric }: { metric: Metric }) {
   const copy = useCopy()
   const change = metric.change_percent
   return (
-    <div className='border-divider min-w-0 rounded-md border px-4 py-3'>
+    <div className='border-divider bg-card min-w-0 rounded-xl border px-4 py-3'>
       <p className='text-fg-muted truncate text-xs font-medium'>
         {metric.label}
       </p>
@@ -70,9 +70,13 @@ function MetricTile({ metric }: { metric: Metric }) {
   )
 }
 
-function MetricGroupCard({ component }: { component: MetricGroupComponent }) {
+export function MetricGroupCard({
+  component,
+}: {
+  component: MetricGroupComponent
+}) {
   return (
-    <section className='space-y-2' aria-label={component.title}>
+    <section className='aa-rise space-y-2' aria-label={component.title}>
       <header>
         <h3 className='text-sm font-semibold'>{component.title}</h3>
         {component.subtitle && (
@@ -88,11 +92,15 @@ function MetricGroupCard({ component }: { component: MetricGroupComponent }) {
   )
 }
 
-function DataTableCard({ component }: { component: DataTableComponent }) {
+export function DataTableCard({
+  component,
+}: {
+  component: DataTableComponent
+}) {
   return (
-    <section className='space-y-2' aria-label={component.title}>
+    <section className='aa-rise space-y-2' aria-label={component.title}>
       <h3 className='text-sm font-semibold'>{component.title}</h3>
-      <div className='border-divider overflow-x-auto rounded-md border'>
+      <div className='border-divider bg-card overflow-x-auto rounded-xl border'>
         <Table>
           <TableHeader>
             <TableRow>

@@ -12,6 +12,9 @@ export type TurnStatus =
   | 'failed'
   | 'cancelled'
 
+/** What the agent is doing, for the thinking orb (thinking-orbs states). */
+export type TurnPhase = 'breathing' | 'working' | 'composing'
+
 export interface ToolStep {
   callId: string
   tool: string
@@ -25,11 +28,16 @@ export interface ChatTurn {
   status: TurnStatus
   text: string
   components: AnswerComponent[]
+  /** A2UI surfaces of this answer's data cards, in order. */
+  surfaceIds: string[]
   citations: Citation[]
   warnings: string[]
   tools: ToolStep[]
   error: { code: string | null; message: string } | null
   unitsCharged: number | null
+  startedAt: number
+  /** Milliseconds from the question to the first answer text ("Thought for …"). */
+  thoughtMs: number | null
 }
 
 export interface ChatState {
@@ -40,8 +48,14 @@ export interface ChatState {
 }
 
 export type ChatAction =
-  | { type: 'ask'; id: string; question: string; mode: AssistantMode }
-  | { type: 'event'; id: string; event: AssistantEvent }
+  | {
+      type: 'ask'
+      id: string
+      question: string
+      mode: AssistantMode
+      at: number
+    }
+  | { type: 'event'; id: string; event: AssistantEvent; at: number }
   | {
       type: 'error'
       id: string
@@ -50,6 +64,7 @@ export type ChatAction =
       remainingUnits: number | null
     }
   | { type: 'cancelled'; id: string }
+  | { type: 'remove'; id: string }
   | { type: 'reset' }
 
 export const initialChatState: ChatState = {
@@ -58,12 +73,27 @@ export const initialChatState: ChatState = {
   remainingUnits: null,
 }
 
+/** Thinking until something happens; working while a tool runs; composing once text flows. */
+export function turnPhase(turn: ChatTurn): TurnPhase | null {
+  if (turn.status !== 'streaming') return null
+  if (turn.tools.some((step) => step.status === 'running')) return 'working'
+  return turn.text ? 'composing' : 'breathing'
+}
+
 const key = (component: AnswerComponent) => JSON.stringify(component)
 
-function applyEvent(turn: ChatTurn, event: AssistantEvent): ChatTurn {
+function applyEvent(
+  turn: ChatTurn,
+  event: AssistantEvent,
+  at: number
+): ChatTurn {
   switch (event.type) {
     case 'text.delta':
-      return { ...turn, text: turn.text + event.text }
+      return {
+        ...turn,
+        text: turn.text + event.text,
+        thoughtMs: turn.thoughtMs ?? at - turn.startedAt,
+      }
     case 'tool.started':
       return {
         ...turn,
@@ -92,6 +122,13 @@ function applyEvent(turn: ChatTurn, event: AssistantEvent): ChatTurn {
         turn.components.some((c) => key(c) === key(event.component))
         ? turn
         : { ...turn, components: [...turn.components, event.component] }
+    case 'ui.a2ui':
+      return turn.surfaceIds.includes(event.surface.surface_id)
+        ? turn
+        : {
+            ...turn,
+            surfaceIds: [...turn.surfaceIds, event.surface.surface_id],
+          }
     case 'run.completed': {
       const { answer } = event
       return {
@@ -100,11 +137,13 @@ function applyEvent(turn: ChatTurn, event: AssistantEvent): ChatTurn {
         status: answer.status,
         text: answer.text,
         components: answer.components.filter((c) => c.type !== 'text'),
+        surfaceIds: answer.a2ui?.map((s) => s.surface_id) ?? turn.surfaceIds,
         citations: answer.citations,
         warnings: answer.warnings,
         tools: turn.tools.map((step) =>
           step.status === 'running' ? { ...step, status: 'done' } : step
         ),
+        thoughtMs: turn.thoughtMs ?? at - turn.startedAt,
       }
     }
     case 'run.failed':
@@ -145,18 +184,21 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
             status: 'streaming',
             text: '',
             components: [],
+            surfaceIds: [],
             citations: [],
             warnings: [],
             tools: [],
             error: null,
             unitsCharged: null,
+            startedAt: action.at,
+            thoughtMs: null,
           },
         ],
       }
     case 'event': {
       const { event } = action
       const next = updateTurn(state, action.id, (turn) =>
-        applyEvent(turn, event)
+        applyEvent(turn, event, action.at)
       )
       if (event.type === 'run.started')
         return { ...next, conversationId: event.conversation_id }
@@ -178,6 +220,11 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
       return updateTurn(state, action.id, (turn) =>
         turn.status === 'streaming' ? { ...turn, status: 'cancelled' } : turn
       )
+    case 'remove':
+      return {
+        ...state,
+        turns: state.turns.filter((turn) => turn.id !== action.id),
+      }
     case 'reset':
       return { ...initialChatState, remainingUnits: state.remainingUnits }
   }

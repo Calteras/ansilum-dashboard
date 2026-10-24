@@ -63,11 +63,18 @@ export interface Citation {
 
 export type AnswerStatus = 'completed' | 'limit_reached' | 'failed'
 
+/** One data card as an A2UI v0.9 surface (https://a2ui.org), built by the agent. */
+export interface A2uiSurfaceMessages {
+  surface_id: string
+  messages: Record<string, unknown>[]
+}
+
 export interface AgentAnswer {
   text: string
   status: AnswerStatus
   citations: Citation[]
   components: AnswerComponent[]
+  a2ui?: A2uiSurfaceMessages[]
   warnings: string[]
 }
 
@@ -111,6 +118,7 @@ export type AssistantEvent =
   | { type: 'retrieval.completed'; call_id: string; source_count: number }
   | { type: 'citation.available'; citation: Citation }
   | { type: 'ui.component'; component: AnswerComponent }
+  | { type: 'ui.a2ui'; surface: A2uiSurfaceMessages }
   | {
       type: 'run.completed'
       run_id: string

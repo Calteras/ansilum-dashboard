@@ -9,17 +9,25 @@ const TABLE_RULE = /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/
 /**
  * Renders the Markdown subset answers use (headings, paragraphs, bullet and
  * numbered lists, pipe tables, **bold**) as React elements. Never HTML: the text
- * comes from a model.
+ * comes from a model. `caret` marks the end of text still being written.
  */
-export function AnswerText({ text }: { text: string }) {
+export function AnswerText({ text, caret }: { text: string; caret?: boolean }) {
+  const blocks = splitBlocks(text)
   return (
-    <div className='space-y-3 text-[15px] leading-7'>
-      {splitBlocks(text).map((block, index) => (
-        <Block key={index} lines={block} />
+    <div className='space-y-4 text-[15px] leading-7'>
+      {blocks.map((block, index) => (
+        <Block
+          key={index}
+          lines={block}
+          caret={caret && index === blocks.length - 1}
+        />
       ))}
+      {caret && !blocks.length && <Caret />}
     </div>
   )
 }
+
+const Caret = () => <span className='aa-caret' aria-hidden='true' />
 
 /** Blank lines separate blocks; a heading line is always a block of its own. */
 function splitBlocks(text: string): string[][] {
@@ -40,38 +48,47 @@ function splitBlocks(text: string): string[][] {
   return blocks
 }
 
-function Block({ lines }: { lines: string[] }) {
+function Block({ lines, caret }: { lines: string[]; caret?: boolean }) {
+  const end = caret ? <Caret /> : null
   const heading = lines.length === 1 ? HEADING.exec(lines[0]) : null
   if (heading)
     return (
       <p
         role='heading'
         aria-level={Math.min(heading[1].length + 2, 6)}
-        className='pt-1 font-semibold'
+        className='pt-2 text-base font-semibold'
       >
         {inline(heading[2])}
+        {end}
       </p>
     )
   if (
     lines.length >= 2 &&
     lines.every((line) => TABLE_ROW.test(line) || TABLE_RULE.test(line))
   )
-    return <MarkdownTable lines={lines} />
-  if (lines.every((line) => BULLET.test(line)))
     return (
-      <ul className='list-disc space-y-1 ps-5'>
-        {lines.map((line, i) => (
-          <li key={i}>{inline(line.replace(BULLET, ''))}</li>
-        ))}
-      </ul>
+      <>
+        <MarkdownTable lines={lines} />
+        {end}
+      </>
     )
-  if (lines.every((line) => NUMBERED.test(line)))
+  const list = lines.every((line) => BULLET.test(line))
+    ? { Tag: 'ul' as const, marker: BULLET, className: 'list-disc' }
+    : lines.every((line) => NUMBERED.test(line))
+      ? { Tag: 'ol' as const, marker: NUMBERED, className: 'list-decimal' }
+      : null
+  if (list)
     return (
-      <ol className='list-decimal space-y-1 ps-5'>
+      <list.Tag
+        className={`${list.className} marker:text-fg-muted space-y-1.5 ps-6`}
+      >
         {lines.map((line, i) => (
-          <li key={i}>{inline(line.replace(NUMBERED, ''))}</li>
+          <li key={i} className='ps-1'>
+            {inline(line.replace(list.marker, ''))}
+            {i === lines.length - 1 && end}
+          </li>
         ))}
-      </ol>
+      </list.Tag>
     )
   return (
     <p>
@@ -81,6 +98,7 @@ function Block({ lines }: { lines: string[] }) {
           {inline(line)}
         </Fragment>
       ))}
+      {end}
     </p>
   )
 }
@@ -100,7 +118,7 @@ function MarkdownTable({ lines }: { lines: string[] }) {
     .filter((_, i) => i !== ruleIndex && !(header && i === 0))
     .map(cells)
   return (
-    <div className='border-divider overflow-x-auto rounded-md border'>
+    <div className='border-divider overflow-x-auto rounded-xl border'>
       <table className='w-full text-left text-sm tabular-nums'>
         {header && (
           <thead>
