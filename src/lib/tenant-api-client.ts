@@ -222,6 +222,7 @@ export const tenantApiPaths = {
   analytics: {
     summary: '/analytics/summary',
     stock: '/analytics/stock',
+    outletsLive: '/analytics/outlets/live',
   },
   cogs: {
     calculate: '/cogs/calculate',

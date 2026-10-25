@@ -13,6 +13,8 @@ export const outletSchema = z.object({
   code: z.string(),
   address: z.string().optional(),
   phone: z.string().optional(),
+  latitude: z.number().nullable().optional(),
+  longitude: z.number().nullable().optional(),
   isActive: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string(),

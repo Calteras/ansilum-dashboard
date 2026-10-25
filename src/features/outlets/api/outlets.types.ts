@@ -7,6 +7,9 @@ export interface Outlet {
   code: string
   address?: string
   phone?: string
+  /** WGS84; both set or both null. */
+  latitude?: number | null
+  longitude?: number | null
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -17,6 +20,8 @@ export interface CreateOutletRequest {
   code: string
   address?: string
   phone?: string
+  latitude?: number
+  longitude?: number
 }
 
 export interface UpdateOutletRequest {
@@ -24,6 +29,9 @@ export interface UpdateOutletRequest {
   code?: string
   address?: string
   phone?: string
+  /** Null clears the position; send both or neither. */
+  latitude?: number | null
+  longitude?: number | null
   isActive?: boolean
 }
 

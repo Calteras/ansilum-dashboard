@@ -23,6 +23,7 @@ import {
 } from '@/features/analytics/api/analytics.queries'
 import { useAssistantPageContext } from '@/features/assistant/hooks/use-assistant-page-context'
 import { pageContextFor } from '@/features/assistant/model/page-context'
+import { OutletMonitor } from '@/features/outlet-monitor'
 import { useCurrentSubscriptionQuery } from '@/features/settings/subscription/subscription.queries'
 import {
   dashboardKeys,
@@ -51,13 +52,13 @@ import {
   type ComparisonMode,
 } from './utils/sales-analytics'
 
-type DashboardTab = 'overview' | 'stock-movements'
+type DashboardTab = 'monitor' | 'overview' | 'stock-movements'
 
 export function Dashboard() {
   const copy = useCopy()
   const queryClient = useQueryClient()
   const { data: subscriptionData } = useCurrentSubscriptionQuery()
-  const [activeTab, setActiveTab] = useState<DashboardTab>('overview')
+  const [activeTab, setActiveTab] = useState<DashboardTab>('monitor')
   const [selectedOutletId, setSelectedOutletId] = useState('')
   const [span, setSpan] = useState<DateSpan>(() => getPresetSpan('this-month'))
   const [comparison, setComparison] =
@@ -76,14 +77,21 @@ export function Dashboard() {
   const outletId = selectedOutletId || outlets[0]?.id || ''
   const outlet = outlets.find((o) => o.id === outletId)
   useAssistantPageContext(
-    pageContextFor({
-      title: copy('Dasbor', 'Dashboard'),
-      surface: 'dashboard',
-      route: '/',
-      span,
-      outletId: outletId || undefined,
-      outletName: outlet?.name,
-    })
+    activeTab === 'monitor'
+      ? pageContextFor({
+          title: copy('Semua outlet', 'All outlets'),
+          surface: 'dashboard',
+          route: '/',
+          span: getPresetSpan('today'),
+        })
+      : pageContextFor({
+          title: copy('Dasbor', 'Dashboard'),
+          surface: 'dashboard',
+          route: '/',
+          span,
+          outletId: outletId || undefined,
+          outletName: outlet?.name,
+        })
   )
 
   // A baseline that would overlap the new range falls back to the previous period.
@@ -351,6 +359,9 @@ export function Dashboard() {
               variant='line'
               aria-label={copy('Bagian analitik', 'Analytics sections')}
             >
+              <TabsTrigger value='monitor'>
+                {copy('Semua outlet', 'All outlets')}
+              </TabsTrigger>
               <TabsTrigger value='overview'>
                 {copy('Penjualan', 'Sales')}
               </TabsTrigger>
@@ -359,6 +370,15 @@ export function Dashboard() {
               </TabsTrigger>
             </TabsList>
           </div>
+
+          <TabsContent value='monitor' className='flex flex-col gap-4 pt-6'>
+            <OutletMonitor
+              onOpenOutlet={(id) => {
+                changeScope(setSelectedOutletId)(id)
+                setActiveTab('overview')
+              }}
+            />
+          </TabsContent>
 
           <TabsContent value='overview' className='flex flex-col gap-4 pt-6'>
             <PageHeader
