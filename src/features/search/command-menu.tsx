@@ -392,6 +392,12 @@ export function CommandMenu() {
         perform: () => go('/employees', { name: q }),
       },
       {
+        id: 'in:customers',
+        title: copy(`Cari “${q}” di Pelanggan`, `Search customers for “${q}”`),
+        icon: SearchIcon,
+        perform: () => go('/customers', { q }),
+      },
+      {
         id: 'in:reservations',
         title: copy(
           `Cari “${q}” di Reservasi`,

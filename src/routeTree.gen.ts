@@ -35,15 +35,18 @@ import { Route as AuthenticatedTablesIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedStockMovementsIndexRouteImport } from './routes/_authenticated/stock-movements/index'
 import { Route as AuthenticatedStaffsIndexRouteImport } from './routes/_authenticated/staffs/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
+import { Route as AuthenticatedRewardsIndexRouteImport } from './routes/_authenticated/rewards/index'
 import { Route as AuthenticatedReservationsIndexRouteImport } from './routes/_authenticated/reservations/index'
 import { Route as AuthenticatedProductsIndexRouteImport } from './routes/_authenticated/products/index'
 import { Route as AuthenticatedOutletsIndexRouteImport } from './routes/_authenticated/outlets/index'
 import { Route as AuthenticatedModifierGroupsIndexRouteImport } from './routes/_authenticated/modifier-groups/index'
 import { Route as AuthenticatedMenusIndexRouteImport } from './routes/_authenticated/menus/index'
+import { Route as AuthenticatedLoyaltyIndexRouteImport } from './routes/_authenticated/loyalty/index'
 import { Route as AuthenticatedIngredientsIndexRouteImport } from './routes/_authenticated/ingredients/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedFoodDeliveryIndexRouteImport } from './routes/_authenticated/food-delivery/index'
 import { Route as AuthenticatedEmployeesIndexRouteImport } from './routes/_authenticated/employees/index'
+import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers/index'
 import { Route as AuthenticatedCogsIndexRouteImport } from './routes/_authenticated/cogs/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedCategoriesIndexRouteImport } from './routes/_authenticated/categories/index'
@@ -61,6 +64,7 @@ import { Route as AuthenticatedSettingsBusinessRouteImport } from './routes/_aut
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as AuthenticatedCustomersCustomerIdRouteImport } from './routes/_authenticated/customers/$customerId'
 import { Route as AuthenticatedChatsConversationIdRouteImport } from './routes/_authenticated/chats/$conversationId'
 import { Route as authAuthEmailVerifiedRouteImport } from './routes/(auth)/auth.email-verified'
 import { Route as authAuthCheckEmailRouteImport } from './routes/(auth)/auth.check-email'
@@ -198,6 +202,12 @@ const AuthenticatedSettingsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedRewardsIndexRoute =
+  AuthenticatedRewardsIndexRouteImport.update({
+    id: '/rewards/',
+    path: '/rewards/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedReservationsIndexRoute =
   AuthenticatedReservationsIndexRouteImport.update({
     id: '/reservations/',
@@ -227,6 +237,12 @@ const AuthenticatedMenusIndexRoute = AuthenticatedMenusIndexRouteImport.update({
   path: '/menus/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLoyaltyIndexRoute =
+  AuthenticatedLoyaltyIndexRouteImport.update({
+    id: '/loyalty/',
+    path: '/loyalty/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedIngredientsIndexRoute =
   AuthenticatedIngredientsIndexRouteImport.update({
     id: '/ingredients/',
@@ -249,6 +265,12 @@ const AuthenticatedEmployeesIndexRoute =
   AuthenticatedEmployeesIndexRouteImport.update({
     id: '/employees/',
     path: '/employees/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCustomersIndexRoute =
+  AuthenticatedCustomersIndexRouteImport.update({
+    id: '/customers/',
+    path: '/customers/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedCogsIndexRoute = AuthenticatedCogsIndexRouteImport.update({
@@ -348,6 +370,12 @@ const AuthenticatedErrorsErrorRoute =
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCustomersCustomerIdRoute =
+  AuthenticatedCustomersCustomerIdRouteImport.update({
+    id: '/customers/$customerId',
+    path: '/customers/$customerId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedChatsConversationIdRoute =
   AuthenticatedChatsConversationIdRouteImport.update({
     id: '/chats/$conversationId',
@@ -386,6 +414,7 @@ export interface FileRoutesByFullPath {
   '/auth/check-email': typeof authAuthCheckEmailRoute
   '/auth/email-verified': typeof authAuthEmailVerifiedRoute
   '/chats/$conversationId': typeof AuthenticatedChatsConversationIdRoute
+  '/customers/$customerId': typeof AuthenticatedCustomersCustomerIdRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -403,15 +432,18 @@ export interface FileRoutesByFullPath {
   '/categories': typeof AuthenticatedCategoriesIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/cogs': typeof AuthenticatedCogsIndexRoute
+  '/customers': typeof AuthenticatedCustomersIndexRoute
   '/employees': typeof AuthenticatedEmployeesIndexRoute
   '/food-delivery': typeof AuthenticatedFoodDeliveryIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/ingredients': typeof AuthenticatedIngredientsIndexRoute
+  '/loyalty': typeof AuthenticatedLoyaltyIndexRoute
   '/menus': typeof AuthenticatedMenusIndexRoute
   '/modifier-groups': typeof AuthenticatedModifierGroupsIndexRoute
   '/outlets': typeof AuthenticatedOutletsIndexRoute
   '/products': typeof AuthenticatedProductsIndexRoute
   '/reservations': typeof AuthenticatedReservationsIndexRoute
+  '/rewards': typeof AuthenticatedRewardsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/staffs': typeof AuthenticatedStaffsIndexRoute
   '/stock-movements': typeof AuthenticatedStockMovementsIndexRoute
@@ -439,6 +471,7 @@ export interface FileRoutesByTo {
   '/auth/check-email': typeof authAuthCheckEmailRoute
   '/auth/email-verified': typeof authAuthEmailVerifiedRoute
   '/chats/$conversationId': typeof AuthenticatedChatsConversationIdRoute
+  '/customers/$customerId': typeof AuthenticatedCustomersCustomerIdRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -456,15 +489,18 @@ export interface FileRoutesByTo {
   '/categories': typeof AuthenticatedCategoriesIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/cogs': typeof AuthenticatedCogsIndexRoute
+  '/customers': typeof AuthenticatedCustomersIndexRoute
   '/employees': typeof AuthenticatedEmployeesIndexRoute
   '/food-delivery': typeof AuthenticatedFoodDeliveryIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/ingredients': typeof AuthenticatedIngredientsIndexRoute
+  '/loyalty': typeof AuthenticatedLoyaltyIndexRoute
   '/menus': typeof AuthenticatedMenusIndexRoute
   '/modifier-groups': typeof AuthenticatedModifierGroupsIndexRoute
   '/outlets': typeof AuthenticatedOutletsIndexRoute
   '/products': typeof AuthenticatedProductsIndexRoute
   '/reservations': typeof AuthenticatedReservationsIndexRoute
+  '/rewards': typeof AuthenticatedRewardsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/staffs': typeof AuthenticatedStaffsIndexRoute
   '/stock-movements': typeof AuthenticatedStockMovementsIndexRoute
@@ -497,6 +533,7 @@ export interface FileRoutesById {
   '/(auth)/auth/check-email': typeof authAuthCheckEmailRoute
   '/(auth)/auth/email-verified': typeof authAuthEmailVerifiedRoute
   '/_authenticated/chats/$conversationId': typeof AuthenticatedChatsConversationIdRoute
+  '/_authenticated/customers/$customerId': typeof AuthenticatedCustomersCustomerIdRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -514,15 +551,18 @@ export interface FileRoutesById {
   '/_authenticated/categories/': typeof AuthenticatedCategoriesIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/cogs/': typeof AuthenticatedCogsIndexRoute
+  '/_authenticated/customers/': typeof AuthenticatedCustomersIndexRoute
   '/_authenticated/employees/': typeof AuthenticatedEmployeesIndexRoute
   '/_authenticated/food-delivery/': typeof AuthenticatedFoodDeliveryIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/ingredients/': typeof AuthenticatedIngredientsIndexRoute
+  '/_authenticated/loyalty/': typeof AuthenticatedLoyaltyIndexRoute
   '/_authenticated/menus/': typeof AuthenticatedMenusIndexRoute
   '/_authenticated/modifier-groups/': typeof AuthenticatedModifierGroupsIndexRoute
   '/_authenticated/outlets/': typeof AuthenticatedOutletsIndexRoute
   '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
   '/_authenticated/reservations/': typeof AuthenticatedReservationsIndexRoute
+  '/_authenticated/rewards/': typeof AuthenticatedRewardsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/staffs/': typeof AuthenticatedStaffsIndexRoute
   '/_authenticated/stock-movements/': typeof AuthenticatedStockMovementsIndexRoute
@@ -553,6 +593,7 @@ export interface FileRouteTypes {
     | '/auth/check-email'
     | '/auth/email-verified'
     | '/chats/$conversationId'
+    | '/customers/$customerId'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
@@ -570,15 +611,18 @@ export interface FileRouteTypes {
     | '/categories'
     | '/chats'
     | '/cogs'
+    | '/customers'
     | '/employees'
     | '/food-delivery'
     | '/help-center'
     | '/ingredients'
+    | '/loyalty'
     | '/menus'
     | '/modifier-groups'
     | '/outlets'
     | '/products'
     | '/reservations'
+    | '/rewards'
     | '/settings/'
     | '/staffs'
     | '/stock-movements'
@@ -606,6 +650,7 @@ export interface FileRouteTypes {
     | '/auth/check-email'
     | '/auth/email-verified'
     | '/chats/$conversationId'
+    | '/customers/$customerId'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
@@ -623,15 +668,18 @@ export interface FileRouteTypes {
     | '/categories'
     | '/chats'
     | '/cogs'
+    | '/customers'
     | '/employees'
     | '/food-delivery'
     | '/help-center'
     | '/ingredients'
+    | '/loyalty'
     | '/menus'
     | '/modifier-groups'
     | '/outlets'
     | '/products'
     | '/reservations'
+    | '/rewards'
     | '/settings'
     | '/staffs'
     | '/stock-movements'
@@ -663,6 +711,7 @@ export interface FileRouteTypes {
     | '/(auth)/auth/check-email'
     | '/(auth)/auth/email-verified'
     | '/_authenticated/chats/$conversationId'
+    | '/_authenticated/customers/$customerId'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
@@ -680,15 +729,18 @@ export interface FileRouteTypes {
     | '/_authenticated/categories/'
     | '/_authenticated/chats/'
     | '/_authenticated/cogs/'
+    | '/_authenticated/customers/'
     | '/_authenticated/employees/'
     | '/_authenticated/food-delivery/'
     | '/_authenticated/help-center/'
     | '/_authenticated/ingredients/'
+    | '/_authenticated/loyalty/'
     | '/_authenticated/menus/'
     | '/_authenticated/modifier-groups/'
     | '/_authenticated/outlets/'
     | '/_authenticated/products/'
     | '/_authenticated/reservations/'
+    | '/_authenticated/rewards/'
     | '/_authenticated/settings/'
     | '/_authenticated/staffs/'
     | '/_authenticated/stock-movements/'
@@ -904,6 +956,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/rewards/': {
+      id: '/_authenticated/rewards/'
+      path: '/rewards'
+      fullPath: '/rewards'
+      preLoaderRoute: typeof AuthenticatedRewardsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reservations/': {
       id: '/_authenticated/reservations/'
       path: '/reservations'
@@ -939,6 +998,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMenusIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/loyalty/': {
+      id: '/_authenticated/loyalty/'
+      path: '/loyalty'
+      fullPath: '/loyalty'
+      preLoaderRoute: typeof AuthenticatedLoyaltyIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/ingredients/': {
       id: '/_authenticated/ingredients/'
       path: '/ingredients'
@@ -965,6 +1031,13 @@ declare module '@tanstack/react-router' {
       path: '/employees'
       fullPath: '/employees'
       preLoaderRoute: typeof AuthenticatedEmployeesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/customers/': {
+      id: '/_authenticated/customers/'
+      path: '/customers'
+      fullPath: '/customers'
+      preLoaderRoute: typeof AuthenticatedCustomersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/cogs/': {
@@ -1086,6 +1159,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/customers/$customerId': {
+      id: '/_authenticated/customers/$customerId'
+      path: '/customers/$customerId'
+      fullPath: '/customers/$customerId'
+      preLoaderRoute: typeof AuthenticatedCustomersCustomerIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/chats/$conversationId': {
       id: '/_authenticated/chats/$conversationId'
       path: '/chats/$conversationId'
@@ -1147,20 +1227,24 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedChatsConversationIdRoute: typeof AuthenticatedChatsConversationIdRoute
+  AuthenticatedCustomersCustomerIdRoute: typeof AuthenticatedCustomersCustomerIdRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAnalyticsIndexRoute: typeof AuthenticatedAnalyticsIndexRoute
   AuthenticatedCategoriesIndexRoute: typeof AuthenticatedCategoriesIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedCogsIndexRoute: typeof AuthenticatedCogsIndexRoute
+  AuthenticatedCustomersIndexRoute: typeof AuthenticatedCustomersIndexRoute
   AuthenticatedEmployeesIndexRoute: typeof AuthenticatedEmployeesIndexRoute
   AuthenticatedFoodDeliveryIndexRoute: typeof AuthenticatedFoodDeliveryIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedIngredientsIndexRoute: typeof AuthenticatedIngredientsIndexRoute
+  AuthenticatedLoyaltyIndexRoute: typeof AuthenticatedLoyaltyIndexRoute
   AuthenticatedMenusIndexRoute: typeof AuthenticatedMenusIndexRoute
   AuthenticatedModifierGroupsIndexRoute: typeof AuthenticatedModifierGroupsIndexRoute
   AuthenticatedOutletsIndexRoute: typeof AuthenticatedOutletsIndexRoute
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
   AuthenticatedReservationsIndexRoute: typeof AuthenticatedReservationsIndexRoute
+  AuthenticatedRewardsIndexRoute: typeof AuthenticatedRewardsIndexRoute
   AuthenticatedStaffsIndexRoute: typeof AuthenticatedStaffsIndexRoute
   AuthenticatedStockMovementsIndexRoute: typeof AuthenticatedStockMovementsIndexRoute
   AuthenticatedTablesIndexRoute: typeof AuthenticatedTablesIndexRoute
@@ -1171,20 +1255,24 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedChatsConversationIdRoute: AuthenticatedChatsConversationIdRoute,
+  AuthenticatedCustomersCustomerIdRoute: AuthenticatedCustomersCustomerIdRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAnalyticsIndexRoute: AuthenticatedAnalyticsIndexRoute,
   AuthenticatedCategoriesIndexRoute: AuthenticatedCategoriesIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedCogsIndexRoute: AuthenticatedCogsIndexRoute,
+  AuthenticatedCustomersIndexRoute: AuthenticatedCustomersIndexRoute,
   AuthenticatedEmployeesIndexRoute: AuthenticatedEmployeesIndexRoute,
   AuthenticatedFoodDeliveryIndexRoute: AuthenticatedFoodDeliveryIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedIngredientsIndexRoute: AuthenticatedIngredientsIndexRoute,
+  AuthenticatedLoyaltyIndexRoute: AuthenticatedLoyaltyIndexRoute,
   AuthenticatedMenusIndexRoute: AuthenticatedMenusIndexRoute,
   AuthenticatedModifierGroupsIndexRoute: AuthenticatedModifierGroupsIndexRoute,
   AuthenticatedOutletsIndexRoute: AuthenticatedOutletsIndexRoute,
   AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
   AuthenticatedReservationsIndexRoute: AuthenticatedReservationsIndexRoute,
+  AuthenticatedRewardsIndexRoute: AuthenticatedRewardsIndexRoute,
   AuthenticatedStaffsIndexRoute: AuthenticatedStaffsIndexRoute,
   AuthenticatedStockMovementsIndexRoute: AuthenticatedStockMovementsIndexRoute,
   AuthenticatedTablesIndexRoute: AuthenticatedTablesIndexRoute,

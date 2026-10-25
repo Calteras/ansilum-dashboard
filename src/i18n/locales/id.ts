@@ -79,6 +79,10 @@ const id = {
     menu: 'Menu',
     inventory: 'Inventaris',
     helpCenter: 'Bantuan',
+    loyalty: 'Loyalitas',
+    loyaltyProgram: 'Program poin',
+    customers: 'Pelanggan',
+    rewards: 'Hadiah',
     groups: {
       general: 'Usaha Anda',
       operations: 'Kegiatan usaha',

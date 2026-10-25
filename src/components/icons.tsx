@@ -66,6 +66,7 @@ import {
   EyeSlashIcon as OutlineEyeSlashIcon,
   FolderIcon as OutlineFolderIcon,
   FunnelIcon as OutlineFunnelIcon,
+  GiftIcon as OutlineGiftIcon,
   InboxIcon as OutlineInboxIcon,
   InformationCircleIcon as OutlineInformationCircleIcon,
   KeyIcon as OutlineKeyIcon,
@@ -208,6 +209,7 @@ export const Filter = icon(OutlineFunnelIcon)
 export const FlaskConical = icon(OutlineBeakerIcon)
 export const Folder = icon(OutlineFolderIcon)
 export const GalleryVerticalEnd = icon(OutlineRectangleStackIcon)
+export const Gift = icon(OutlineGiftIcon)
 export const Grid3X3 = icon(OutlineTableCellsIcon)
 export const HelpCircle = icon(OutlineQuestionMarkCircleIcon)
 export const ImagePlus = icon(OutlinePhotoIcon)

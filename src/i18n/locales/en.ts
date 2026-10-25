@@ -79,6 +79,10 @@ const en = {
     menu: 'Menu',
     inventory: 'Inventory',
     helpCenter: 'Help',
+    loyalty: 'Loyalty',
+    loyaltyProgram: 'Program',
+    customers: 'Customers',
+    rewards: 'Rewards',
     groups: {
       general: 'General',
       operations: 'Operations',
