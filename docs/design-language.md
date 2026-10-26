@@ -16,15 +16,20 @@ document in sync with it.
 
 | Group     | Tokens                                                                     | Use                                                      |
 | --------- | -------------------------------------------------------------------------- | -------------------------------------------------------- |
-| Surfaces  | `background` → `card` → `surface-subtle` → `surface-hover` → `surface-selected`, `popover` | Elevation by luminosity. Overlays use `popover`.          |
+| Surfaces  | `page` → `card` → `surface-subtle` → `surface-hover` → `surface-selected`, `popover`, `background` | Elevation by luminosity. `page` is the console canvas under cards (light: a grey step below white, dark: the background). `background` stays white in light mode for fields, headers and the public storefront. Overlays use `popover`. |
 | Lines     | `border` (= `divider`), `divider-strong`, `input`                           | Hairlines between regions; `divider-strong` for controls. |
-| Text      | `foreground`, `fg-secondary`, `fg-muted`                                   | Primary, supporting, metadata (all ≥ 4.5:1).              |
+| Text      | `foreground`, `fg-secondary`, `fg-muted`                                   | Primary, supporting, metadata (all ≥ 4.5:1, `fg-muted` up to `surface-selected`). |
 | Status    | `status-success`, `status-warning`, `status-danger`, `status-info`         | Text, icons and 10% tints. Use `STATUS_TONE` for badges.  |
 | Data      | `series-primary`, `series-neutral`, `chart-grid`                           | Key series, baseline or de-emphasis, solid gridlines.     |
-| Shell     | `--app-header-height` (56px), `shadow-overlay`                             | Only floating layers cast a shadow.                       |
+| Shell     | `--app-header-height` (56px), `shadow-overlay`, `shadow-surface`           | Floating layers cast `shadow-overlay`. Resting surfaces (`Card`, `DataPanel`, page-level tables and sections) use `shadow-surface`: a 1px lift in light mode, none in dark. |
 
 `warning` / `success` (sun, leaf) are fills with their `-foreground` text, never
 text colours on their own.
+
+A bordered region on the console page needs its own fill: `bg-card` (with
+`shadow-surface` at the top level), or it shows the grey page through. Separation
+in light mode is measured against dark mode's: page vs card ≥ 1.09:1, hairline on
+a card ≥ 1.23:1, control border on a card ≥ 1.48:1.
 
 ## Geometry and type
 

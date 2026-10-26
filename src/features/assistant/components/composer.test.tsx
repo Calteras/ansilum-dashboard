@@ -10,13 +10,18 @@ function Harness({
   onStop = () => {},
   streaming = false,
   deepAnalysisAvailable = true,
+  draft = '',
+  autoFocus,
 }: {
   onSubmit: (question: string, mode: AssistantMode) => void
   onStop?: () => void
   streaming?: boolean
   deepAnalysisAvailable?: boolean
+  /** A draft kept in the store from an earlier visit. */
+  draft?: string
+  autoFocus?: boolean
 }) {
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState(draft)
   const [deep, setDeep] = useState(false)
   return (
     <Composer
@@ -29,6 +34,7 @@ function Harness({
       streaming={streaming}
       units={{ ASK: 1, DEEP_ANALYSIS: 5 }}
       deepAnalysisAvailable={deepAnalysisAvailable}
+      autoFocus={autoFocus}
     />
   )
 }
@@ -55,6 +61,21 @@ describe('Composer', () => {
     await user.type(screen.getByRole('textbox'), 'Kenapa?')
     await user.click(screen.getByRole('button', { name: 'Send question' }))
     expect(onSubmit).toHaveBeenCalledWith('Kenapa?', 'DEEP_ANALYSIS')
+  })
+
+  it('comes back to a saved draft with the caret at its end', async () => {
+    const user = userEvent.setup()
+    const draft = 'Bandingkan omzet minggu ini dengan'
+    render(<Harness onSubmit={vi.fn()} draft={draft} autoFocus />)
+    const input = screen.getByRole<HTMLTextAreaElement>('textbox')
+    expect(input).toHaveFocus()
+    expect([input.selectionStart, input.selectionEnd]).toEqual([
+      draft.length,
+      draft.length,
+    ])
+    // Typing carries on where the draft stopped.
+    await user.keyboard(' minggu lalu')
+    expect(input).toHaveValue(`${draft} minggu lalu`)
   })
 
   it('keeps Deep Analysis off when the plan does not include it', () => {

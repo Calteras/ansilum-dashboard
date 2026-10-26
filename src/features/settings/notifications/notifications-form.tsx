@@ -99,7 +99,7 @@ export function NotificationsForm() {
               control={form.control}
               name='communication_emails'
               render={({ field }) => (
-                <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+                <FormItem className='bg-card shadow-surface flex flex-row items-center justify-between rounded-lg border p-4'>
                   <div className='space-y-0.5'>
                     <FormLabel className='text-base'><UiText id="Email komunikasi" en="Communication emails" /></FormLabel>
                     <FormDescription><UiText id="Terima email tentang aktivitas akun Anda." en="Receive emails about your account activity." /></FormDescription>
@@ -117,7 +117,7 @@ export function NotificationsForm() {
               control={form.control}
               name='marketing_emails'
               render={({ field }) => (
-                <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+                <FormItem className='bg-card shadow-surface flex flex-row items-center justify-between rounded-lg border p-4'>
                   <div className='space-y-0.5'>
                     <FormLabel className='text-base'><UiText id="Email penawaran" en="Marketing emails" /></FormLabel>
                     <FormDescription><UiText id="Terima email tentang produk dan fitur baru." en="Receive emails about new products, features, and more." /></FormDescription>
@@ -135,7 +135,7 @@ export function NotificationsForm() {
               control={form.control}
               name='social_emails'
               render={({ field }) => (
-                <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+                <FormItem className='bg-card shadow-surface flex flex-row items-center justify-between rounded-lg border p-4'>
                   <div className='space-y-0.5'>
                     <FormLabel className='text-base'><UiText id="Email sosial" en="Social emails" /></FormLabel>
                     <FormDescription><UiText id="Terima email tentang aktivitas sosial Anda." en="Receive emails for friend requests, follows, and more." /></FormDescription>
@@ -153,7 +153,7 @@ export function NotificationsForm() {
               control={form.control}
               name='security_emails'
               render={({ field }) => (
-                <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+                <FormItem className='bg-card shadow-surface flex flex-row items-center justify-between rounded-lg border p-4'>
                   <div className='space-y-0.5'>
                     <FormLabel className='text-base'><UiText id="Email keamanan" en="Security emails" /></FormLabel>
                     <FormDescription><UiText id="Terima email tentang aktivitas dan keamanan akun Anda." en="Receive emails about your account activity and security." /></FormDescription>

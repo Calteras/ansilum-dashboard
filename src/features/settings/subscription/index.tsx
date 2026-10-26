@@ -93,7 +93,7 @@ export function SettingsSubscription() {
             </div>
           </div>
         ) : billing.isError || !overview ? (
-          <div role='alert' className='rounded-lg border p-4 text-sm'>
+          <div role='alert' className='bg-card shadow-surface rounded-lg border p-4 text-sm'>
             {copy(
               'Info tagihan belum bisa dimuat. Paket Anda tidak berubah.',
               'Billing couldn’t be loaded. Your plan hasn’t changed.'

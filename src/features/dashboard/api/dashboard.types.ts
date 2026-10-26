@@ -41,6 +41,14 @@ export interface TransactionSummaryParams {
   endDate: string
 }
 
+export interface StockMovementListParams {
+  outletId?: string
+  startDate?: string
+  endDate?: string
+  offset?: number
+  limit?: number
+}
+
 export interface TransactionListParams {
   outletId: string
   startDate: string

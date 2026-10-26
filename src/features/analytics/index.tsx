@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
-import { format } from 'date-fns'
-import { getPresetSpan, type DateSpan } from '@/lib/date-range'
+import { getPresetSpan, toApiDateTime, type DateSpan } from '@/lib/date-range'
 import { useCopy } from '@/hooks/use-copy'
 import { ContextToolbar } from '@/components/data-display/context-toolbar'
 import { DataPanel } from '@/components/data-display/data-panel'
@@ -38,8 +37,8 @@ export function Analytics() {
   )
 
   const analyticsParams = {
-    startDate: format(span.from, 'yyyy-MM-dd'),
-    endDate: format(span.to, 'yyyy-MM-dd'),
+    startDate: toApiDateTime(span.from),
+    endDate: toApiDateTime(span.to),
     outletId: outletId || undefined,
   }
 

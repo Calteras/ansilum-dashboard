@@ -6,8 +6,10 @@ import {
   listTransactionsApi,
   listAllTransactionsApi,
   listStockMovementsApi,
+  listAllStockMovementsApi,
 } from './dashboard.api'
 import type {
+  StockMovementListParams,
   TransactionSummaryParams,
   TransactionListParams,
 } from './dashboard.types'
@@ -19,6 +21,8 @@ type ClosedTransactionsParams = Pick<
 
 /** Upper bound for the trend chart's client-side aggregation. */
 export const SALES_SERIES_ROW_LIMIT = 5000
+/** Upper bound for the stock movements report's client-side aggregation. */
+export const STOCK_MOVEMENT_ROW_LIMIT = 5000
 
 export const dashboardKeys = {
   all: ['dashboard'] as const,
@@ -30,6 +34,8 @@ export const dashboardKeys = {
   closedTransactions: (params: ClosedTransactionsParams) =>
     [...dashboardKeys.all, 'closed-transactions', params] as const,
   stockMovements: () => [...dashboardKeys.all, 'stock-movements'] as const,
+  stockMovementRange: (params: StockMovementListParams) =>
+    [...dashboardKeys.all, 'stock-movements', 'range', params] as const,
 }
 
 export function useDashboardOutletsQuery() {
@@ -98,12 +104,27 @@ export function useTransactionsQuery(params: TransactionListParams) {
   })
 }
 
+/** Movements of one range and outlet, newest first, up to STOCK_MOVEMENT_ROW_LIMIT. */
+export function useStockMovementRangeQuery(
+  params: Omit<StockMovementListParams, 'offset' | 'limit'>
+) {
+  const activeTenant = useAuthStore((s) => s.activeTenant)
+
+  return useQuery({
+    queryKey: dashboardKeys.stockMovementRange(params),
+    queryFn: () =>
+      listAllStockMovementsApi(params, { maxRows: STOCK_MOVEMENT_ROW_LIMIT }),
+    enabled: !!activeTenant && !!params.startDate && !!params.endDate,
+    placeholderData: keepPreviousData,
+  })
+}
+
 export function useStockMovementsQuery(enabled: boolean) {
   const activeTenant = useAuthStore((s) => s.activeTenant)
 
   return useQuery({
     queryKey: dashboardKeys.stockMovements(),
-    queryFn: listStockMovementsApi,
+    queryFn: () => listStockMovementsApi(),
     enabled: enabled && !!activeTenant,
   })
 }

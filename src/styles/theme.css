@@ -25,11 +25,11 @@
   --popover-foreground: var(--ink);
   --primary: var(--ink);
   --primary-foreground: var(--canvas);
-  --secondary: var(--mist);
+  --secondary: var(--surface-hover);
   --secondary-foreground: var(--ink);
   --muted: var(--mist);
   --muted-foreground: var(--soft);
-  --accent: var(--mist);
+  --accent: var(--surface-hover);
   --accent-foreground: var(--ink);
   --destructive: #b42318;
   --destructive-foreground: #ffffff;
@@ -49,19 +49,24 @@
   --sidebar-foreground: var(--soft);
   --sidebar-primary: var(--ink);
   --sidebar-primary-foreground: var(--canvas);
-  --sidebar-accent: var(--mist);
+  --sidebar-accent: var(--surface-selected);
   --sidebar-accent-foreground: var(--ink);
   --sidebar-border: var(--divider);
   --sidebar-ring: var(--brand-ink);
 
-  /* Data surfaces: quiet elevation, hairline dividers, text that recedes in steps. */
-  --surface-subtle: #f7f8fa;
-  --surface-hover: #f2f4f6;
-  --surface-selected: #eceff3;
-  --divider: #eceef1;
-  --divider-strong: #d9dde3;
+  /*
+   * Data surfaces: quiet elevation, hairline dividers, text that recedes in steps.
+   * The console page sits a step below white cards (1.1:1), as dark mode's does;
+   * hairlines 1.27:1 and control borders 1.54:1 on a card, at least dark's.
+   */
+  --page: #f3f4f6;
+  --surface-subtle: #f6f7f9;
+  --surface-hover: #eef0f3;
+  --surface-selected: #e5e8ed;
+  --divider: #e1e4e9;
+  --divider-strong: #cbd1d8;
   --fg-secondary: var(--soft);
-  --fg-muted: #66707c; /* 4.5:1 on --surface-subtle */
+  --fg-muted: #5f6975; /* 4.5:1 on --surface-selected, the darkest fill it sits on */
   --status-success: #12805a;
   --status-warning: #a15c07;
   --status-danger: #b42318;
@@ -69,10 +74,14 @@
   /* Validated pair: accent series + neutral (baseline or de-emphasis), both >= 3:1 on the surface. */
   --series-primary: var(--brand);
   --series-neutral: #7f8996;
-  --chart-grid: #eef0f3;
+  --chart-grid: #e9ecf0;
 
-  /* Shell and elevation. Only floating layers (menus, dialogs) cast a shadow. */
+  /*
+   * Shell and elevation. Floating layers (menus, dialogs) cast a shadow; resting
+   * surfaces only a hairline lift in light mode, where luminosity alone is too faint.
+   */
   --app-header-height: 56px;
+  --surface-shadow: 0 1px 2px 0 rgb(17 20 24 / 0.06);
   --overlay-shadow:
     0 10px 28px -12px rgb(17 20 24 / 0.18), 0 2px 6px -2px rgb(17 20 24 / 0.08);
 }
@@ -118,6 +127,8 @@
   --sidebar-ring: var(--sun);
 
   /* Elevation through luminosity: canvas < surface < subtle < hover < selected. */
+  --page: var(--background);
+  --surface-shadow: none;
   --surface-subtle: #1a212b;
   --surface-hover: #1d2530;
   --surface-selected: #242d39;
@@ -195,6 +206,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-page: var(--page);
   --color-surface-subtle: var(--surface-subtle);
   --color-surface-hover: var(--surface-hover);
   --color-surface-selected: var(--surface-selected);
@@ -210,4 +222,5 @@
   --color-series-neutral: var(--series-neutral);
   --color-chart-grid: var(--chart-grid);
   --shadow-overlay: var(--overlay-shadow);
+  --shadow-surface: var(--surface-shadow);
 }

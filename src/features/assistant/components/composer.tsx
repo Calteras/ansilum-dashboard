@@ -69,6 +69,18 @@ export function Composer({
     el.style.height = `${Math.min(el.scrollHeight, MAX_HEIGHT_PX)}px`
   }, [value])
 
+  // The draft outlives the page; coming back, carry on typing where it ends
+  // rather than at its start, where a plain autofocus leaves the caret.
+  useLayoutEffect(() => {
+    const el = inputRef.current
+    if (!autoFocus || !el) return
+    el.focus()
+    el.setSelectionRange(el.value.length, el.value.length)
+    el.scrollTop = el.scrollHeight
+    // Mount only: later renders must not move the caret.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const submit = (event?: FormEvent) => {
     event?.preventDefault()
     if (canSend) onSubmit(value, mode)
@@ -143,7 +155,6 @@ export function Composer({
         id='assistant-question'
         rows={1}
         value={value}
-        autoFocus={autoFocus}
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={onKeyDown}
         placeholder={copy(

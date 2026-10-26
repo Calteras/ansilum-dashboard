@@ -61,7 +61,10 @@ export function SetupOverview() {
       </div>
       <ol className='grid gap-3 sm:grid-cols-2 lg:grid-cols-3'>
         {overview.map((step, index) => (
-          <li key={step.id} className='flex gap-3 rounded-lg border p-4'>
+          <li
+            key={step.id}
+            className='bg-card shadow-surface flex gap-3 rounded-lg border p-4'
+          >
             <StepNumber index={index} state='upcoming' />
             <div>
               <p className='text-sm font-medium'>{stepTitles[step.id]}</p>
@@ -477,7 +480,7 @@ function LaunchChecklist({
 }) {
   const info = providers[provider]
   return (
-    <div className='space-y-3 rounded-lg border p-4'>
+    <div className='bg-card shadow-surface space-y-3 rounded-lg border p-4'>
       <h4 className='font-semibold'>Run these actions in order</h4>
       <ol className='list-decimal space-y-1.5 pl-5 text-sm'>
         {info.launchSequence.map((action) => (

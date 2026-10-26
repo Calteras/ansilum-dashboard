@@ -9,7 +9,7 @@ export function DataPanel({ className, ...props }: ComponentProps<'section'>) {
   return (
     <section
       className={cn(
-        'border-divider bg-card min-w-0 rounded-lg border',
+        'border-divider bg-card shadow-surface min-w-0 rounded-lg border',
         className
       )}
       {...props}

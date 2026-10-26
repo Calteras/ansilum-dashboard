@@ -154,8 +154,8 @@ export function Dashboard() {
 
   const isFullTier = (subscriptionData?.data?.tier ?? 'BASIC') === 'FULL'
   const { data: analyticsData } = useAnalyticsSummaryQuery({
-    startDate: isFullTier ? format(span.from, 'yyyy-MM-dd') : '',
-    endDate: isFullTier ? format(span.to, 'yyyy-MM-dd') : '',
+    startDate: isFullTier ? toApiDateTime(span.from) : '',
+    endDate: isFullTier ? toApiDateTime(span.to) : '',
     outletId: outletId || undefined,
   })
 

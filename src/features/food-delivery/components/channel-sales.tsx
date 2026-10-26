@@ -165,7 +165,7 @@ export function AdjustmentForm({ orderId }: { orderId: string }) {
     () => setConfirmed(false)
   )
   return (
-    <details className='rounded-md border p-3'>
+    <details className='bg-card rounded-md border p-3'>
       <summary className='cursor-pointer font-medium'>
         Record financial adjustment
       </summary>

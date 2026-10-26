@@ -118,7 +118,7 @@ function MarkdownTable({ lines }: { lines: string[] }) {
     .filter((_, i) => i !== ruleIndex && !(header && i === 0))
     .map(cells)
   return (
-    <div className='border-divider overflow-x-auto rounded-xl border'>
+    <div className='bg-card border-divider overflow-x-auto rounded-xl border'>
       <table className='w-full text-left text-sm tabular-nums'>
         {header && (
           <thead>

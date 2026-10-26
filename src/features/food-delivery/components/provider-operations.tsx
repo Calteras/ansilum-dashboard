@@ -75,7 +75,7 @@ export function ProviderMenu({ binding }: { binding: Binding }) {
         </Notice>
       )}
       {binding.importedMenu && (
-        <details className='space-y-3 rounded-lg border p-4'>
+        <details className='bg-card shadow-surface space-y-3 rounded-lg border p-4'>
           <summary className='cursor-pointer text-sm font-medium'>
             Start from the menu {providers[binding.provider].name} sent
           </summary>
@@ -292,7 +292,7 @@ export function ProviderOperations({
         )}
       </form>
       {session.id && (
-        <div className='space-y-3 rounded-lg border p-4'>
+        <div className='bg-card shadow-surface space-y-3 rounded-lg border p-4'>
           <p className='text-xs break-all'>Operation ID: {session.id}</p>
           <ErrorNotice error={status.error} />
           {status.isPending && <p role='status'>Checking provider outcome…</p>}

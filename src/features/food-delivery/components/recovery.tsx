@@ -178,7 +178,7 @@ export function CommandStatus({ id }: { id: string }) {
     deliveryApi.resolve(id, outcome, evidence.trim())
   )
   return (
-    <div className='space-y-3 rounded-md border p-3'>
+    <div className='bg-card space-y-3 rounded-md border p-3'>
       <p className='text-xs break-all'>Command ID: {id}</p>
       <ErrorNotice error={query.error} />
       {query.isPending && <p role='status'>Checking command…</p>}

@@ -5,6 +5,7 @@ import type {
   TransactionSummaryResponse,
   TransactionsListResponse,
   StockMovementsResponse,
+  StockMovementListParams,
   TransactionSummaryParams,
   TransactionListParams,
 } from './dashboard.types'
@@ -48,22 +49,29 @@ export async function listTransactionsApi(
   )
 }
 
+interface PageWalk {
+  pageSize?: number
+  maxRows?: number
+}
+
 /**
- * Walks every page of the transactions list. `maxRows` caps the walk; the list is
- * newest-first, so a capped result is missing the oldest rows, never the latest.
+ * Walks every page of a newest-first list. `maxRows` caps the walk, so a capped
+ * result is missing the oldest rows, never the latest.
  */
-export async function listAllTransactionsApi(
-  params: Omit<TransactionListParams, 'offset' | 'limit'>,
-  { pageSize = 500, maxRows = Number.POSITIVE_INFINITY } = {}
-): Promise<{ data: Transaction[]; total: number }> {
-  const data: Transaction[] = []
+async function walkPages<T>(
+  fetchPage: (
+    offset: number,
+    limit: number
+  ) => Promise<{ data: T[]; meta?: { total: number } }>,
+  { pageSize = 500, maxRows = Number.POSITIVE_INFINITY }: PageWalk
+): Promise<{ data: T[]; total: number }> {
+  const data: T[] = []
   let total = Number.POSITIVE_INFINITY
   while (data.length < total && data.length < maxRows) {
-    const page = await listTransactionsApi({
-      ...params,
-      offset: data.length,
-      limit: Math.min(pageSize, maxRows - data.length),
-    })
+    const page = await fetchPage(
+      data.length,
+      Math.min(pageSize, maxRows - data.length)
+    )
     data.push(...page.data)
     total = page.meta?.total ?? data.length
     if (page.data.length === 0) break
@@ -71,6 +79,37 @@ export async function listAllTransactionsApi(
   return { data, total: Number.isFinite(total) ? total : data.length }
 }
 
-export async function listStockMovementsApi(): Promise<StockMovementsResponse> {
-  return tenantGet<StockMovementsResponse>(tenantApiPaths.stockMovements.list)
+export function listAllTransactionsApi(
+  params: Omit<TransactionListParams, 'offset' | 'limit'>,
+  walk: PageWalk = {}
+): Promise<{ data: Transaction[]; total: number }> {
+  return walkPages(
+    (offset, limit) => listTransactionsApi({ ...params, offset, limit }),
+    walk
+  )
+}
+
+export async function listStockMovementsApi(
+  params: StockMovementListParams = {}
+): Promise<StockMovementsResponse> {
+  const searchParams = new URLSearchParams()
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== '')
+      searchParams.set(key, String(value))
+  }
+  const query = searchParams.toString()
+  return tenantGet<StockMovementsResponse>(
+    `${tenantApiPaths.stockMovements.list}${query ? `?${query}` : ''}`
+  )
+}
+
+/** Every movement in the range, filtered by the server rather than the latest page. */
+export function listAllStockMovementsApi(
+  params: Omit<StockMovementListParams, 'offset' | 'limit'>,
+  walk: PageWalk = {}
+) {
+  return walkPages(
+    (offset, limit) => listStockMovementsApi({ ...params, offset, limit }),
+    walk
+  )
 }

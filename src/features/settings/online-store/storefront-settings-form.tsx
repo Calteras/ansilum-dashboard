@@ -153,7 +153,7 @@ export function StorefrontSettingsForm({
             control={form.control}
             name='enabled'
             render={({ field }) => (
-              <FormItem className='flex items-start justify-between gap-4 rounded-lg border p-4'>
+              <FormItem className='bg-card shadow-surface flex items-start justify-between gap-4 rounded-lg border p-4'>
                 <div className='space-y-1'>
                   <FormLabel className='text-[15px]'>
                     {copy('Terima pesanan online', 'Take online orders')}
@@ -181,7 +181,7 @@ export function StorefrontSettingsForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{copy('Alamat toko', 'Store address')}</FormLabel>
-                <div className='focus-within:ring-ring/50 flex items-center rounded-md border focus-within:ring-[3px]'>
+                <div className='bg-card focus-within:ring-ring/50 flex items-center rounded-md border focus-within:ring-[3px]'>
                   <span className='text-fg-muted ps-3 text-sm whitespace-nowrap'>
                     {window.location.host}/store/
                   </span>

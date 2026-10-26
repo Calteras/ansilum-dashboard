@@ -1,16 +1,16 @@
-import { useMemo, useState } from 'react'
-import { getPresetSpan, type DateSpan } from '@/lib/date-range'
-import { AlertTriangle } from '@/components/icons'
+import { useState } from 'react'
+import { getPresetSpan, toApiDateTime, type DateSpan } from '@/lib/date-range'
 import { ContextToolbar } from '@/components/data-display/context-toolbar'
 import { DataPanel } from '@/components/data-display/data-panel'
 import { DateRangePicker } from '@/components/date-range-picker'
+import { AlertTriangle } from '@/components/icons'
 import { AppHeader } from '@/components/layout/app-header'
 import { Main } from '@/components/layout/main'
 import { PageHeader } from '@/components/layout/page-header'
 import { OutletSelect } from '@/components/outlet-select'
 import {
   useDashboardOutletsQuery,
-  useStockMovementsQuery,
+  useStockMovementRangeQuery,
 } from '@/features/dashboard/api/dashboard.queries'
 import { StockMovementsStats } from '@/features/dashboard/components/stock-movements/stock-movements-stats'
 import { StockMovementsGroupedTable } from './components/stock-movements-grouped-table'
@@ -22,24 +22,16 @@ export function StockMovementsReport() {
   const { data: outletsData } = useDashboardOutletsQuery()
   const outlets = outletsData?.data ?? []
 
+  // Filtered by the server: a busy outlet records far more than one page a day.
   const { data: movementsData, isLoading: isLoadingMovements } =
-    useStockMovementsQuery(true)
-
-  // The endpoint has no scope parameters yet, so the toolbar filters locally.
-  const stockMovements = useMemo(
-    () =>
-      (movementsData?.data ?? []).filter((movement) => {
-        const date = new Date(movement.movementDate)
-        return (
-          (outletId === 'all' || movement.outlet?.id === outletId) &&
-          date >= span.from &&
-          date <= span.to
-        )
-      }),
-    [movementsData, outletId, span]
-  )
+    useStockMovementRangeQuery({
+      outletId: outletId === 'all' ? undefined : outletId,
+      startDate: toApiDateTime(span.from),
+      endDate: toApiDateTime(span.to),
+    })
+  const stockMovements = movementsData?.data ?? []
   const isPartial =
-    (movementsData?.meta?.total ?? 0) > (movementsData?.data.length ?? 0)
+    (movementsData?.total ?? 0) > (movementsData?.data.length ?? 0)
 
   return (
     <>
@@ -68,9 +60,8 @@ export function StockMovementsReport() {
               className='text-status-warning size-3.5 shrink-0'
               aria-hidden
             />
-            Partial data: {movementsData?.data.length} of{' '}
-            {movementsData?.meta.total} entries loaded, so totals may be
-            understated.
+            Partial data: {movementsData?.data.length} of {movementsData?.total}{' '}
+            entries loaded, so totals may be understated.
           </p>
         )}
 

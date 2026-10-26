@@ -59,7 +59,7 @@ export function ContextToolbar({
       className={cn(
         'flex flex-wrap items-center gap-2',
         sticky &&
-          'bg-background md:data-[stuck=true]:border-divider -mx-4 border-b border-transparent px-4 py-2 transition-colors sm:-mx-6 sm:px-6 md:sticky md:top-(--app-header-height) md:z-20',
+          'bg-page md:data-[stuck=true]:border-divider -mx-4 border-b border-transparent px-4 py-2 transition-colors sm:-mx-6 sm:px-6 md:sticky md:top-(--app-header-height) md:z-20',
         className
       )}
     >

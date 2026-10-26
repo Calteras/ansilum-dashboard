@@ -119,7 +119,7 @@ export function SettingsOnlineStore() {
               </Alert>
             )}
 
-            <div className='rounded-lg border p-4'>
+            <div className='bg-card shadow-surface rounded-lg border p-4'>
               <p className='text-sm font-medium'>
                 {live
                   ? copy('Toko online aktif', 'Your online store is live')
@@ -202,7 +202,7 @@ export function SettingsOnlineStore() {
                     'Choose which outlets appear on your store. Keep warehouses and central kitchens off.'
                   )}
                 </p>
-                <ul className='divide-y rounded-lg border'>
+                <ul className='bg-card shadow-surface divide-y rounded-lg border'>
                   {data.outlets.map((o) => (
                     <li
                       key={o.id}
@@ -285,7 +285,7 @@ function MenuVisibility({
         placeholder={copy('Cari menu', 'Search menu')}
         aria-label={copy('Cari menu', 'Search menu')}
       />
-      <ul className='divide-y rounded-lg border'>
+      <ul className='bg-card shadow-surface divide-y rounded-lg border'>
         {rows.length === 0 && (
           <li className='text-muted-foreground px-4 py-6 text-sm'>
             {copy('Tidak ada menu.', 'No menu items.')}

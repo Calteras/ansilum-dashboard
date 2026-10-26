@@ -240,7 +240,7 @@ export function OutletInventoryTab() {
       )}
 
       {/* ── Table ────────────────────────────────────────────── */}
-      <div className='border-border rounded-lg border'>
+      <div className='bg-card shadow-surface border-border rounded-lg border'>
         <Table>
           <TableHeader>
             <TableRow className='bg-muted/40 hover:bg-muted/40'>

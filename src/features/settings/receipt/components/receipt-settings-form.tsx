@@ -388,7 +388,7 @@ export function ReceiptSettingsForm({
               control={control}
               name='receiptCopies'
               render={({ field }) => (
-                <FormItem className='flex flex-row items-center justify-between gap-4 rounded-lg border p-4'>
+                <FormItem className='bg-card shadow-surface flex flex-row items-center justify-between gap-4 rounded-lg border p-4'>
                   <div className='space-y-0.5'>
                     <FormLabel className='text-base'>
                       {copy('Jumlah salinan', 'Copies')}
@@ -539,7 +539,7 @@ function SwitchField({
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className='flex flex-row items-center justify-between gap-4 rounded-lg border p-4'>
+        <FormItem className='bg-card shadow-surface flex flex-row items-center justify-between gap-4 rounded-lg border p-4'>
           <div className='space-y-0.5'>
             <FormLabel className='text-base'>{label}</FormLabel>
             {description && <FormDescription>{description}</FormDescription>}

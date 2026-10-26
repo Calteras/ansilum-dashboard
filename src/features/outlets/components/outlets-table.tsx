@@ -107,7 +107,7 @@ export function OutletsTable({ data, search, navigate, isLoading, onRefresh, isF
         onRefresh={onRefresh}
         isFetching={isFetching}
       />
-      <div className='overflow-hidden rounded-lg border'>
+      <div className='bg-card shadow-surface overflow-hidden rounded-lg border'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -118,7 +118,7 @@ export function OutletsTable({ data, search, navigate, isLoading, onRefresh, isF
                       key={header.id}
                       colSpan={header.colSpan}
                       className={cn(
-                        'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted',
+                        'bg-surface-subtle',
                         header.column.columnDef.meta?.className,
                         header.column.columnDef.meta?.thClassName
                       )}
@@ -156,7 +156,7 @@ export function OutletsTable({ data, search, navigate, isLoading, onRefresh, isF
                     <TableCell
                       key={cell.id}
                       className={cn(
-                        'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted',
+                        'bg-card group-hover/row:bg-surface-hover group-data-[state=selected]/row:bg-surface-selected',
                         cell.column.columnDef.meta?.className,
                         cell.column.columnDef.meta?.tdClassName
                       )}

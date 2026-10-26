@@ -86,7 +86,11 @@ export function formatSpan(span: DateSpan): string {
   return `${format(from, 'dd MMM')} – ${format(to, 'dd MMM yyyy')}`
 }
 
-/** Local wall-clock timestamp, the format the transactions API expects. */
+/**
+ * The exact instant, with its zone (`…Z`). A zone-less local time is read on
+ * whatever clock the server runs (UTC in production), which pushed the browser's
+ * "today" 7 hours late for a Jakarta outlet.
+ */
 export function toApiDateTime(date: Date): string {
-  return format(date, "yyyy-MM-dd'T'HH:mm:ss")
+  return date.toISOString()
 }

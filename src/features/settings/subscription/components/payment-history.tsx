@@ -66,7 +66,10 @@ export function PaymentHistory() {
           {copy('Memuat pembayaran…', 'Loading payments…')}
         </p>
       ) : history.isError ? (
-        <div role='alert' className='rounded-lg border p-4 text-sm'>
+        <div
+          role='alert'
+          className='bg-card shadow-surface rounded-lg border p-4 text-sm'
+        >
           {copy(
             'Riwayat pembayaran belum bisa dimuat.',
             'Payment history couldn’t be loaded.'
