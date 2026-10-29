@@ -83,6 +83,9 @@ const en = {
     loyaltyProgram: 'Program',
     customers: 'Customers',
     rewards: 'Rewards',
+    pricingRules: 'Pricing',
+    promotions: 'Promotions',
+    taxes: 'Taxes & service',
     groups: {
       general: 'General',
       operations: 'Operations',

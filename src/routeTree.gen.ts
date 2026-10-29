@@ -31,12 +31,14 @@ import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
 import { Route as StoreSlugIndexRouteImport } from './routes/store/$slug/index'
 import { Route as AuthenticatedTransactionsIndexRouteImport } from './routes/_authenticated/transactions/index'
+import { Route as AuthenticatedTaxesIndexRouteImport } from './routes/_authenticated/taxes/index'
 import { Route as AuthenticatedTablesIndexRouteImport } from './routes/_authenticated/tables/index'
 import { Route as AuthenticatedStockMovementsIndexRouteImport } from './routes/_authenticated/stock-movements/index'
 import { Route as AuthenticatedStaffsIndexRouteImport } from './routes/_authenticated/staffs/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedRewardsIndexRouteImport } from './routes/_authenticated/rewards/index'
 import { Route as AuthenticatedReservationsIndexRouteImport } from './routes/_authenticated/reservations/index'
+import { Route as AuthenticatedPromotionsIndexRouteImport } from './routes/_authenticated/promotions/index'
 import { Route as AuthenticatedProductsIndexRouteImport } from './routes/_authenticated/products/index'
 import { Route as AuthenticatedOutletsIndexRouteImport } from './routes/_authenticated/outlets/index'
 import { Route as AuthenticatedModifierGroupsIndexRouteImport } from './routes/_authenticated/modifier-groups/index'
@@ -178,6 +180,11 @@ const AuthenticatedTransactionsIndexRoute =
     path: '/transactions/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedTaxesIndexRoute = AuthenticatedTaxesIndexRouteImport.update({
+  id: '/taxes/',
+  path: '/taxes/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTablesIndexRoute =
   AuthenticatedTablesIndexRouteImport.update({
     id: '/tables/',
@@ -212,6 +219,12 @@ const AuthenticatedReservationsIndexRoute =
   AuthenticatedReservationsIndexRouteImport.update({
     id: '/reservations/',
     path: '/reservations/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPromotionsIndexRoute =
+  AuthenticatedPromotionsIndexRouteImport.update({
+    id: '/promotions/',
+    path: '/promotions/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedProductsIndexRoute =
@@ -442,12 +455,14 @@ export interface FileRoutesByFullPath {
   '/modifier-groups': typeof AuthenticatedModifierGroupsIndexRoute
   '/outlets': typeof AuthenticatedOutletsIndexRoute
   '/products': typeof AuthenticatedProductsIndexRoute
+  '/promotions': typeof AuthenticatedPromotionsIndexRoute
   '/reservations': typeof AuthenticatedReservationsIndexRoute
   '/rewards': typeof AuthenticatedRewardsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/staffs': typeof AuthenticatedStaffsIndexRoute
   '/stock-movements': typeof AuthenticatedStockMovementsIndexRoute
   '/tables': typeof AuthenticatedTablesIndexRoute
+  '/taxes': typeof AuthenticatedTaxesIndexRoute
   '/transactions': typeof AuthenticatedTransactionsIndexRoute
   '/store/$slug': typeof StoreSlugIndexRoute
 }
@@ -499,12 +514,14 @@ export interface FileRoutesByTo {
   '/modifier-groups': typeof AuthenticatedModifierGroupsIndexRoute
   '/outlets': typeof AuthenticatedOutletsIndexRoute
   '/products': typeof AuthenticatedProductsIndexRoute
+  '/promotions': typeof AuthenticatedPromotionsIndexRoute
   '/reservations': typeof AuthenticatedReservationsIndexRoute
   '/rewards': typeof AuthenticatedRewardsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/staffs': typeof AuthenticatedStaffsIndexRoute
   '/stock-movements': typeof AuthenticatedStockMovementsIndexRoute
   '/tables': typeof AuthenticatedTablesIndexRoute
+  '/taxes': typeof AuthenticatedTaxesIndexRoute
   '/transactions': typeof AuthenticatedTransactionsIndexRoute
   '/store/$slug': typeof StoreSlugIndexRoute
 }
@@ -561,12 +578,14 @@ export interface FileRoutesById {
   '/_authenticated/modifier-groups/': typeof AuthenticatedModifierGroupsIndexRoute
   '/_authenticated/outlets/': typeof AuthenticatedOutletsIndexRoute
   '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
+  '/_authenticated/promotions/': typeof AuthenticatedPromotionsIndexRoute
   '/_authenticated/reservations/': typeof AuthenticatedReservationsIndexRoute
   '/_authenticated/rewards/': typeof AuthenticatedRewardsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/staffs/': typeof AuthenticatedStaffsIndexRoute
   '/_authenticated/stock-movements/': typeof AuthenticatedStockMovementsIndexRoute
   '/_authenticated/tables/': typeof AuthenticatedTablesIndexRoute
+  '/_authenticated/taxes/': typeof AuthenticatedTaxesIndexRoute
   '/_authenticated/transactions/': typeof AuthenticatedTransactionsIndexRoute
   '/store/$slug/': typeof StoreSlugIndexRoute
 }
@@ -621,12 +640,14 @@ export interface FileRouteTypes {
     | '/modifier-groups'
     | '/outlets'
     | '/products'
+    | '/promotions'
     | '/reservations'
     | '/rewards'
     | '/settings/'
     | '/staffs'
     | '/stock-movements'
     | '/tables'
+    | '/taxes'
     | '/transactions'
     | '/store/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -678,12 +699,14 @@ export interface FileRouteTypes {
     | '/modifier-groups'
     | '/outlets'
     | '/products'
+    | '/promotions'
     | '/reservations'
     | '/rewards'
     | '/settings'
     | '/staffs'
     | '/stock-movements'
     | '/tables'
+    | '/taxes'
     | '/transactions'
     | '/store/$slug'
   id:
@@ -739,12 +762,14 @@ export interface FileRouteTypes {
     | '/_authenticated/modifier-groups/'
     | '/_authenticated/outlets/'
     | '/_authenticated/products/'
+    | '/_authenticated/promotions/'
     | '/_authenticated/reservations/'
     | '/_authenticated/rewards/'
     | '/_authenticated/settings/'
     | '/_authenticated/staffs/'
     | '/_authenticated/stock-movements/'
     | '/_authenticated/tables/'
+    | '/_authenticated/taxes/'
     | '/_authenticated/transactions/'
     | '/store/$slug/'
   fileRoutesById: FileRoutesById
@@ -928,6 +953,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTransactionsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/taxes/': {
+      id: '/_authenticated/taxes/'
+      path: '/taxes'
+      fullPath: '/taxes'
+      preLoaderRoute: typeof AuthenticatedTaxesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tables/': {
       id: '/_authenticated/tables/'
       path: '/tables'
@@ -968,6 +1000,13 @@ declare module '@tanstack/react-router' {
       path: '/reservations'
       fullPath: '/reservations'
       preLoaderRoute: typeof AuthenticatedReservationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/promotions/': {
+      id: '/_authenticated/promotions/'
+      path: '/promotions'
+      fullPath: '/promotions'
+      preLoaderRoute: typeof AuthenticatedPromotionsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/products/': {
@@ -1243,11 +1282,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedModifierGroupsIndexRoute: typeof AuthenticatedModifierGroupsIndexRoute
   AuthenticatedOutletsIndexRoute: typeof AuthenticatedOutletsIndexRoute
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
+  AuthenticatedPromotionsIndexRoute: typeof AuthenticatedPromotionsIndexRoute
   AuthenticatedReservationsIndexRoute: typeof AuthenticatedReservationsIndexRoute
   AuthenticatedRewardsIndexRoute: typeof AuthenticatedRewardsIndexRoute
   AuthenticatedStaffsIndexRoute: typeof AuthenticatedStaffsIndexRoute
   AuthenticatedStockMovementsIndexRoute: typeof AuthenticatedStockMovementsIndexRoute
   AuthenticatedTablesIndexRoute: typeof AuthenticatedTablesIndexRoute
+  AuthenticatedTaxesIndexRoute: typeof AuthenticatedTaxesIndexRoute
   AuthenticatedTransactionsIndexRoute: typeof AuthenticatedTransactionsIndexRoute
 }
 
@@ -1271,11 +1312,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedModifierGroupsIndexRoute: AuthenticatedModifierGroupsIndexRoute,
   AuthenticatedOutletsIndexRoute: AuthenticatedOutletsIndexRoute,
   AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
+  AuthenticatedPromotionsIndexRoute: AuthenticatedPromotionsIndexRoute,
   AuthenticatedReservationsIndexRoute: AuthenticatedReservationsIndexRoute,
   AuthenticatedRewardsIndexRoute: AuthenticatedRewardsIndexRoute,
   AuthenticatedStaffsIndexRoute: AuthenticatedStaffsIndexRoute,
   AuthenticatedStockMovementsIndexRoute: AuthenticatedStockMovementsIndexRoute,
   AuthenticatedTablesIndexRoute: AuthenticatedTablesIndexRoute,
+  AuthenticatedTaxesIndexRoute: AuthenticatedTaxesIndexRoute,
   AuthenticatedTransactionsIndexRoute: AuthenticatedTransactionsIndexRoute,
 }
 

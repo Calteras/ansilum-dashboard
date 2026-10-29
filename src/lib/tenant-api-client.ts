@@ -158,6 +158,25 @@ export const tenantApiPaths = {
     redemptions: (id: string) => `/rewards/${id}/redemptions`,
   },
   loyaltyConfig: '/loyalty-config',
+  discounts: {
+    list: '/discounts',
+    create: '/discounts',
+    update: (id: string) => `/discounts/${id}`,
+    archive: (id: string) => `/discounts/${id}`,
+    performance: (id: string) => `/discounts/${id}/performance`,
+  },
+  taxConfigs: {
+    list: '/tax-configs',
+    create: '/tax-configs',
+    update: (id: string) => `/tax-configs/${id}`,
+    archive: (id: string) => `/tax-configs/${id}`,
+  },
+  serviceCharges: {
+    list: '/service-charges',
+    create: '/service-charges',
+    update: (id: string) => `/service-charges/${id}`,
+    archive: (id: string) => `/service-charges/${id}`,
+  },
   outlets: {
     list: '/outlets',
     create: '/outlets',

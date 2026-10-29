@@ -83,6 +83,9 @@ const id = {
     loyaltyProgram: 'Program poin',
     customers: 'Pelanggan',
     rewards: 'Hadiah',
+    pricingRules: 'Harga & promo',
+    promotions: 'Promo & diskon',
+    taxes: 'Pajak & layanan',
     groups: {
       general: 'Usaha Anda',
       operations: 'Kegiatan usaha',
