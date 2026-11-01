@@ -33,3 +33,13 @@ export function hasRouteAccess(
   const requiredTier = getRequiredTier(path)
   return TIER_HIERARCHY[currentTier] >= TIER_HIERARCHY[requiredTier]
 }
+
+/**
+ * The tier features are unlocked by: the paid plan, or a higher running free
+ * trial. Billing and capacity keep using the paid `tier`.
+ */
+export function featureTierOf(
+  data: { tier?: SubscriptionTier; featureTier?: SubscriptionTier } | undefined
+): SubscriptionTier {
+  return data?.featureTier ?? data?.tier ?? 'BASIC'
+}

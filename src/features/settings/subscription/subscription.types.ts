@@ -51,7 +51,15 @@ export interface SubscriptionPlansResponse {
 
 export interface CurrentSubscriptionResponse {
   data: {
+    /** The paid plan (BASIC without one). */
     tier: SubscriptionTier
+    /** Paid plan or a higher running trial: what features follow. */
+    featureTier?: SubscriptionTier
+    trial?: {
+      offerCode: string
+      tier: SubscriptionTier
+      expiresAt: string
+    } | null
     message?: string
     userId: string
     status: 'ACTIVE' | null

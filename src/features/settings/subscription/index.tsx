@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AlertTriangle } from '@/components/icons'
 import { formatDateTime } from '@/features/checkout/format'
+import { TrialOffer } from '@/features/trial/components/trial-offer'
 import { CancelPlanSection } from './components/cancel-plan-section'
 import { PaymentHistory } from './components/payment-history'
 import { PaymentMethodSection } from './components/payment-method-section'
@@ -47,6 +48,7 @@ export function SettingsSubscription() {
       <Separator className='my-4 flex-none' />
 
       <div className='max-w-3xl space-y-10 pb-12'>
+        <TrialOffer />
         {pendingOrder && (
           <div className='border-primary/30 bg-primary/5 flex flex-wrap items-center justify-between gap-3 rounded-lg border p-4'>
             <div>

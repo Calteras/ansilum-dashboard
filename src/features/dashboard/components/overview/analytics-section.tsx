@@ -1,4 +1,5 @@
 /** Live analytics for Full; a quiet upgrade notice for other plans. */
+import { featureTierOf } from '@/lib/subscription-access'
 import { format } from 'date-fns'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
@@ -25,7 +26,7 @@ export function AnalyticsDashboardSection({
   const { t } = useTranslation()
   const copy = useCopy()
   const { data: subData } = useCurrentSubscriptionQuery()
-  const isFullTier = (subData?.data?.tier ?? 'BASIC') === 'FULL'
+  const isFullTier = featureTierOf(subData?.data) === 'FULL'
 
   const { data: analyticsData, isLoading } = useAnalyticsSummaryQuery({
     // Only fetch on the Full plan

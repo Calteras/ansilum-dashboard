@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { hasRouteAccess } from '@/lib/subscription-access'
+import { featureTierOf, hasRouteAccess } from '@/lib/subscription-access'
 import { useCurrentSubscriptionQuery } from '@/features/settings/subscription/subscription.queries'
 import type { NavGroup, NavItem, NavLink } from '../types'
 import { sidebarData } from './sidebar-data'
@@ -32,7 +32,7 @@ export function isPathActive(pathname: string, url: string) {
 export function useNavigation() {
   const { t, i18n } = useTranslation()
   const { data } = useCurrentSubscriptionQuery()
-  const tier = data?.data?.tier ?? 'BASIC'
+  const tier = featureTierOf(data?.data)
 
   return useMemo(() => {
     const tr = (key: string) => t(key as never) as string

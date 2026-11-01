@@ -1,6 +1,10 @@
 import { type ReactNode } from 'react'
 import { useLocation, Link } from '@tanstack/react-router'
-import { hasRouteAccess, getRequiredTier } from '@/lib/subscription-access'
+import {
+  featureTierOf,
+  hasRouteAccess,
+  getRequiredTier,
+} from '@/lib/subscription-access'
 import { Button } from '@/components/ui/button'
 import { Lock } from '@/components/icons'
 import { UiText } from '@/components/ui-text'
@@ -10,7 +14,7 @@ export function SubscriptionGuard({ children }: { children: ReactNode }) {
   const pathname = useLocation({ select: (l) => l.pathname })
   const { data, isLoading } = useCurrentSubscriptionQuery()
 
-  const currentTier = data?.data?.tier ?? 'BASIC'
+  const currentTier = featureTierOf(data?.data)
 
   if (isLoading || hasRouteAccess(currentTier, pathname)) {
     return <>{children}</>

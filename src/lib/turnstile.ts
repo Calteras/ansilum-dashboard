@@ -1,5 +1,7 @@
 export interface TurnstileOptions {
   sitekey: string
+  /** Bound into the token; the server rejects a token for another action. */
+  action?: string
   callback: (token: string) => void
   'expired-callback': () => void
   'error-callback': () => void

@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react'
+import { featureTierOf } from '@/lib/subscription-access'
+import { TrialBanner } from '@/features/trial/components/trial-banner'
 import { format } from 'date-fns'
 import { useIsFetching, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
@@ -152,7 +154,7 @@ export function Dashboard() {
   const movementsQuery = useStockMovementsQuery(activeTab === 'stock-movements')
   const stockMovements = movementsQuery.data?.data ?? []
 
-  const isFullTier = (subscriptionData?.data?.tier ?? 'BASIC') === 'FULL'
+  const isFullTier = featureTierOf(subscriptionData?.data) === 'FULL'
   const { data: analyticsData } = useAnalyticsSummaryQuery({
     startDate: isFullTier ? toApiDateTime(span.from) : '',
     endDate: isFullTier ? toApiDateTime(span.to) : '',
@@ -349,6 +351,7 @@ export function Dashboard() {
       <AppHeader />
 
       <Main className='flex w-full flex-1 flex-col pt-0 pb-10'>
+        <TrialBanner />
         <Tabs
           value={activeTab}
           onValueChange={(value) => setActiveTab(value as DashboardTab)}

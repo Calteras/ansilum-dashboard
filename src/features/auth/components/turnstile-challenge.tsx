@@ -1,12 +1,15 @@
-import { UiText } from '@/components/ui-text'
 import { useEffect, useRef, useState } from 'react'
 import { loadTurnstile, type TurnstileAPI } from '@/lib/turnstile'
 import { Button } from '@/components/ui/button'
+import { UiText } from '@/components/ui-text'
 
 export function TurnstileChallenge({
   onToken,
+  action,
 }: {
   onToken: (token: string | null) => void
+  /** Server-checked purpose of the token, e.g. "trial_activate". */
+  action?: string
 }) {
   const container = useRef<HTMLDivElement>(null)
   const [attempt, setAttempt] = useState(0)
@@ -34,6 +37,7 @@ export function TurnstileChallenge({
         setStatus('Complete the security check to continue.')
         widget = api.render(container.current, {
           sitekey,
+          ...(action ? { action } : {}),
           'response-field': false,
           callback: (token) => {
             if (disposed) return
@@ -59,7 +63,7 @@ export function TurnstileChallenge({
       onToken(null)
       if (widget !== undefined) api?.remove(widget)
     }
-  }, [attempt, onToken])
+  }, [attempt, onToken, action])
   return (
     <div className='space-y-2'>
       <div ref={container} />
@@ -78,7 +82,9 @@ export function TurnstileChallenge({
             setStatus('Loading security check…')
             setAttempt((value) => value + 1)
           }}
-        ><UiText id="Ulangi pemeriksaan keamanan" en="Retry security check" /></Button>
+        >
+          <UiText id='Ulangi pemeriksaan keamanan' en='Retry security check' />
+        </Button>
       )}
     </div>
   )
