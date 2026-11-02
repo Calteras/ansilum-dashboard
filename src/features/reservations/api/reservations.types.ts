@@ -94,4 +94,9 @@ export interface ReservationsListResponse {
 
 export interface ReservationListParams {
   outletId: string
+  /** Business days, "yyyy-MM-dd", inclusive. */
+  startDate?: string
+  endDate?: string
+  /** The API returns 50 by default. */
+  limit?: number
 }

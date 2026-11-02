@@ -19,11 +19,14 @@ export const reservationKeys = {
     [...reservationKeys.lists(), params] as const,
 }
 
-export function useReservationsQuery(params: ReservationListParams) {
+export function useReservationsQuery(
+  params: ReservationListParams,
+  options: { enabled?: boolean } = {}
+) {
   return useQuery({
     queryKey: reservationKeys.list(params),
     queryFn: () => listReservationsApi(params),
-    enabled: !!params.outletId,
+    enabled: !!params.outletId && (options.enabled ?? true),
   })
 }
 

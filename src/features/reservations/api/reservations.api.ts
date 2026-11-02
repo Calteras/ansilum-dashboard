@@ -1,8 +1,4 @@
-import {
-  tenantGet,
-  tenantPost,
-  tenantApiPaths,
-} from '@/lib/tenant-api-client'
+import { tenantGet, tenantPost, tenantApiPaths } from '@/lib/tenant-api-client'
 import type {
   Reservation,
   ReservationsListResponse,
@@ -15,6 +11,9 @@ export async function listReservationsApi(
 ): Promise<ReservationsListResponse> {
   const searchParams = new URLSearchParams()
   searchParams.set('outletId', params.outletId)
+  if (params.startDate) searchParams.set('startDate', params.startDate)
+  if (params.endDate) searchParams.set('endDate', params.endDate)
+  if (params.limit) searchParams.set('limit', String(params.limit))
   const query = searchParams.toString()
   return tenantGet<ReservationsListResponse>(
     `${tenantApiPaths.reservations.list}?${query}`

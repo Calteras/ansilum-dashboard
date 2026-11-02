@@ -1,18 +1,9 @@
-import { formatMoney } from '@/lib/format'
 import { useState } from 'react'
 import { z } from 'zod'
 import { format } from 'date-fns'
 import { useForm, useFieldArray, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  Users,
-  Clock,
-  Plus,
-  Minus,
-  Trash2,
-  UtensilsCrossed,
-  Check,
-} from '@/components/icons'
+import { formatMoney } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -39,58 +30,25 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
+import {
+  Users,
+  Clock,
+  Plus,
+  Minus,
+  Trash2,
+  UtensilsCrossed,
+  Check,
+} from '@/components/icons'
 import { SelectDropdown } from '@/components/select-dropdown'
 import { useEmployeesQuery } from '@/features/employees/api/employees.queries'
 import { useModifierGroupsQuery } from '@/features/modifier-groups/api/modifier-groups.queries'
 import type { ModifierGroup } from '@/features/modifier-groups/api/modifier-groups.types'
 import { useProductsQuery } from '@/features/products/api/products.queries'
 import type { Product } from '@/features/products/api/products.types'
-import type { TableSection } from '@/features/tables/data/types'
 import { useCreateReservationMutation } from '../api/reservations.queries'
-
-const SECTIONS: { label: string; value: TableSection }[] = [
-  { label: 'Main Hall', value: 'Main Hall' },
-  { label: 'Outdoor', value: 'Outdoor' },
-  { label: 'VIP Room', value: 'VIP Room' },
-  { label: 'Bar Area', value: 'Bar Area' },
-  { label: 'Private Dining', value: 'Private Dining' },
-]
-
-const MOCK_TABLES: Record<
-  string,
-  { id: string; name: string; capacity: number; status: string }[]
-> = {
-  'Main Hall': [
-    { id: 't1', name: 'T1', capacity: 4, status: 'available' },
-    { id: 't2', name: 'T2', capacity: 6, status: 'occupied' },
-    { id: 't3', name: 'T3', capacity: 4, status: 'available' },
-    { id: 't4', name: 'T4', capacity: 2, status: 'available' },
-    { id: 't5', name: 'T5', capacity: 4, status: 'reserved' },
-    { id: 't6', name: 'T6', capacity: 8, status: 'available' },
-  ],
-  Outdoor: [
-    { id: 't7', name: 'T7', capacity: 4, status: 'available' },
-    { id: 't8', name: 'T8', capacity: 6, status: 'available' },
-    { id: 't9', name: 'T9', capacity: 4, status: 'occupied' },
-  ],
-  'VIP Room': [
-    { id: 't10', name: 'VIP-A', capacity: 8, status: 'available' },
-    { id: 't11', name: 'VIP-B', capacity: 10, status: 'available' },
-    { id: 't12', name: 'VIP-C', capacity: 12, status: 'reserved' },
-  ],
-  'Bar Area': [
-    { id: 't13', name: 'BAR-1', capacity: 2, status: 'available' },
-    { id: 't14', name: 'BAR-2', capacity: 2, status: 'available' },
-    { id: 't15', name: 'BAR-3', capacity: 2, status: 'occupied' },
-    { id: 't16', name: 'BAR-4', capacity: 2, status: 'available' },
-  ],
-  'Private Dining': [
-    { id: 't17', name: 'PD-1', capacity: 6, status: 'available' },
-    { id: 't18', name: 'PD-2', capacity: 8, status: 'available' },
-  ],
-}
+import { useReservationTables } from '../hooks/use-reservation-tables'
+import { ReservationTablePicker } from './reservation-table-picker'
 
 const TIME_SLOTS = [
   '10:00',
@@ -155,7 +113,7 @@ const formSchema = z.object({
   time: z.string().min(1, 'Please select a time.'),
   numberOfPeople: z.coerce.number().min(1),
   notes: z.string().optional(),
-  tableId: z.string().min(1),
+  tableId: z.string(),
   cashierId: z.string().min(1),
   depositAmount: z.coerce.number().min(0).optional(),
   items: z.array(
@@ -189,7 +147,6 @@ type Props = {
 }
 
 export function ReservationsMakeForm({ outletId }: Props) {
-  const [activeSection, setActiveSection] = useState<string>('Main Hall')
   const [menuSearch, setMenuSearch] = useState('')
   const [customizing, setCustomizing] = useState<CustomizingProduct | null>(
     null
@@ -250,6 +207,18 @@ export function ReservationsMakeForm({ outletId }: Props) {
   // eslint-disable-next-line react-hooks/incompatible-library
   const selectedTableId = form.watch('tableId')
   const watchedItems = form.watch('items')
+  const reservationDay = form.watch('reservationDate')
+  const reservationTime = form.watch('time')
+  const partySize = Number(form.watch('numberOfPeople')) || 0
+  const day = reservationDay ? format(reservationDay, 'yyyy-MM-dd') : null
+  const tables = useReservationTables(outletId, day, reservationTime)
+
+  // Tables belong to one outlet: switching outlets clears the choice.
+  const [tablesOf, setTablesOf] = useState(outletId)
+  if (tablesOf !== outletId) {
+    setTablesOf(outletId)
+    form.setValue('tableId', '')
+  }
 
   const getItemTotal = (item: ReservationItem) => {
     const base = Number(item.price) + Number(item.variantPriceDelta ?? 0)
@@ -409,6 +378,17 @@ export function ReservationsMakeForm({ outletId }: Props) {
   }
 
   const onSubmit = async (values: ReservationFormValues) => {
+    const table = tables.tables.find((t) => t.id === values.tableId)
+    if (tables.tables.length > 0 && !table) {
+      form.setError('tableId', { message: 'Please choose a table.' })
+      return
+    }
+    if (table && tables.taken(table)) {
+      form.setError('tableId', {
+        message: `${table.name} is already booked around that time.`,
+      })
+      return
+    }
     try {
       await createMutation.mutateAsync({
         localUuid: crypto.randomUUID(),
@@ -416,8 +396,10 @@ export function ReservationsMakeForm({ outletId }: Props) {
         cashierId: values.cashierId,
         customerName: values.customerName,
         customerPhone: values.customerPhone,
-        reservationDate: `${format(values.reservationDate, 'yyyy-MM-dd')}T${values.time}:00`,
-        tableNumber: values.tableId,
+        reservationDate: new Date(
+          `${format(values.reservationDate, 'yyyy-MM-dd')}T${values.time}:00`
+        ).toISOString(),
+        tableNumber: table?.name,
         notes: values.notes || undefined,
         depositAmount: values.depositAmount || undefined,
         items: values.items.map((item) => ({
@@ -697,166 +679,16 @@ export function ReservationsMakeForm({ outletId }: Props) {
             <div className='space-y-4'>
               <h3 className='text-sm font-semibold'>Table</h3>
 
-              <Tabs value={activeSection} onValueChange={setActiveSection}>
-                <TabsList className='w-full'>
-                  {SECTIONS.map((s) => (
-                    <TabsTrigger key={s.value} value={s.value}>
-                      {s.label}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-
-                {SECTIONS.map((section) => (
-                  <TabsContent key={section.value} value={section.value}>
-                    <div className='grid grid-cols-3 gap-4 pt-2'>
-                      {(MOCK_TABLES[section.value] ?? []).map((table) => {
-                        const isSelected = selectedTableId === table.id
-                        const isOccupied = table.status === 'occupied'
-                        const isReserved = table.status === 'reserved'
-                        const isDisabled = isOccupied || isReserved
-
-                        return (
-                          <button
-                            key={table.id}
-                            type='button'
-                            disabled={isDisabled}
-                            onClick={() =>
-                              form.setValue('tableId', table.id, {
-                                shouldValidate: true,
-                              })
-                            }
-                            className={cn(
-                              'relative flex aspect-square flex-col items-center justify-center rounded-lg border-2 p-4 transition-colors',
-                              isSelected && !isDisabled
-                                ? 'border-primary bg-primary/10 ring-primary/30 ring-2'
-                                : '',
-                              isOccupied
-                                ? 'border-destructive/30 bg-destructive/5 cursor-not-allowed opacity-50'
-                                : '',
-                              isReserved
-                                ? 'border-status-warning/30 bg-status-warning/5 cursor-not-allowed opacity-50'
-                                : '',
-                              !isDisabled && !isSelected
-                                ? 'border-input hover:border-primary/50 hover:bg-muted/50 cursor-pointer'
-                                : ''
-                            )}
-                          >
-                            <div
-                              className={cn(
-                                'mb-2 flex h-12 w-12 items-center justify-center rounded-lg border-2',
-                                isSelected && !isDisabled
-                                  ? 'border-primary bg-primary text-primary-foreground'
-                                  : 'border-muted-foreground/30'
-                              )}
-                            >
-                              {isSelected && !isDisabled ? (
-                                <svg
-                                  className='h-5 w-5'
-                                  fill='none'
-                                  viewBox='0 0 24 24'
-                                  stroke='currentColor'
-                                  strokeWidth={3}
-                                >
-                                  <path
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                    d='M5 13l4 4L19 7'
-                                  />
-                                </svg>
-                              ) : null}
-                            </div>
-
-                            {/* Seat indicators */}
-                            <div className='absolute top-1 left-1/2 flex -translate-x-1/2 gap-1'>
-                              {Array.from({
-                                length: Math.min(
-                                  Math.ceil(table.capacity / 2),
-                                  3
-                                ),
-                              }).map((_, i) => (
-                                <div
-                                  key={`t-${i}`}
-                                  className={cn(
-                                    'h-2 w-4 rounded-t-full',
-                                    isSelected && !isDisabled
-                                      ? 'bg-primary/60'
-                                      : 'bg-muted-foreground/20'
-                                  )}
-                                />
-                              ))}
-                            </div>
-                            <div className='absolute bottom-1 left-1/2 flex -translate-x-1/2 gap-1'>
-                              {Array.from({
-                                length: Math.min(
-                                  Math.floor(table.capacity / 2),
-                                  3
-                                ),
-                              }).map((_, i) => (
-                                <div
-                                  key={`b-${i}`}
-                                  className={cn(
-                                    'h-2 w-4 rounded-b-full',
-                                    isSelected && !isDisabled
-                                      ? 'bg-primary/60'
-                                      : 'bg-muted-foreground/20'
-                                  )}
-                                />
-                              ))}
-                            </div>
-                            <div className='absolute top-1/2 left-1 -translate-y-1/2'>
-                              <div
-                                className={cn(
-                                  'h-4 w-2 rounded-l-full',
-                                  isSelected && !isDisabled
-                                    ? 'bg-primary/60'
-                                    : 'bg-muted-foreground/20'
-                                )}
-                              />
-                            </div>
-                            <div className='absolute top-1/2 right-1 -translate-y-1/2'>
-                              <div
-                                className={cn(
-                                  'h-4 w-2 rounded-r-full',
-                                  isSelected && !isDisabled
-                                    ? 'bg-primary/60'
-                                    : 'bg-muted-foreground/20'
-                                )}
-                              />
-                            </div>
-
-                            <span className='mt-1 text-xs font-medium'>
-                              {table.name}
-                            </span>
-                            <span className='text-muted-foreground text-xs'>
-                              <Users size={10} className='mr-0.5 inline' />
-                              {table.capacity}
-                            </span>
-                          </button>
-                        )
-                      })}
-                    </div>
-
-                    <div className='text-muted-foreground mt-4 flex flex-wrap gap-4 text-xs'>
-                      <div className='flex items-center gap-1.5'>
-                        <div className='border-input h-3 w-3 rounded border-2' />
-                        Available
-                      </div>
-                      <div className='flex items-center gap-1.5'>
-                        <div className='border-primary bg-primary/20 h-3 w-3 rounded border-2' />
-                        Selected
-                      </div>
-                      <div className='flex items-center gap-1.5'>
-                        <div className='border-destructive/30 bg-destructive/10 h-3 w-3 rounded border-2' />
-                        Occupied
-                      </div>
-                      <div className='flex items-center gap-1.5'>
-                        <div className='border-status-warning/30 bg-status-warning/10 h-3 w-3 rounded border-2' />
-                        Reserved
-                      </div>
-                    </div>
-                  </TabsContent>
-                ))}
-              </Tabs>
+              <ReservationTablePicker
+                outletId={outletId}
+                day={day}
+                time={reservationTime}
+                partySize={partySize}
+                value={selectedTableId}
+                onChange={(tableId) =>
+                  form.setValue('tableId', tableId, { shouldValidate: true })
+                }
+              />
 
               {form.formState.errors.tableId && (
                 <p className='text-destructive text-sm'>
