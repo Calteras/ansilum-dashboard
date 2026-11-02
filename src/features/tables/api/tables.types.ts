@@ -62,6 +62,10 @@ export interface ActiveTransaction {
   seatedAt?: string
   fromReservation?: boolean
   cashierName?: string | null
+  /** Party size, when the register recorded it. */
+  guestCount?: number | null
+  /** Orders the party placed since sitting down, paid now or later. */
+  orderCount?: number
 }
 
 /** A booking on the board's day that holds the table around its time. */
@@ -85,8 +89,9 @@ export interface TableMonitoring extends TableLayoutTable {
     name: string
     order: number
   }
+  /** The party seated here: every order since it sat down, summed. */
   activeTransaction: ActiveTransaction | null
-  /** More than one means two parties share the table. */
+  /** Unpaid bills on the table. */
   openOrders?: number
   bookings?: TableBooking[]
 }

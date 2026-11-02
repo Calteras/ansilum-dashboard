@@ -157,23 +157,30 @@ export function MonitoringTableCard({
                 <span className='text-muted-foreground shrink-0 tabular-nums'>{order.transactionNo}</span>
               </div>
               <div className='text-muted-foreground mt-1 flex flex-wrap gap-x-3 gap-y-0.5 tabular-nums'>
+                {order.guestCount ? <span>{order.guestCount} of {table.capacity} seats</span> : null}
                 {order.seatedAt && <span>Since {time(order.seatedAt)}</span>}
+                {(order.orderCount ?? 1) > 1 && <span>{order.orderCount} orders</span>}
                 {order.itemCount !== undefined && <span>{order.itemCount} item{order.itemCount === 1 ? '' : 's'}</span>}
                 {order.cashierName && <span>{order.cashierName}</span>}
                 {order.fromReservation && <span>Booked guest</span>}
               </div>
               <div className='mt-2 flex items-baseline justify-between tabular-nums'>
                 <span className='text-muted-foreground'>
-                  {order.paidAmount ? `${formatMoney(order.paidAmount)} paid` : 'Unpaid'}
+                  {(order.paidAmount ?? 0) >= order.grandTotal && !table.openOrders
+                    ? 'Paid'
+                    : order.paidAmount
+                      ? `${formatMoney(order.paidAmount)} paid`
+                      : 'Unpaid'}
                 </span>
                 <span className='text-sm font-semibold'>{formatMoney(order.grandTotal)}</span>
               </div>
-              {(table.openOrders ?? 1) > 1 && (
-                <p className='text-status-warning mt-2'>{table.openOrders} open orders share this table</p>
-              )}
             </div>
+          ) : table.openOrders ? (
+            <p className='text-status-warning text-xs'>
+              {table.openOrders} unpaid bill{table.openOrders === 1 ? '' : 's'} left on this table
+            </p>
           ) : (
-            <p className='text-muted-foreground text-xs'>No active order</p>
+            <p className='text-muted-foreground text-xs'>No one seated</p>
           )}
           {held && (
             <p className='border-status-warning/30 bg-status-warning/10 text-status-warning rounded-md border px-2 py-1.5 text-xs'>

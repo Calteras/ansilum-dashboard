@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { formatMoney } from '@/lib/format'
 import type {
@@ -83,33 +83,49 @@ describe('MonitoringTableCard', () => {
   })
   afterEach(() => vi.useRealTimers())
 
-  it('shows the party seated at the table', () => {
+  const party = {
+    id: 's1',
+    transactionNo: 'TRX-1',
+    status: 'CLOSED',
+    tableNumber: 'T1',
+    grandTotal: 207000,
+    createdAt: '2030-06-15T10:30:00.000Z',
+    seatedAt: '2030-06-15T10:30:00.000Z',
+    customerName: 'Budi',
+    itemCount: 3,
+    paidAmount: 207000,
+    cashierName: 'Rina',
+    guestCount: 4,
+    orderCount: 2,
+  }
+
+  it('shows the party seated at the table, paid up front', () => {
+    renderCard(
+      table({ status: 'OCCUPIED', openOrders: 0, activeTransaction: party })
+    )
+    expect(screen.getByText('Budi')).toBeInTheDocument()
+    expect(screen.getByText('4 of 4 seats')).toBeInTheDocument()
+    expect(screen.getByText('Since 17:30')).toBeInTheDocument()
+    expect(screen.getByText('2 orders')).toBeInTheDocument()
+    expect(screen.getByText('3 items')).toBeInTheDocument()
+    expect(screen.getByText('Rina')).toBeInTheDocument()
+    expect(screen.getByText('Paid')).toBeInTheDocument()
+    expect(screen.getByText(formatMoney(207000))).toBeInTheDocument()
+  })
+
+  it('shows what is still owed, and a bill left on a cleared table', () => {
     renderCard(
       table({
         status: 'OCCUPIED',
-        openOrders: 2,
-        activeTransaction: {
-          id: 's1',
-          transactionNo: 'TRX-1',
-          status: 'OPEN',
-          tableNumber: 'T1',
-          grandTotal: 120000,
-          createdAt: '2030-06-15T10:30:00.000Z',
-          seatedAt: '2030-06-15T10:30:00.000Z',
-          customerName: 'Budi',
-          itemCount: 3,
-          paidAmount: 0,
-          cashierName: 'Rina',
-        },
+        openOrders: 1,
+        activeTransaction: { ...party, paidAmount: 103500 },
       })
     )
-    expect(screen.getByText('Budi')).toBeInTheDocument()
-    expect(screen.getByText('Since 17:30')).toBeInTheDocument()
-    expect(screen.getByText('3 items')).toBeInTheDocument()
-    expect(screen.getByText('Rina')).toBeInTheDocument()
-    expect(screen.getByText(formatMoney(120000))).toBeInTheDocument()
+    expect(screen.getByText(`${formatMoney(103500)} paid`)).toBeInTheDocument()
+    cleanup()
+    renderCard(table({ openOrders: 1 }))
     expect(
-      screen.getByText('2 open orders share this table')
+      screen.getByText('1 unpaid bill left on this table')
     ).toBeInTheDocument()
   })
 
