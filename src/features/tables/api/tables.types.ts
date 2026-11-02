@@ -55,6 +55,28 @@ export interface ActiveTransaction {
   tableNumber: string
   grandTotal: number
   createdAt: string
+  customerName?: string | null
+  itemCount?: number
+  paidAmount?: number
+  /** When the party sat down: arrival for a booking, else the order time. */
+  seatedAt?: string
+  fromReservation?: boolean
+  cashierName?: string | null
+}
+
+/** A booking on the board's day that holds the table around its time. */
+export interface TableBooking {
+  id: string
+  transactionNo: string
+  tableNumber: string | null
+  customerName: string | null
+  customerPhone: string | null
+  reservationDate: string
+  grandTotal: number
+  paidAmount: number
+  depositAmount: number
+  itemCount: number
+  notes: string | null
 }
 
 export interface TableMonitoring extends TableLayoutTable {
@@ -64,6 +86,9 @@ export interface TableMonitoring extends TableLayoutTable {
     order: number
   }
   activeTransaction: ActiveTransaction | null
+  /** More than one means two parties share the table. */
+  openOrders?: number
+  bookings?: TableBooking[]
 }
 
 export interface TableMonitoringResponse {
@@ -74,6 +99,13 @@ export interface TableMonitoringResponse {
     byStatus: Record<TableStatus, number>
     capacity: number
     occupiedCapacity: number
+    bookings?: number
+    bookedTables?: number
   }
   tables: TableMonitoring[]
+  /** The business day the bookings are for ("yyyy-MM-dd"). */
+  date?: string
+  timeZone?: string
+  bookingHoldMinutes?: number
+  unassignedBookings?: TableBooking[]
 }

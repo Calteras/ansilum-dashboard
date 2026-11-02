@@ -116,28 +116,31 @@ const formSchema = z.object({
   tableId: z.string(),
   cashierId: z.string().min(1),
   depositAmount: z.coerce.number().min(0).optional(),
-  items: z.array(
-    z.object({
-      productId: z.string(),
-      productName: z.string(),
-      price: z.number(),
-      quantity: z.number(),
-      notes: z.string().optional(),
-      variantId: z.string().optional(),
-      variantName: z.string().optional(),
-      variantPriceDelta: z.number().optional(),
-      selectedModifiers: z
-        .array(
-          z.object({
-            modifierId: z.string(),
-            modifierName: z.string(),
-            groupName: z.string(),
-            priceAdjustment: z.number(),
-          })
-        )
-        .optional(),
-    })
-  ),
+  items: z
+    .array(
+      z.object({
+        productId: z.string(),
+        productName: z.string(),
+        price: z.number(),
+        quantity: z.number(),
+        notes: z.string().optional(),
+        variantId: z.string().optional(),
+        variantName: z.string().optional(),
+        variantPriceDelta: z.number().optional(),
+        selectedModifiers: z
+          .array(
+            z.object({
+              modifierId: z.string(),
+              modifierName: z.string(),
+              groupName: z.string(),
+              priceAdjustment: z.number(),
+            })
+          )
+          .optional(),
+      })
+    )
+    // A reservation is a pre-order: the server prices it from its items.
+    .min(1, 'Add at least one pre-order item.'),
 })
 
 type ReservationFormValues = z.infer<typeof formSchema>
@@ -396,9 +399,9 @@ export function ReservationsMakeForm({ outletId }: Props) {
         cashierId: values.cashierId,
         customerName: values.customerName,
         customerPhone: values.customerPhone,
-        reservationDate: new Date(
-          `${format(values.reservationDate, 'yyyy-MM-dd')}T${values.time}:00`
-        ).toISOString(),
+        // Zone-less: the server reads it on the business clock, as from the POS.
+        reservationDate: `${format(values.reservationDate, 'yyyy-MM-dd')}T${values.time}:00`,
+        tableId: table?.id,
         tableNumber: table?.name,
         notes: values.notes || undefined,
         depositAmount: values.depositAmount || undefined,
@@ -719,6 +722,12 @@ export function ReservationsMakeForm({ outletId }: Props) {
                 value={menuSearch}
                 onChange={(e) => setMenuSearch(e.target.value)}
               />
+
+              {form.formState.errors.items?.message && (
+                <p className='text-destructive text-sm'>
+                  {form.formState.errors.items.message}
+                </p>
+              )}
 
               {/* Product grid */}
               <div className='max-h-80 space-y-4 overflow-y-auto pr-1'>

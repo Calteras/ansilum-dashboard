@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
   Select,
   SelectContent,
@@ -11,7 +11,6 @@ import { AppHeader } from '@/components/layout/app-header'
 import { Main } from '@/components/layout/main'
 import { PageHeader } from '@/components/layout/page-header'
 import { useDashboardOutletsQuery } from '@/features/dashboard/api/dashboard.queries'
-import { useReservationsQuery } from './api/reservations.queries'
 import { ReservationsDialogs } from './components/reservations-dialogs'
 import { ReservationsList } from './components/reservations-list'
 import { ReservationsMakeForm } from './components/reservations-make-form'
@@ -23,17 +22,9 @@ export function Reservations() {
   const { data: outletsData } = useDashboardOutletsQuery()
   const outlets = outletsData?.data ?? []
 
-  const [selectedOutletId, setSelectedOutletId] = useState<string>('')
-
-  useEffect(() => {
-    if (outlets.length > 0 && !selectedOutletId) {
-      setSelectedOutletId(outlets[0].id)
-    }
-  }, [outlets, selectedOutletId])
-
-  const { data, isLoading } = useReservationsQuery({
-    outletId: selectedOutletId,
-  })
+  const [pickedOutletId, setSelectedOutletId] = useState<string>('')
+  // The first outlet until one is picked.
+  const selectedOutletId = pickedOutletId || outlets[0]?.id || ''
 
   return (
     <ReservationsProvider>
@@ -77,10 +68,7 @@ export function Reservations() {
           </TabsContent>
 
           <TabsContent value='list' className='mt-4'>
-            <ReservationsList
-              reservations={data?.data ?? []}
-              isLoading={isLoading}
-            />
+            <ReservationsList outletId={selectedOutletId} />
           </TabsContent>
         </Tabs>
       </Main>

@@ -1,12 +1,9 @@
 import { useTableLayoutQuery } from '@/features/tables/api/tables.queries'
 import type { TableLayoutTable } from '@/features/tables/api/tables.types'
 import { useReservationsQuery } from '../api/reservations.queries'
-import {
-  bookingsByTable,
-  isTaken,
-  reservationInstant,
-  tableKey,
-} from '../lib/table-availability'
+import { wallClock, wallMinutes, type WallClock } from '../lib/business-clock'
+import { bookingsByTable, isTaken, tableKey } from '../lib/table-availability'
+import { useBusinessTimeZone } from './use-business-time-zone'
 
 /**
  * The outlet's configured tables (the same layout the POS uses), with the
@@ -18,6 +15,7 @@ export function useReservationTables(
   day: string | null,
   time: string
 ) {
+  const timeZone = useBusinessTimeZone()
   const layout = useTableLayoutQuery(outletId)
   // Only the chosen business day's open bookings matter.
   const booked = useReservationsQuery(
@@ -33,13 +31,16 @@ export function useReservationTables(
     .filter((s) => s.tables.length > 0)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
   const tables = sections.flatMap((s) => s.tables)
-  const bookings = day ? bookingsByTable(booked.data?.data ?? []) : new Map()
-  const at = day ? reservationInstant(day, time) : null
+  const bookings = day
+    ? bookingsByTable(booked.data?.data ?? [], timeZone)
+    : new Map<string, WallClock[]>()
+  const at = day ? wallMinutes(day, time) : null
   return {
     layout,
     sections,
     tables,
-    bookingsFor: (table: TableLayoutTable): Date[] =>
+    isToday: !!day && day === wallClock(new Date(), timeZone)?.day,
+    bookingsFor: (table: TableLayoutTable): WallClock[] =>
       bookings.get(tableKey(table.name)) ?? [],
     taken: (table: TableLayoutTable) =>
       isTaken(bookings.get(tableKey(table.name)) ?? [], at),

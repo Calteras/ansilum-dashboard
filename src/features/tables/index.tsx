@@ -31,7 +31,10 @@ import { Metric, MetricGroup } from '@/components/data-display/metric'
 import { PageHeader } from '@/components/layout/page-header'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Link } from '@tanstack/react-router'
+import { formatMoney } from '@/lib/format'
 import { useDashboardOutletsQuery } from '@/features/dashboard/api/dashboard.queries'
+import { wallClock } from '@/features/reservations/lib/business-clock'
 import {
   useReleaseTableMutation,
   useSaveTableLayoutMutation,
@@ -41,7 +44,9 @@ import {
 } from './api/tables.queries'
 import type {
   TableLayoutResponse,
+  TableBooking,
   TableMonitoring,
+  TableMonitoringResponse,
   TableStatus,
 } from './api/tables.types'
 import { SaveLayoutDialog, type buildPayload } from './components/save-layout-dialog'
@@ -97,15 +102,27 @@ function StatusBadge({ status }: { status: TableStatus }) {
   return <Badge variant='outline' className={styles[status]}>{statusLabels[status]}</Badge>
 }
 
-function MonitoringTableCard({
+/** The booking holding the table now: within the hold window of its time. */
+function heldBy(bookings: TableBooking[], holdMinutes: number, now = Date.now()) {
+  return bookings.find((b) => Math.abs(Date.parse(b.reservationDate) - now) < holdMinutes * 60_000)
+}
+
+export function MonitoringTableCard({
   table,
   outletId,
+  board,
   onRefresh,
 }: {
   table: TableMonitoring
   outletId: string
+  board: TableMonitoringResponse
   onRefresh: () => void
 }) {
+  const timeZone = board.timeZone ?? 'Asia/Jakarta'
+  const time = (iso: string) => wallClock(iso, timeZone)?.time ?? ''
+  const bookings = table.bookings ?? []
+  const held = table.activeTransaction ? undefined : heldBy(bookings, board.bookingHoldMinutes ?? 120)
+  const order = table.activeTransaction
   const statusMutation = useUpdateTableStatusMutation()
   const releaseMutation = useReleaseTableMutation()
   const nextStatus: TableStatus = table.status === 'AVAILABLE' ? 'CLEANING' : 'AVAILABLE'
@@ -133,18 +150,52 @@ function MonitoringTableCard({
           <StatusBadge status={table.status} />
         </div>
         <div className='space-y-3 p-4'>
-          {table.activeTransaction ? (
-            <div className='bg-muted/50 rounded-lg p-3'>
-              <div className='flex items-center justify-between text-xs'>
-                <span className='text-muted-foreground'>Active order</span>
-                <span className='font-sans tabular-nums font-medium'>{table.activeTransaction.transactionNo}</span>
+          {order ? (
+            <div className='bg-muted/50 rounded-lg p-3 text-xs'>
+              <div className='flex items-center justify-between gap-2'>
+                <span className='truncate text-sm font-medium'>{order.customerName || 'Guest'}</span>
+                <span className='text-muted-foreground shrink-0 tabular-nums'>{order.transactionNo}</span>
               </div>
-              <p className='mt-1 text-right text-sm font-semibold'>
-                {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(table.activeTransaction.grandTotal)}
-              </p>
+              <div className='text-muted-foreground mt-1 flex flex-wrap gap-x-3 gap-y-0.5 tabular-nums'>
+                {order.seatedAt && <span>Since {time(order.seatedAt)}</span>}
+                {order.itemCount !== undefined && <span>{order.itemCount} item{order.itemCount === 1 ? '' : 's'}</span>}
+                {order.cashierName && <span>{order.cashierName}</span>}
+                {order.fromReservation && <span>Booked guest</span>}
+              </div>
+              <div className='mt-2 flex items-baseline justify-between tabular-nums'>
+                <span className='text-muted-foreground'>
+                  {order.paidAmount ? `${formatMoney(order.paidAmount)} paid` : 'Unpaid'}
+                </span>
+                <span className='text-sm font-semibold'>{formatMoney(order.grandTotal)}</span>
+              </div>
+              {(table.openOrders ?? 1) > 1 && (
+                <p className='text-status-warning mt-2'>{table.openOrders} open orders share this table</p>
+              )}
             </div>
           ) : (
             <p className='text-muted-foreground text-xs'>No active order</p>
+          )}
+          {held && (
+            <p className='border-status-warning/30 bg-status-warning/10 text-status-warning rounded-md border px-2 py-1.5 text-xs'>
+              Held for {held.customerName || 'a booking'} at {time(held.reservationDate)}
+            </p>
+          )}
+          {bookings.length > 0 && (
+            <div className='space-y-1'>
+              <p className='text-muted-foreground text-xs'>Booked today</p>
+              <ul className='divide-y text-xs'>
+                {bookings.map((b) => (
+                  <li key={b.id} className='flex items-center justify-between gap-2 py-1'>
+                    <span className='min-w-0 truncate'>
+                      <span className='font-medium tabular-nums'>{time(b.reservationDate)}</span> {b.customerName || 'Guest'}
+                    </span>
+                    <span className='text-muted-foreground shrink-0 tabular-nums'>
+                      {b.itemCount} item{b.itemCount === 1 ? '' : 's'}{b.paidAmount > 0 ? ` · ${formatMoney(b.paidAmount)} paid` : ''}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
           <div className='flex gap-2'>
             <Button variant='outline' size='sm' className='flex-1' disabled={busy} onClick={changeStatus}>
@@ -303,14 +354,22 @@ export function TableManagement(): React.JSX.Element {
         ) : view === 'monitor' ? (
           <div className='space-y-6'>
             {monitoringQuery.data && <DataPanel aria-label='Table status summary' className='overflow-hidden'>
-              <MetricGroup className='grid-cols-2 sm:grid-cols-3 lg:grid-cols-5'>
+              <MetricGroup className='grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'>
                 {([['tables', 'Tables'], ['AVAILABLE', 'Available'], ['OCCUPIED', 'Occupied'], ['RESERVED', 'Reserved'], ['CLEANING', 'Cleaning']] as const).map(([key, label]) => (
                   <Metric key={key} label={label} value={key === 'tables' ? monitoringQuery.data.totals.tables : monitoringQuery.data.totals.byStatus[key]} />
                 ))}
+                <Metric label='Booked today' value={monitoringQuery.data.totals.bookings ?? 0} />
               </MetricGroup>
             </DataPanel>}
+            {(monitoringQuery.data?.unassignedBookings?.length ?? 0) > 0 && (
+              <p role='status' className='border-status-warning/30 bg-status-warning/10 flex flex-wrap items-center gap-2 rounded-lg border px-4 py-3 text-sm'>
+                <AlertCircle className='text-status-warning size-4' />
+                {monitoringQuery.data!.unassignedBookings!.length} of today's bookings have no table that matches this floor.
+                <Link to='/reservations' className='underline underline-offset-4'>Open reservations</Link>
+              </p>
+            )}
             <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
-              {(monitoringQuery.data?.tables ?? []).map((table) => <MonitoringTableCard key={table.id} table={table} outletId={outletId} onRefresh={() => monitoringQuery.refetch()} />)}
+              {(monitoringQuery.data?.tables ?? []).map((table) => <MonitoringTableCard key={table.id} table={table} outletId={outletId} board={monitoringQuery.data!} onRefresh={() => monitoringQuery.refetch()} />)}
             </div>
           </div>
         ) : (

@@ -1,5 +1,7 @@
 import { tenantGet, tenantPost, tenantApiPaths } from '@/lib/tenant-api-client'
 import type {
+  AddDepositRequest,
+  CancelReservationRequest,
   Reservation,
   ReservationsListResponse,
   CreateReservationRequest,
@@ -14,6 +16,8 @@ export async function listReservationsApi(
   if (params.startDate) searchParams.set('startDate', params.startDate)
   if (params.endDate) searchParams.set('endDate', params.endDate)
   if (params.limit) searchParams.set('limit', String(params.limit))
+  if (params.statuses?.length)
+    searchParams.set('status', params.statuses.join(','))
   const query = searchParams.toString()
   return tenantGet<ReservationsListResponse>(
     `${tenantApiPaths.reservations.list}?${query}`
@@ -30,17 +34,16 @@ export async function fulfillReservationApi(id: string): Promise<Reservation> {
   return tenantPost<Reservation>(tenantApiPaths.reservations.fulfill(id))
 }
 
-export async function cancelReservationApi(id: string): Promise<Reservation> {
-  return tenantPost<Reservation>(tenantApiPaths.reservations.cancel(id))
+export async function cancelReservationApi(
+  id: string,
+  data: CancelReservationRequest
+): Promise<Reservation> {
+  return tenantPost<Reservation>(tenantApiPaths.reservations.cancel(id), data)
 }
 
 export async function addDepositApi(
   id: string,
-  amount: number,
-  paymentMethod: string
+  data: AddDepositRequest
 ): Promise<Reservation> {
-  return tenantPost<Reservation>(tenantApiPaths.reservations.deposit(id), {
-    amount,
-    paymentMethod,
-  })
+  return tenantPost<Reservation>(tenantApiPaths.reservations.deposit(id), data)
 }

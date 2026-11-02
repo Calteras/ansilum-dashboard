@@ -8,6 +8,8 @@ import {
   addDepositApi,
 } from './reservations.api'
 import type {
+  AddDepositRequest,
+  CancelReservationRequest,
   CreateReservationRequest,
   ReservationListParams,
 } from './reservations.types'
@@ -70,7 +72,13 @@ export function useFulfillReservationMutation() {
 export function useCancelReservationMutation() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: string) => cancelReservationApi(id),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string
+      data: CancelReservationRequest
+    }) => cancelReservationApi(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reservationKeys.lists() })
       toast.success('Reservation cancelled', {
@@ -88,15 +96,8 @@ export function useCancelReservationMutation() {
 export function useAddDepositMutation() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({
-      id,
-      amount,
-      paymentMethod,
-    }: {
-      id: string
-      amount: number
-      paymentMethod: string
-    }) => addDepositApi(id, amount, paymentMethod),
+    mutationFn: ({ id, data }: { id: string; data: AddDepositRequest }) =>
+      addDepositApi(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reservationKeys.lists() })
       toast.success('Deposit added', {

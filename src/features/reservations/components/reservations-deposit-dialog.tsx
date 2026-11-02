@@ -1,8 +1,6 @@
-'use client'
-
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
+import { formatMoney } from '@/lib/format'
+import { useCopy } from '@/hooks/use-copy'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -12,15 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -28,17 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import type { Reservation } from '../api/reservations.types'
 import { useAddDepositMutation } from '../api/reservations.queries'
-
-const depositSchema = z.object({
-  amount: z.coerce
-    .number()
-    .min(1, 'Deposit amount must be at least 1.'),
-  paymentMethod: z.string().min(1, 'Payment method is required'),
-})
-
-type DepositForm = z.infer<typeof depositSchema>
+import type { PaymentMethod, Reservation } from '../api/reservations.types'
+import { paymentMethodOptions } from '../data/data'
+import { amountDue, paidAmount } from '../lib/reservation-money'
 
 type Props = {
   open: boolean
@@ -46,119 +30,141 @@ type Props = {
   currentRow: Reservation
 }
 
+/**
+ * Records money received in advance. The request id is kept for the attempt,
+ * so retrying after a timeout cannot record the deposit twice.
+ */
 export function ReservationsDepositDialog({
   open,
   onOpenChange,
   currentRow,
 }: Props) {
-  const depositMutation = useAddDepositMutation()
-  const isLoading = depositMutation.isPending
+  const copy = useCopy()
+  const deposit = useAddDepositMutation()
+  const paid = paidAmount(currentRow)
+  const due = amountDue(currentRow)
+  const requested = Number(currentRow.depositAmount ?? 0)
+  const suggested = Math.min(Math.max(requested - paid, 0), due)
+  const [amount, setAmount] = useState(suggested ? String(suggested) : '')
+  const [method, setMethod] = useState<PaymentMethod>('CASH')
+  const [attempt, setAttempt] = useState(() => crypto.randomUUID())
+  const value = Number(amount)
+  const valid = Number.isInteger(value) && value >= 1 && value <= due
 
-  const form = useForm<DepositForm>({
-    resolver: zodResolver(depositSchema) as any,
-    defaultValues: { amount: 0, paymentMethod: 'CASH' },
-  })
-
-  const onSubmit = async (values: DepositForm) => {
-    try {
-      await depositMutation.mutateAsync({
-        id: currentRow.id,
-        amount: values.amount,
-        paymentMethod: values.paymentMethod,
-      })
-      form.reset()
-      onOpenChange(false)
-    } catch {
-      // Error handled by mutation
+  const close = (next: boolean) => {
+    if (deposit.isPending) return
+    if (!next) {
+      setAmount(suggested ? String(suggested) : '')
+      setMethod('CASH')
+      setAttempt(crypto.randomUUID())
     }
+    onOpenChange(next)
   }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(state) => {
-        if (!isLoading) {
-          form.reset()
-          onOpenChange(state)
-        }
-      }}
-    >
+    <Dialog open={open} onOpenChange={close}>
       <DialogContent className='sm:max-w-md'>
         <DialogHeader className='text-start'>
-          <DialogTitle>Add Deposit</DialogTitle>
+          <DialogTitle>{copy('Terima deposit', 'Take a deposit')}</DialogTitle>
           <DialogDescription>
-            Add a deposit to reservation{' '}
-            <span className='font-semibold'>{currentRow.transactionNo}</span>.
-            Current deposit:{' '}
-            <span className='font-semibold'>
-              {new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0,
-              }).format(currentRow.depositAmount)}
-            </span>
+            {copy(
+              `${currentRow.customerName} · ${currentRow.transactionNo}. Sudah dibayar ${formatMoney(paid)} dari total ${formatMoney(currentRow.grandTotal)}.`,
+              `${currentRow.customerName} · ${currentRow.transactionNo}. ${formatMoney(paid)} paid of ${formatMoney(currentRow.grandTotal)}.`
+            )}
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form
-            id='deposit-form'
-            onSubmit={form.handleSubmit(onSubmit as any)}
-            className='space-y-4'
-          >
-            <FormField<DepositForm>
-              control={form.control as any}
-              name='amount'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Deposit Amount</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      placeholder='Enter deposit amount'
-                      min={1}
-                      {...field}
-                      value={field.value as number}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField<DepositForm>
-              control={form.control as any}
-              name='paymentMethod'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Payment Method</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value as string}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select payment method' />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value='CASH'>Cash</SelectItem>
-                      <SelectItem value='QRIS'>QRIS</SelectItem>
-                      <SelectItem value='DEBIT_CARD'>Debit Card</SelectItem>
-                      <SelectItem value='CREDIT_CARD'>Credit Card</SelectItem>
-                      <SelectItem value='E_WALLET'>E-Wallet</SelectItem>
-                      <SelectItem value='BANK_TRANSFER'>Bank Transfer</SelectItem>
-                      <SelectItem value='OTHER'>Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </form>
-        </Form>
+
+        {due <= 0 ? (
+          <p className='text-sm'>
+            {copy('Pesanan ini sudah lunas.', 'This pre-order is fully paid.')}
+          </p>
+        ) : (
+          <div className='grid gap-4'>
+            <div className='grid gap-2'>
+              <Label htmlFor='deposit-amount'>
+                {copy('Jumlah (Rp)', 'Amount (Rp)')}
+              </Label>
+              <Input
+                id='deposit-amount'
+                inputMode='numeric'
+                className='tabular-nums'
+                value={amount}
+                onChange={(e) => setAmount(e.target.value.replace(/\D/g, ''))}
+                aria-invalid={!!amount && !valid}
+              />
+              <p
+                className={
+                  amount && !valid
+                    ? 'text-status-danger text-[13px]'
+                    : 'text-fg-muted text-[13px]'
+                }
+              >
+                {copy(
+                  `Paling banyak ${formatMoney(due)}, sisa yang belum dibayar.`,
+                  `Up to ${formatMoney(due)}, the unpaid balance.`
+                )}
+                {requested > 0 &&
+                  copy(
+                    ` Deposit yang diminta ${formatMoney(requested)}.`,
+                    ` Requested deposit: ${formatMoney(requested)}.`
+                  )}
+              </p>
+            </div>
+            <div className='grid gap-2'>
+              <Label htmlFor='deposit-method'>
+                {copy('Metode pembayaran', 'Payment method')}
+              </Label>
+              <Select
+                value={method}
+                onValueChange={(v) => setMethod(v as PaymentMethod)}
+              >
+                <SelectTrigger id='deposit-method' className='w-full'>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {paymentMethodOptions.map((m) => (
+                    <SelectItem key={m.value} value={m.value}>
+                      {copy(m.id, m.en)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
+
         <DialogFooter>
-          <Button type='submit' form='deposit-form' disabled={isLoading}>
-            {isLoading ? 'Adding...' : 'Add Deposit'}
+          <Button
+            variant='outline'
+            onClick={() => close(false)}
+            disabled={deposit.isPending}
+          >
+            {copy('Batal', 'Cancel')}
           </Button>
+          {due > 0 && (
+            <Button
+              disabled={!valid || deposit.isPending}
+              onClick={async () => {
+                try {
+                  await deposit.mutateAsync({
+                    id: currentRow.id,
+                    data: {
+                      clientPaymentId: attempt,
+                      amount: value,
+                      paymentMethod: method,
+                    },
+                  })
+                  close(false)
+                } catch {
+                  // Toast shown by the mutation; the same id is reused on retry.
+                }
+              }}
+            >
+              {deposit.isPending
+                ? copy('Menyimpan…', 'Saving…')
+                : copy('Simpan deposit', 'Save deposit')}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

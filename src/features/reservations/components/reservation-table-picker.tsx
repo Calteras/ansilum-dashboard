@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { format } from 'date-fns'
 import { Link } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 import { useCopy } from '@/hooks/use-copy'
@@ -30,13 +29,9 @@ export function ReservationTablePicker({
   onChange: (tableId: string) => void
 }) {
   const copy = useCopy()
-  const { layout, sections, tables, bookingsFor, taken } = useReservationTables(
-    outletId,
-    day,
-    time
-  )
+  const { layout, sections, tables, isToday, bookingsFor, taken } =
+    useReservationTables(outletId, day, time)
   const [picked, setPicked] = useState<string | null>(null)
-  const isToday = day === format(new Date(), 'yyyy-MM-dd')
   const activeSection =
     sections.find((s) => (s.id ?? s.name) === picked) ?? sections[0]
 
@@ -202,7 +197,7 @@ export function ReservationTablePicker({
             {bookedTimes.length > 0 && (
               <span className='text-status-warning max-w-full truncate text-[11px] leading-tight'>
                 {copy('Dipesan', 'Booked')}{' '}
-                {bookedTimes.map((t) => format(t, 'HH:mm')).join(', ')}
+                {bookedTimes.map((t) => t.time).join(', ')}
               </span>
             )}
             {live && !bookedTimes.length && (

@@ -8,11 +8,8 @@ import type { TableLayoutResponse } from '@/features/tables/api/tables.types'
 import { listReservationsApi } from './api/reservations.api'
 import type { Reservation } from './api/reservations.types'
 import { ReservationTablePicker } from './components/reservation-table-picker'
-import {
-  bookingsByTable,
-  isTaken,
-  reservationInstant,
-} from './lib/table-availability'
+import { dayDate, wallClock, wallMinutes } from './lib/business-clock'
+import { bookingsByTable, isTaken } from './lib/table-availability'
 
 vi.mock('@/features/tables/api/tables.api', () => ({
   getTableLayoutApi: vi.fn(),
@@ -28,7 +25,9 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
 }))
 
 const DAY = '2030-06-15'
-const at = (time: string) => new Date(`${DAY}T${time}:00`).toISOString()
+const TZ = 'Asia/Jakarta'
+// Booking instants as the server stores them: wall-clock times on the business clock.
+const at = (time: string) => new Date(`${DAY}T${time}:00+07:00`).toISOString()
 const booking = (overrides: Partial<Reservation>) =>
   ({
     status: 'RESERVED',
@@ -65,28 +64,53 @@ const layout: TableLayoutResponse = {
   ],
 }
 
+describe('business clock', () => {
+  it('reads instants on the business time zone, whatever the browser zone', () => {
+    expect(wallClock('2030-06-15T12:30:00Z', TZ)).toMatchObject({
+      day: '2030-06-15',
+      time: '19:30',
+    })
+    expect(wallClock('2030-06-15T12:30:00Z', 'Asia/Makassar')?.time).toBe(
+      '20:30'
+    )
+    // Late UTC evening is already the next business day.
+    expect(wallClock('2030-06-15T18:00:00Z', TZ)).toMatchObject({
+      day: '2030-06-16',
+      time: '01:00',
+    })
+    // An unknown zone falls back to the default, as on the server.
+    expect(wallClock('2030-06-15T12:30:00Z', 'Mars/Base')?.time).toBe('19:30')
+    expect(wallClock('nope', TZ)).toBeNull()
+  })
+
+  it('compares chosen times with stored ones on the same clock', () => {
+    expect(wallClock(at('19:00'), TZ)?.minutes).toBe(wallMinutes(DAY, '19:00'))
+    expect(wallMinutes(DAY, '')).toBeNull()
+    expect(dayDate(DAY).getDate()).toBe(15)
+  })
+})
+
 describe('table availability', () => {
   it('collects open bookings per table name, ignoring case and spacing', () => {
-    const map = bookingsByTable([
-      booking({ tableNumber: ' t1 ' }),
-      booking({ tableNumber: 'T1', reservationDate: at('12:00') }),
-      booking({ tableNumber: 'T2', status: 'VOIDED' }),
-      booking({ tableNumber: undefined }),
-    ])
+    const map = bookingsByTable(
+      [
+        booking({ tableNumber: ' t1 ' }),
+        booking({ tableNumber: 'T1', reservationDate: at('12:00') }),
+        booking({ tableNumber: 'T2', status: 'VOIDED' }),
+        booking({ tableNumber: undefined }),
+      ],
+      TZ
+    )
     expect([...map.keys()]).toEqual(['t1'])
-    expect(map.get('t1')!.map((d) => d.toISOString())).toEqual([
-      at('12:00'),
-      at('19:00'),
-    ])
+    expect(map.get('t1')!.map((d) => d.time)).toEqual(['12:00', '19:00'])
   })
 
   it('holds a table for two hours either side of a booking', () => {
-    const booked = [new Date(at('19:00'))]
-    expect(isTaken(booked, reservationInstant(DAY, '20:30'))).toBe(true)
-    expect(isTaken(booked, reservationInstant(DAY, '17:30'))).toBe(true)
-    expect(isTaken(booked, reservationInstant(DAY, '21:00'))).toBe(false)
-    expect(isTaken(booked, reservationInstant(DAY, ''))).toBe(false)
-    expect(reservationInstant(DAY, '19:00')?.toISOString()).toBe(at('19:00'))
+    const booked = [wallClock(at('19:00'), TZ)!]
+    expect(isTaken(booked, wallMinutes(DAY, '20:30'))).toBe(true)
+    expect(isTaken(booked, wallMinutes(DAY, '17:30'))).toBe(true)
+    expect(isTaken(booked, wallMinutes(DAY, '21:00'))).toBe(false)
+    expect(isTaken(booked, wallMinutes(DAY, ''))).toBe(false)
   })
 })
 

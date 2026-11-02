@@ -77,6 +77,8 @@ export interface CreateReservationRequest {
   discountPercent?: number
   customerName: string
   customerPhone: string
+  /** The table from the outlet layout; the server refuses overlapping bookings. */
+  tableId?: string
   tableNumber?: string
   notes?: string
   reservationDate: string
@@ -92,8 +94,34 @@ export interface ReservationsListResponse {
   }
 }
 
+export interface CancelReservationRequest {
+  /** The approving Owner/Manager/Supervisor employee. */
+  voidedById: string
+  voidReason: string
+  /** Required when a deposit was paid: how it is returned. */
+  refundPaymentMethod?: PaymentMethod
+}
+
+export interface AddDepositRequest {
+  /** Stable per attempt, so a retried request is not charged twice. */
+  clientPaymentId: string
+  amount: number
+  paymentMethod: PaymentMethod
+}
+
+export type PaymentMethod =
+  | 'CASH'
+  | 'QRIS'
+  | 'DEBIT_CARD'
+  | 'CREDIT_CARD'
+  | 'E_WALLET'
+  | 'BANK_TRANSFER'
+  | 'OTHER'
+
 export interface ReservationListParams {
   outletId: string
+  /** Defaults to bookings awaiting arrival (RESERVED). */
+  statuses?: ReservationStatus[]
   /** Business days, "yyyy-MM-dd", inclusive. */
   startDate?: string
   endDate?: string
