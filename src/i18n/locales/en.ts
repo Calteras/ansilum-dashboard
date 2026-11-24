@@ -54,6 +54,7 @@ const en = {
   },
   nav: {
     foodDelivery: 'Food delivery',
+    streetFood: 'StreetFood',
     dashboard: 'Dashboard',
     analytics: 'Analytics',
     products: 'Products',

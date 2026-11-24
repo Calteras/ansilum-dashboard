@@ -33,6 +33,7 @@ import { Route as StoreSlugIndexRouteImport } from './routes/store/$slug/index'
 import { Route as AuthenticatedTransactionsIndexRouteImport } from './routes/_authenticated/transactions/index'
 import { Route as AuthenticatedTaxesIndexRouteImport } from './routes/_authenticated/taxes/index'
 import { Route as AuthenticatedTablesIndexRouteImport } from './routes/_authenticated/tables/index'
+import { Route as AuthenticatedStreetFoodIndexRouteImport } from './routes/_authenticated/street-food/index'
 import { Route as AuthenticatedStockMovementsIndexRouteImport } from './routes/_authenticated/stock-movements/index'
 import { Route as AuthenticatedStaffsIndexRouteImport } from './routes/_authenticated/staffs/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
@@ -189,6 +190,12 @@ const AuthenticatedTablesIndexRoute =
   AuthenticatedTablesIndexRouteImport.update({
     id: '/tables/',
     path: '/tables/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedStreetFoodIndexRoute =
+  AuthenticatedStreetFoodIndexRouteImport.update({
+    id: '/street-food/',
+    path: '/street-food/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedStockMovementsIndexRoute =
@@ -461,6 +468,7 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/staffs': typeof AuthenticatedStaffsIndexRoute
   '/stock-movements': typeof AuthenticatedStockMovementsIndexRoute
+  '/street-food': typeof AuthenticatedStreetFoodIndexRoute
   '/tables': typeof AuthenticatedTablesIndexRoute
   '/taxes': typeof AuthenticatedTaxesIndexRoute
   '/transactions': typeof AuthenticatedTransactionsIndexRoute
@@ -520,6 +528,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/staffs': typeof AuthenticatedStaffsIndexRoute
   '/stock-movements': typeof AuthenticatedStockMovementsIndexRoute
+  '/street-food': typeof AuthenticatedStreetFoodIndexRoute
   '/tables': typeof AuthenticatedTablesIndexRoute
   '/taxes': typeof AuthenticatedTaxesIndexRoute
   '/transactions': typeof AuthenticatedTransactionsIndexRoute
@@ -584,6 +593,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/staffs/': typeof AuthenticatedStaffsIndexRoute
   '/_authenticated/stock-movements/': typeof AuthenticatedStockMovementsIndexRoute
+  '/_authenticated/street-food/': typeof AuthenticatedStreetFoodIndexRoute
   '/_authenticated/tables/': typeof AuthenticatedTablesIndexRoute
   '/_authenticated/taxes/': typeof AuthenticatedTaxesIndexRoute
   '/_authenticated/transactions/': typeof AuthenticatedTransactionsIndexRoute
@@ -646,6 +656,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/staffs'
     | '/stock-movements'
+    | '/street-food'
     | '/tables'
     | '/taxes'
     | '/transactions'
@@ -705,6 +716,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/staffs'
     | '/stock-movements'
+    | '/street-food'
     | '/tables'
     | '/taxes'
     | '/transactions'
@@ -768,6 +780,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/'
     | '/_authenticated/staffs/'
     | '/_authenticated/stock-movements/'
+    | '/_authenticated/street-food/'
     | '/_authenticated/tables/'
     | '/_authenticated/taxes/'
     | '/_authenticated/transactions/'
@@ -965,6 +978,13 @@ declare module '@tanstack/react-router' {
       path: '/tables'
       fullPath: '/tables'
       preLoaderRoute: typeof AuthenticatedTablesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/street-food/': {
+      id: '/_authenticated/street-food/'
+      path: '/street-food'
+      fullPath: '/street-food'
+      preLoaderRoute: typeof AuthenticatedStreetFoodIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/stock-movements/': {
@@ -1287,6 +1307,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRewardsIndexRoute: typeof AuthenticatedRewardsIndexRoute
   AuthenticatedStaffsIndexRoute: typeof AuthenticatedStaffsIndexRoute
   AuthenticatedStockMovementsIndexRoute: typeof AuthenticatedStockMovementsIndexRoute
+  AuthenticatedStreetFoodIndexRoute: typeof AuthenticatedStreetFoodIndexRoute
   AuthenticatedTablesIndexRoute: typeof AuthenticatedTablesIndexRoute
   AuthenticatedTaxesIndexRoute: typeof AuthenticatedTaxesIndexRoute
   AuthenticatedTransactionsIndexRoute: typeof AuthenticatedTransactionsIndexRoute
@@ -1317,6 +1338,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRewardsIndexRoute: AuthenticatedRewardsIndexRoute,
   AuthenticatedStaffsIndexRoute: AuthenticatedStaffsIndexRoute,
   AuthenticatedStockMovementsIndexRoute: AuthenticatedStockMovementsIndexRoute,
+  AuthenticatedStreetFoodIndexRoute: AuthenticatedStreetFoodIndexRoute,
   AuthenticatedTablesIndexRoute: AuthenticatedTablesIndexRoute,
   AuthenticatedTaxesIndexRoute: AuthenticatedTaxesIndexRoute,
   AuthenticatedTransactionsIndexRoute: AuthenticatedTransactionsIndexRoute,

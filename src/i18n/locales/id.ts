@@ -54,6 +54,7 @@ const id = {
   },
   nav: {
     foodDelivery: 'Pesanan delivery',
+    streetFood: 'StreetFood',
     dashboard: 'Ringkasan',
     analytics: 'Analitik',
     products: 'Produk',
