@@ -70,6 +70,8 @@ export interface NewLink {
 export interface RotatedSecret {
   keyId: string
   secret: string
+  /** The POS already gave the new secret to the platform; nobody has to send it anywhere. */
+  registered?: boolean
 }
 
 interface FeeLine {

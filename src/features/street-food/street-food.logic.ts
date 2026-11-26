@@ -13,6 +13,7 @@ export type ConnectionState =
   | 'unreachable'
   | 'platform_error'
   | 'delayed'
+  | 'key_rejected'
   | 'connected'
 
 /**
@@ -25,8 +26,12 @@ export function connectionState(overview: StreetFoodOverview): ConnectionState {
   const { link, delivery, outlets } = overview
   if (!link || link.status !== 'ACTIVE') return 'not_connected'
   if (!outlets.some((outlet) => outlet.enabled)) return 'needs_outlet'
-  if (delivery?.lastDeliveredAt)
-    return delivery.pending > 0 && delivery.lastError ? 'delayed' : 'connected'
+  if (delivery?.lastDeliveredAt) {
+    if (!(delivery.pending > 0 && delivery.lastError)) return 'connected'
+    // It worked before and the platform now refuses the key: the secret was replaced here (or
+    // there) and the other side still holds the old one. Waiting does not fix it.
+    return delivery.lastError === 'HTTP_401' ? 'key_rejected' : 'delayed'
+  }
   const error = delivery?.lastError
   if (!error) return 'sending'
   if (error === 'HTTP_401') return 'waiting_registration'
@@ -43,6 +48,7 @@ export function refreshInterval(state: ConnectionState): number | false {
     case 'platform_error':
       return 5_000
     case 'delayed':
+    case 'key_rejected':
       return 15_000
     default:
       return false

@@ -37,12 +37,16 @@ export function ConnectionStatus({
   canEdit,
   onNewSecret,
   onDisconnect,
+  onReconnect,
+  reconnecting = false,
 }: {
   overview: StreetFoodOverview
   state: ConnectionState
   canEdit: boolean
   onNewSecret: () => void
   onDisconnect: () => void
+  onReconnect: () => void
+  reconnecting?: boolean
 }) {
   const copy = useCopy()
   const { link, delivery } = overview
@@ -135,6 +139,20 @@ export function ConnectionStatus({
             `Code: ${delivery?.lastError}. Sending is retried automatically. If it continues, contact your StreetFood operator.`
           ),
         }
+      case 'key_rejected':
+        return {
+          tone: 'danger',
+          icon: <AlertCircle className='text-status-danger' aria-hidden />,
+          badge: copy('Kunci ditolak', 'Key rejected'),
+          title: copy(
+            'Platform tidak lagi mengenali kunci POS ini',
+            'The platform no longer recognises this POS key'
+          ),
+          body: copy(
+            `${delivery?.pending} pembaruan tertahan (${delivery?.lastError}). Biasanya karena kunci rahasia diganti di sini sementara platform masih menyimpan yang lama. Tekan Hubungkan ulang untuk mendaftarkan kunci saat ini ke platform; pembaruan yang tertahan langsung dikirim. Terakhir diterima: ${when(delivery?.lastDeliveredAt ?? null)}.`,
+            `${delivery?.pending} updates are held back (${delivery?.lastError}). This usually means the secret was changed here while the platform still holds the old one. Press Reconnect to register the current key at the platform; held-back updates are then sent at once. Last received: ${when(delivery?.lastDeliveredAt ?? null)}.`
+          ),
+        }
       case 'delayed':
         return {
           tone: 'warning',
@@ -202,6 +220,22 @@ export function ConnectionStatus({
           </dl>
           {canEdit && (
             <div className='mt-3 flex flex-wrap gap-2'>
+              {(state === 'key_rejected' ||
+                state === 'waiting_registration') && (
+                <Button
+                  type='button'
+                  size='sm'
+                  disabled={reconnecting}
+                  onClick={onReconnect}
+                >
+                  {reconnecting ? (
+                    <Loader2 size={14} className='animate-spin' />
+                  ) : (
+                    <Key size={14} />
+                  )}
+                  {copy('Hubungkan ulang', 'Reconnect')}
+                </Button>
+              )}
               <Button
                 type='button'
                 variant='outline'

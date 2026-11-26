@@ -5,6 +5,7 @@ import {
   disconnectApi,
   getFeesApi,
   getOverviewApi,
+  reconnectApi,
   rotateSecretApi,
   saveHoursApi,
   saveSettingsApi,
@@ -75,6 +76,23 @@ export function useConnectMutation(
   return useMutation({
     mutationFn: (platformUrl: string) => connectApi(platformUrl),
     onSuccess: () => void refresh(),
+    onError: (error: Error) =>
+      toast.error(messages.failed, { description: error.message }),
+  })
+}
+
+/** Gives the platform this POS's current key again; deliveries that were refused go out at once. */
+export function useReconnectMutation(
+  tenantId: string | undefined,
+  messages: Messages
+) {
+  const refresh = useRefresh(tenantId)
+  return useMutation({
+    mutationFn: () => reconnectApi(),
+    onSuccess: () => {
+      void refresh()
+      if (messages.saved) toast.success(messages.saved)
+    },
     onError: (error: Error) =>
       toast.error(messages.failed, { description: error.message }),
   })

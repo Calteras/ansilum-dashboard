@@ -113,6 +113,18 @@ describe('connectionState', () => {
         })
       )
     ).toBe('delayed')
+    // The platform delivered before and now refuses the key: waiting will not fix it.
+    expect(
+      connectionState(
+        linked({
+          delivery: delivery({
+            lastDeliveredAt: delivered,
+            pending: 7,
+            lastError: 'HTTP_401',
+          }),
+        })
+      )
+    ).toBe('key_rejected')
     // Old failures do not matter once nothing is waiting.
     expect(
       connectionState(
@@ -131,6 +143,7 @@ describe('connectionState', () => {
     expect(refreshInterval('waiting_registration')).toBe(5_000)
     expect(refreshInterval('sending')).toBe(5_000)
     expect(refreshInterval('delayed')).toBe(15_000)
+    expect(refreshInterval('key_rejected')).toBe(15_000)
     expect(refreshInterval('connected')).toBe(false)
     expect(refreshInterval('not_connected')).toBe(false)
     expect(refreshInterval('needs_outlet')).toBe(false)

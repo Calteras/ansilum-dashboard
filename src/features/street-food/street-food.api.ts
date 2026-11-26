@@ -33,6 +33,16 @@ export async function connectApi(platformUrl: string) {
     .data
 }
 
+/** Registers the existing link at the platform again, without a new secret. Safe to repeat. */
+export async function reconnectApi() {
+  return (
+    await tenantPost<Envelope<{ connected: boolean }>>(
+      `${BASE}/link/connect`,
+      {}
+    )
+  ).data
+}
+
 export async function rotateSecretApi() {
   return (
     await tenantPost<Envelope<RotatedSecret>>(`${BASE}/link/rotate-secret`)

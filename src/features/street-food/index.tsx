@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { useCopy } from '@/hooks/use-copy'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -32,6 +33,7 @@ import {
   useHoursMutation,
   useOverviewQuery,
   usePublicationMutation,
+  useReconnectMutation,
   useRotateSecretMutation,
   useSettingsMutation,
 } from './street-food.queries'
@@ -65,6 +67,13 @@ function Workspace({ admin }: { admin: boolean }) {
   const failed = copy('Belum berhasil', 'That did not work')
   const connect = useConnectMutation(tenantId, { failed })
   const rotate = useRotateSecretMutation(tenantId, { failed })
+  const reconnect = useReconnectMutation(tenantId, {
+    failed,
+    saved: copy(
+      'Kunci didaftarkan ke platform',
+      'The key was registered with the platform'
+    ),
+  })
   const disconnect = useDisconnectMutation(tenantId, {
     failed,
     saved: copy('Koneksi diputus', 'Disconnected'),
@@ -166,6 +175,8 @@ function Workspace({ admin }: { admin: boolean }) {
             canEdit={admin}
             onNewSecret={() => setConfirm('rotate')}
             onDisconnect={() => setConfirm('disconnect')}
+            onReconnect={() => reconnect.mutate()}
+            reconnecting={reconnect.isPending}
           />
 
           <section aria-labelledby='sf-outlets' className='space-y-3'>
@@ -250,8 +261,8 @@ function Workspace({ admin }: { admin: boolean }) {
         onOpenChange={(open) => !open && setConfirm(null)}
         title={copy('Buat kunci rahasia baru?', 'Create a new secret?')}
         desc={copy(
-          'Kunci lama langsung berhenti bekerja. Outlet Anda tidak tersinkron sampai operator StreetFood memperbarui kunci di platform dengan rincian baru.',
-          'The old secret stops working at once. Your outlets will not sync until the StreetFood operator updates the key on the platform with the new details.'
+          'Kunci lama langsung berhenti bekerja. Kunci baru didaftarkan ke platform otomatis; jika server ini belum bisa melakukannya, Anda mendapat rincian untuk dikirim ke operator StreetFood, dan outlet tidak tersinkron sampai operator memperbaruinya.',
+          'The old secret stops working at once. The new one is registered with the platform for you; if this server cannot do that yet, you get details to send to your StreetFood operator, and your outlets will not sync until they update the key.'
         )}
         confirmText={copy('Buat kunci baru', 'Create new secret')}
         cancelBtnText={copy('Batal', 'Cancel')}
@@ -260,6 +271,15 @@ function Workspace({ admin }: { admin: boolean }) {
           rotate.mutate(undefined, {
             onSuccess: (next) => {
               setConfirm(null)
+              if (next.registered) {
+                toast.success(
+                  copy(
+                    'Kunci baru sudah didaftarkan ke platform',
+                    'The new secret is registered with the platform'
+                  )
+                )
+                return
+              }
               setRotated(true)
               setCredentials({
                 tenantId: tenantId ?? '',
