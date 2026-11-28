@@ -10,6 +10,7 @@ import type {
   NewLink,
   OutletSettingsInput,
   RotatedSecret,
+  BlockedCustomer,
   OrderView,
   StreetFoodOverview,
   StreetOrder,
@@ -74,6 +75,24 @@ export async function getFeesApi() {
   return (await tenantGet<Envelope<Fees>>(`${BASE}/fees`)).data
 }
 
+/** The orders a customer's pickup code belongs to, open ones first. */
+export async function findOrdersByCodeApi(outletId: string, code: string) {
+  const params = new URLSearchParams({ outletId, code })
+  return (
+    await tenantGet<Envelope<{ orders: StreetOrder[] }>>(
+      `/streetfood-orders?${params}`
+    )
+  ).data.orders
+}
+
+/** The customer never came for a ready order. Allowed once the grace period has passed. */
+export function noShowApi(outletId: string, orderId: string) {
+  return tenantPost(
+    `/streetfood-orders/${encodeURIComponent(orderId)}/no-show`,
+    { outletId }
+  )
+}
+
 /** An outlet's orders: waiting for the vendor, in progress, or finished in the last day. */
 export async function listOrdersApi(outletId: string, view: OrderView) {
   const params = new URLSearchParams({ outletId, view })
@@ -82,4 +101,36 @@ export async function listOrdersApi(outletId: string, view: OrderView) {
       `/streetfood-orders?${params}`
     )
   ).data.orders
+}
+
+/** One tap: a thumb for the order's customer. The platform is told once. */
+export function rateOrderApi(
+  outletId: string,
+  orderId: string,
+  rating: 'UP' | 'DOWN'
+) {
+  return tenantPost(
+    `/streetfood-orders/${encodeURIComponent(orderId)}/rating`,
+    {
+      outletId,
+      rating,
+    }
+  )
+}
+
+/** Do not serve this order's customer again. */
+export function blockCustomerApi(outletId: string, orderId: string) {
+  return tenantPost(`/streetfood-orders/${encodeURIComponent(orderId)}/block`, {
+    outletId,
+  })
+}
+
+export async function listBlocksApi() {
+  return (
+    await tenantGet<Envelope<{ blocks: BlockedCustomer[] }>>(`${BASE}/blocks`)
+  ).data.blocks
+}
+
+export function unblockApi(id: string) {
+  return tenantDelete(`${BASE}/blocks/${encodeURIComponent(id)}`)
 }

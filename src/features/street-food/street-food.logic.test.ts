@@ -38,6 +38,8 @@ const outlet = (over: Partial<StreetFoodOutlet> = {}): StreetFoodOutlet => ({
   acceptingOrders: true,
   dayOpen: false,
   lastCheckedAt: null,
+  prepayFrom: 'NONE',
+  refuseFrom: 'NONE',
   ...over,
 })
 

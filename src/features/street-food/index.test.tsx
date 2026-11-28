@@ -2,7 +2,7 @@ import type { PropsWithChildren } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useAuthStore } from '@/stores/auth-store'
 import { StreetFood } from './index'
 import {
@@ -10,6 +10,8 @@ import {
   disconnectApi,
   getFeesApi,
   getOverviewApi,
+  listBlocksApi,
+  listOrdersApi,
   rotateSecretApi,
   saveHoursApi,
   saveSettingsApi,
@@ -43,6 +45,8 @@ const outlet = (over: Partial<StreetFoodOutlet> = {}): StreetFoodOutlet => ({
   acceptingOrders: true,
   dayOpen: false,
   lastCheckedAt: null,
+  prepayFrom: 'NONE',
+  refuseFrom: 'NONE',
   ...over,
 })
 
@@ -118,8 +122,17 @@ function setup() {
   return { user: userEvent.setup(), ...render(<StreetFood />, { wrapper }) }
 }
 
+beforeAll(() => {
+  // Radix Select needs these in jsdom.
+  Element.prototype.hasPointerCapture = () => false
+  Element.prototype.releasePointerCapture = () => {}
+  Element.prototype.scrollIntoView = () => {}
+})
+
 beforeEach(() => {
   vi.mocked(getOverviewApi).mockReset().mockResolvedValue(notLinked)
+  vi.mocked(listOrdersApi).mockReset().mockResolvedValue([])
+  vi.mocked(listBlocksApi).mockReset().mockResolvedValue([])
   vi.mocked(getFeesApi)
     .mockReset()
     .mockResolvedValue({
@@ -328,6 +341,33 @@ describe('once linked', () => {
     await user.click(await screen.findByRole('radio', { name: 'Pause' }))
     expect(saveSettingsApi).toHaveBeenCalledWith('melati', {
       onlineStatus: 'PAUSED',
+    })
+  })
+
+  it('shows, and saves, what the outlet does about customers who need care', async () => {
+    vi.mocked(getOverviewApi).mockResolvedValue({
+      ...connected,
+      outlets: [outlet({ enabled: true, prepayFrom: 'CAUTION' })],
+    })
+    const { user } = setup()
+
+    const ask = await screen.findByRole('combobox', {
+      name: 'Ask to pay in the app',
+    })
+    expect(ask).toHaveTextContent('Caution and worse')
+    expect(
+      screen.getByRole('combobox', { name: 'Refuse orders from' })
+    ).toHaveTextContent('Nobody')
+
+    await user.click(
+      screen.getByRole('combobox', { name: 'Refuse orders from' })
+    )
+    await user.click(
+      await screen.findByRole('option', { name: 'Prepay required only' })
+    )
+
+    expect(saveSettingsApi).toHaveBeenCalledWith('melati', {
+      refuseFrom: 'PREPAY_REQUIRED',
     })
   })
 

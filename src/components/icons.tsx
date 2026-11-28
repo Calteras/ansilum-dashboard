@@ -71,6 +71,8 @@ import {
   InformationCircleIcon as OutlineInformationCircleIcon,
   KeyIcon as OutlineKeyIcon,
   LanguageIcon as OutlineLanguageIcon,
+  HandThumbDownIcon as OutlineHandThumbDownIcon,
+  HandThumbUpIcon as OutlineHandThumbUpIcon,
   LinkIcon as OutlineLinkIcon,
   LockClosedIcon as OutlineLockClosedIcon,
   MagnifyingGlassIcon as OutlineMagnifyingGlassIcon,
@@ -183,6 +185,8 @@ export const CircleDashed = icon(OutlineClockIcon)
 export const CircleDot = icon(OutlineRadioIcon)
 export const CircleIcon = icon(OutlineEllipsisHorizontalCircleIcon)
 export const CircleOff = icon(OutlineNoSymbolIcon)
+export const ThumbsUp = icon(OutlineHandThumbUpIcon)
+export const ThumbsDown = icon(OutlineHandThumbDownIcon)
 export const CircleQuestionMark = icon(OutlineQuestionMarkCircleIcon)
 export const ClipboardList = icon(OutlineClipboardDocumentListIcon)
 export const Clock = icon(OutlineClockIcon)

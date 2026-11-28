@@ -40,6 +40,7 @@ import type {
   LocationSharing,
   OnlineStatus,
   OutletSettingsInput,
+  PolicyLevel,
   StreetFoodOutlet,
 } from '../street-food.types'
 
@@ -200,6 +201,8 @@ export function OutletCard({
         </div>
       </div>
 
+      <CustomerPolicy outlet={outlet} disabled={disabled} onSave={onSave} />
+
       <MoreSettings
         key={settingsKey(outlet)}
         outlet={outlet}
@@ -213,6 +216,85 @@ export function OutletCard({
 /** Remount the form when the saved values change, so it never shows a stale draft. */
 const settingsKey = (o: StreetFoodOutlet) =>
   [o.prepTimeMinutes, o.timezone, o.locationMode, o.locationSharing].join('|')
+
+const POLICY_LEVELS: PolicyLevel[] = ['NONE', 'CAUTION', 'PREPAY_REQUIRED']
+
+/**
+ * What this outlet does about customers the platform labels worrying. Nothing happens unless the
+ * owner chooses: the platform tells, the vendor decides.
+ */
+function CustomerPolicy({
+  outlet,
+  disabled,
+  onSave,
+}: {
+  outlet: StreetFoodOutlet
+  disabled: boolean
+  onSave: (settings: OutletSettingsInput) => void
+}) {
+  const copy = useCopy()
+  const level: Record<PolicyLevel, string> = {
+    NONE: copy('Tidak ada', 'Nobody'),
+    CAUTION: copy('Hati-hati dan lebih berat', 'Caution and worse'),
+    PREPAY_REQUIRED: copy('Wajib bayar di muka', 'Prepay required only'),
+  }
+  const field = (
+    id: string,
+    label: string,
+    value: PolicyLevel,
+    save: (next: PolicyLevel) => OutletSettingsInput
+  ) => (
+    <div className='space-y-1.5'>
+      <Label htmlFor={id}>{label}</Label>
+      <Select
+        value={value}
+        disabled={disabled}
+        onValueChange={(next) => onSave(save(next as PolicyLevel))}
+      >
+        <SelectTrigger id={id} className='w-full'>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {POLICY_LEVELS.map((l) => (
+            <SelectItem key={l} value={l}>
+              {level[l]}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  )
+
+  return (
+    <div className='mt-4 space-y-3 border-t pt-4'>
+      <div>
+        <p className='text-sm font-medium'>
+          {copy('Pelanggan yang perlu diwaspadai', 'Customers who need care')}
+        </p>
+        <p className='text-fg-muted text-[13px]'>
+          {copy(
+            'Setiap pesanan datang dengan label: baru, terpercaya, hati-hati, atau wajib bayar di muka. Tidak ada yang terjadi kecuali Anda memilihnya.',
+            'Each order comes with a label: new, reliable, caution or prepay required. Nothing happens unless you choose it.'
+          )}
+        </p>
+      </div>
+      <div className='grid gap-4 sm:grid-cols-2'>
+        {field(
+          `prepay-${outlet.outletId}`,
+          copy('Minta bayar di aplikasi untuk', 'Ask to pay in the app'),
+          outlet.prepayFrom,
+          (prepayFrom) => ({ prepayFrom })
+        )}
+        {field(
+          `refuse-${outlet.outletId}`,
+          copy('Tolak pesanan dari', 'Refuse orders from'),
+          outlet.refuseFrom,
+          (refuseFrom) => ({ refuseFrom })
+        )}
+      </div>
+    </div>
+  )
+}
 
 function Chip({
   tone,

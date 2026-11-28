@@ -4,8 +4,14 @@ import {
   connectApi,
   disconnectApi,
   getFeesApi,
+  findOrdersByCodeApi,
+  blockCustomerApi,
   getOverviewApi,
+  listBlocksApi,
   listOrdersApi,
+  noShowApi,
+  rateOrderApi,
+  unblockApi,
   reconnectApi,
   rotateSecretApi,
   saveHoursApi,
@@ -26,8 +32,19 @@ const streetFoodKeys = {
     [...streetFoodKeys.all, 'overview', tenantId] as const,
   fees: (tenantId: string) =>
     [...streetFoodKeys.all, 'fees', tenantId] as const,
+  blocks: (tenantId: string) =>
+    [...streetFoodKeys.all, 'blocks', tenantId] as const,
   orders: (tenantId: string, outletId: string, view: OrderView) =>
     [...streetFoodKeys.all, 'orders', tenantId, outletId, view] as const,
+  ordersByCode: (tenantId: string, outletId: string, code: string) =>
+    [
+      ...streetFoodKeys.all,
+      'orders',
+      tenantId,
+      outletId,
+      'code',
+      code,
+    ] as const,
 }
 
 /**
@@ -220,5 +237,119 @@ export function useOrdersQuery(
     queryFn: () => listOrdersApi(outletId ?? '', view),
     enabled: !!tenantId && !!outletId,
     refetchInterval: 15_000,
+  })
+}
+
+/** The orders for a four digit pickup code. Nothing is asked until all four digits are in. */
+export function useOrdersByCodeQuery(
+  tenantId: string | undefined,
+  outletId: string | undefined,
+  code: string
+) {
+  return useQuery({
+    queryKey: streetFoodKeys.ordersByCode(tenantId ?? '', outletId ?? '', code),
+    queryFn: () => findOrdersByCodeApi(outletId ?? '', code),
+    enabled: !!tenantId && !!outletId && /^\d{4}$/.test(code),
+    refetchInterval: 15_000,
+  })
+}
+
+/** Marks a ready order as one the customer never came for. */
+export function useNoShowMutation(
+  tenantId: string | undefined,
+  messages: Messages
+) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      outletId,
+      orderId,
+    }: {
+      outletId: string
+      orderId: string
+    }) => noShowApi(outletId, orderId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: [...streetFoodKeys.all, 'orders', tenantId ?? ''],
+      })
+      if (messages.saved) toast.success(messages.saved)
+    },
+    onError: (error: Error) =>
+      toast.error(messages.failed, { description: error.message }),
+  })
+}
+
+function useRefreshOrders(tenantId: string | undefined) {
+  const queryClient = useQueryClient()
+  return () =>
+    queryClient.invalidateQueries({
+      queryKey: [...streetFoodKeys.all, 'orders', tenantId ?? ''],
+    })
+}
+
+/**
+ * One tap on a thumb. It shows at once and is put back if the POS refuses, so a busy vendor
+ * never waits on it and never has to tap twice.
+ */
+export function useRateMutation(
+  tenantId: string | undefined,
+  messages: Messages
+) {
+  const refresh = useRefreshOrders(tenantId)
+  return useMutation({
+    mutationFn: (v: {
+      outletId: string
+      orderId: string
+      rating: 'UP' | 'DOWN'
+    }) => rateOrderApi(v.outletId, v.orderId, v.rating),
+    onSettled: () => void refresh(),
+    onError: (error: Error) =>
+      toast.error(messages.failed, { description: error.message }),
+  })
+}
+
+/** "Do not serve this customer again". */
+export function useBlockMutation(
+  tenantId: string | undefined,
+  messages: Messages
+) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (v: { outletId: string; orderId: string }) =>
+      blockCustomerApi(v.outletId, v.orderId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: streetFoodKeys.blocks(tenantId ?? ''),
+      })
+      if (messages.saved) toast.success(messages.saved)
+    },
+    onError: (error: Error) =>
+      toast.error(messages.failed, { description: error.message }),
+  })
+}
+
+export function useBlocksQuery(tenantId: string | undefined, enabled: boolean) {
+  return useQuery({
+    queryKey: streetFoodKeys.blocks(tenantId ?? ''),
+    queryFn: listBlocksApi,
+    enabled: !!tenantId && enabled,
+  })
+}
+
+export function useUnblockMutation(
+  tenantId: string | undefined,
+  messages: Messages
+) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => unblockApi(id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: streetFoodKeys.blocks(tenantId ?? ''),
+      })
+      if (messages.saved) toast.success(messages.saved)
+    },
+    onError: (error: Error) =>
+      toast.error(messages.failed, { description: error.message }),
   })
 }

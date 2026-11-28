@@ -11,6 +11,7 @@ import { AppHeader } from '@/components/layout/app-header'
 import { Main } from '@/components/layout/main'
 import { PageHeader } from '@/components/layout/page-header'
 import { useAuth, useHasAnyRole } from '@/features/auth/hooks/use-auth'
+import { BlockedCustomers } from './components/blocked-customers'
 import { ConnectCard } from './components/connect-card'
 import { ConnectionStatus } from './components/connection-status'
 import {
@@ -227,6 +228,8 @@ function Workspace({ admin }: { admin: boolean }) {
               </ul>
             )}
           </section>
+
+          <BlockedCustomers tenantId={tenantId} canEdit={admin} />
 
           {showFees && (
             <FeesCard

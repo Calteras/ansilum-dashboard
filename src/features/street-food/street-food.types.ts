@@ -4,6 +4,12 @@ export type OnlineStatus = 'AUTO' | 'OPEN' | 'PAUSED' | 'CLOSED'
 export type LocationMode = 'FIXED' | 'MOBILE'
 export type LocationSharing = 'LIVE' | 'SPOT' | 'HIDDEN'
 
+/** What the platform says about a customer: a label, never a score. */
+export type TrustLabel = 'NEW' | 'RELIABLE' | 'CAUTION' | 'PREPAY_REQUIRED'
+
+/** Where an outlet's own policy starts to apply: from this label upward. */
+export type PolicyLevel = 'NONE' | 'CAUTION' | 'PREPAY_REQUIRED'
+
 /** 0 = Sunday … 6 = Saturday, times "HH:MM" in the outlet's timezone. */
 export interface HoursInterval {
   dayOfWeek: number
@@ -49,6 +55,10 @@ export interface StreetFoodOutlet {
   acceptingOrders: boolean
   /** A mobile vendor has opened its working day. */
   dayOpen: boolean
+  /** Customers labelled this or worse must pay in the app (pay-at-pickup orders). */
+  prepayFrom: PolicyLevel
+  /** Customers labelled this or worse are refused. */
+  refuseFrom: PolicyLevel
   lastCheckedAt: string | null
 }
 
@@ -93,6 +103,8 @@ export interface OutletSettingsInput {
   prepTimeMinutes?: number
   locationMode?: LocationMode
   locationSharing?: LocationSharing
+  prepayFrom?: PolicyLevel
+  refuseFrom?: PolicyLevel
 }
 
 export type OrderView = 'waiting' | 'active' | 'done'
@@ -118,5 +130,32 @@ export interface StreetOrder {
   itemCount: number
   paymentMode: 'PREPAID' | 'PAY_AT_PICKUP'
   acceptBy: string
+  createdAt: string
+  /** Four digits the customer shows to find the order. */
+  pickupCode: string | null
+  readyAt: string | null
+  /** A ready order can be called a no-show from this moment. */
+  noShowAvailableAt: string | null
+  reasonCode: string | null
+  /** What the platform said about the customer when the order came. */
+  customerTrust: CustomerTrust | null
+  /** The vendor's thumb for this customer, if any. */
+  rating: 'UP' | 'DOWN' | null
+  /** A thumb can be tapped now. */
+  canRate: boolean
+  /** The thumb is the vendor's earlier action (a no-show), not a tap. */
+  ratingCounted: boolean
+}
+
+export interface CustomerTrust {
+  label: TrustLabel
+  completedOrders: number
+  noShowsLast90Days: number
+}
+
+/** A customer this business will not serve again. */
+export interface BlockedCustomer {
+  id: string
+  customerName: string
   createdAt: string
 }
