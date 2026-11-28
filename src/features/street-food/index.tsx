@@ -19,6 +19,7 @@ import {
 } from './components/credentials-dialog'
 import { FeesCard } from './components/fees-card'
 import { HoursDialog } from './components/hours-dialog'
+import { OrdersPanel } from './components/orders-panel'
 import { OutletCard } from './components/outlet-card'
 import { SetupSteps } from './components/setup-steps'
 import {
@@ -101,6 +102,10 @@ function Workspace({ admin }: { admin: boolean }) {
   const busyOutlet = (outletId: string) =>
     (publication.isPending && publication.variables?.outletId === outletId) ||
     (settings.isPending && settings.variables?.outletId === outletId)
+
+  // The orders panel needs a linked business with at least one outlet.
+  const showOrders =
+    admin && !!data && state !== 'not_connected' && data.outlets.length > 0
 
   const content = !admin ? (
     <Alert>
@@ -246,7 +251,18 @@ function Workspace({ admin }: { admin: boolean }) {
             'Show your outlets to StreetFood customers, take their orders, and control their status.'
           )}
         />
-        <div className='max-w-3xl space-y-6'>{content}</div>
+        <div
+          className={
+            showOrders
+              ? 'grid items-start gap-6 xl:grid-cols-[minmax(0,48rem)_minmax(22rem,1fr)]'
+              : undefined
+          }
+        >
+          <div className='max-w-3xl min-w-0 space-y-6'>{content}</div>
+          {showOrders && data && (
+            <OrdersPanel tenantId={tenantId} outlets={data.outlets} />
+          )}
+        </div>
       </Main>
 
       <CredentialsDialog

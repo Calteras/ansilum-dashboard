@@ -20,6 +20,8 @@ export interface TransactionSummary {
   totalTax: number
   netSales: number
   paymentBreakdown: Record<string, number>
+  /** Collected total by where the sale came from: POS, STREETFOOD. */
+  channelBreakdown?: Record<string, number>
 }
 
 export interface TransactionSummaryResponse {

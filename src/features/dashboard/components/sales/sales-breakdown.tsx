@@ -46,6 +46,13 @@ export function SalesBreakdown({
       ]
     : []
 
+  // Only worth a section once sales come from more than the register.
+  const channels = Object.entries(summary?.channelBreakdown ?? {})
+  const channelLabel: Record<string, string> = {
+    POS: copy('Kasir (POS)', 'Register (POS)'),
+    STREETFOOD: 'StreetFood',
+  }
+
   return (
     <section
       aria-labelledby='sales-breakdown-title'
@@ -92,6 +99,31 @@ export function SalesBreakdown({
             </div>
           ))}
         </dl>
+      )}
+      {!isLoading && channels.length > 1 && (
+        <div
+          className={cn(
+            'border-divider border-t pt-3 transition-opacity',
+            isStale && 'opacity-50'
+          )}
+        >
+          <h4 className='text-fg-muted pb-1 text-xs font-medium'>
+            {copy('Saluran penjualan', 'Sales channels')}
+          </h4>
+          <dl className='flex flex-col text-[13px] tabular-nums'>
+            {channels.map(([source, amount]) => (
+              <div
+                key={source}
+                className='flex items-baseline justify-between gap-4 py-1.5'
+              >
+                <dt className='text-fg-secondary'>
+                  {channelLabel[source] ?? source}
+                </dt>
+                <dd>{formatMoney(amount)}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
       )}
     </section>
   )

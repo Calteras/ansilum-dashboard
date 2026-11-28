@@ -94,3 +94,29 @@ export interface OutletSettingsInput {
   locationMode?: LocationMode
   locationSharing?: LocationSharing
 }
+
+export type OrderView = 'waiting' | 'active' | 'done'
+
+export type OrderStatus =
+  | 'PENDING_ACCEPTANCE'
+  | 'ACCEPTED'
+  | 'PREPARING'
+  | 'READY'
+  | 'COMPLETED'
+  | 'REJECTED'
+  | 'CANCELLED'
+  | 'EXPIRED'
+
+/** One row of an outlet's StreetFood orders (ansilum-be `GET /streetfood-orders`). */
+export interface StreetOrder {
+  id: string
+  platformOrderId: string
+  status: OrderStatus
+  fulfillment: { type: 'PICKUP' | 'DINE_IN'; label: string | null }
+  customerName: string
+  totalMinor: number
+  itemCount: number
+  paymentMode: 'PREPAID' | 'PAY_AT_PICKUP'
+  acceptBy: string
+  createdAt: string
+}

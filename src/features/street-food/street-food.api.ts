@@ -10,7 +10,9 @@ import type {
   NewLink,
   OutletSettingsInput,
   RotatedSecret,
+  OrderView,
   StreetFoodOverview,
+  StreetOrder,
 } from './street-food.types'
 
 const BASE = '/integrations/streetfood'
@@ -39,10 +41,7 @@ export async function connectApi(platformUrl: string) {
  */
 export async function reconnectApi() {
   return (
-    await tenantPost<Envelope<{ connected: boolean }>>(
-      `${BASE}/connect`,
-      {}
-    )
+    await tenantPost<Envelope<{ connected: boolean }>>(`${BASE}/connect`, {})
   ).data
 }
 
@@ -73,4 +72,14 @@ export function saveHoursApi(outletId: string, intervals: HoursInterval[]) {
 
 export async function getFeesApi() {
   return (await tenantGet<Envelope<Fees>>(`${BASE}/fees`)).data
+}
+
+/** An outlet's orders: waiting for the vendor, in progress, or finished in the last day. */
+export async function listOrdersApi(outletId: string, view: OrderView) {
+  const params = new URLSearchParams({ outletId, view })
+  return (
+    await tenantGet<Envelope<{ orders: StreetOrder[] }>>(
+      `/streetfood-orders?${params}`
+    )
+  ).data.orders
 }

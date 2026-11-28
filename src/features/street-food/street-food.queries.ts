@@ -5,6 +5,7 @@ import {
   disconnectApi,
   getFeesApi,
   getOverviewApi,
+  listOrdersApi,
   reconnectApi,
   rotateSecretApi,
   saveHoursApi,
@@ -14,6 +15,7 @@ import {
 import { connectionState, refreshInterval } from './street-food.logic'
 import type {
   HoursInterval,
+  OrderView,
   OutletSettingsInput,
   StreetFoodOverview,
 } from './street-food.types'
@@ -24,6 +26,8 @@ const streetFoodKeys = {
     [...streetFoodKeys.all, 'overview', tenantId] as const,
   fees: (tenantId: string) =>
     [...streetFoodKeys.all, 'fees', tenantId] as const,
+  orders: (tenantId: string, outletId: string, view: OrderView) =>
+    [...streetFoodKeys.all, 'orders', tenantId, outletId, view] as const,
 }
 
 /**
@@ -202,5 +206,19 @@ export function useHoursMutation(
     },
     onError: (error: Error) =>
       toast.error(messages.failed, { description: error.message }),
+  })
+}
+
+/** An outlet's StreetFood orders, looked at again every 15 seconds while the panel is open. */
+export function useOrdersQuery(
+  tenantId: string | undefined,
+  outletId: string | undefined,
+  view: OrderView
+) {
+  return useQuery({
+    queryKey: streetFoodKeys.orders(tenantId ?? '', outletId ?? '', view),
+    queryFn: () => listOrdersApi(outletId ?? '', view),
+    enabled: !!tenantId && !!outletId,
+    refetchInterval: 15_000,
   })
 }
