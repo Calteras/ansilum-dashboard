@@ -33,11 +33,14 @@ export async function connectApi(platformUrl: string) {
     .data
 }
 
-/** Registers the existing link at the platform again, without a new secret. Safe to repeat. */
+/**
+ * Registers the existing link at the platform again, without a new secret. Safe to repeat.
+ * The server falls back to its default platform, so no address is needed.
+ */
 export async function reconnectApi() {
   return (
     await tenantPost<Envelope<{ connected: boolean }>>(
-      `${BASE}/link/connect`,
+      `${BASE}/connect`,
       {}
     )
   ).data
